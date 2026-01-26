@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冷氣清洗紀錄系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <nav class="bg-indigo-600 text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">冷氣清洗紀錄系統</h1>
+            <div class="space-x-2">
+                <button onclick="showPage('formPage')" class="px-4 py-2 hover:bg-indigo-700 rounded-md transition font-medium">填寫資料</button>
+                <button onclick="showPage('listPage')" class="px-4 py-2 hover:bg-indigo-700 rounded-md transition font-medium">紀錄清單</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-6">
+        
+        <section id="formPage" class="max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">📝 新增清洗紀錄</h2>
+            <form id="recordForm" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600">預約日期時間</label>
+                        <input type="datetime-local" id="bookingTime" required class="mt-1 block w-full border-gray-300 rounded-lg p-2.5 border outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600">客戶姓名</label>
+                        <input type="text" id="customerName" required class="mt-1 block w-full border-gray-300 rounded-lg p-2.5 border outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600">施工地址 (選填)</label>
+                    <input type="text" id="address" placeholder="選填項目" class="mt-1 block w-full border-gray-300 rounded-lg p-2.5 border outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600">連絡電話</label>
+                    <input type="tel" id="phone" required class="mt-1 block w-full border-gray-300 rounded-lg p-2.5 border outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg">
+                    <div><label class="block text-xs font-bold text-gray-500">冷氣數量</label><input type="number" id="acCount" value="0" min="0" oninput="toggleAcBrand()" class="w-full border-gray-300 rounded p-2 border"></div>
+                    <div><label class="block text-xs font-bold text-gray-500">洗衣機數量</label><input type="number" id="wmCount" value="0" min="0" class="w-full border-gray-300 rounded p-2 border"></div>
+                    <div><label class="block text-xs font-bold text-gray-500">水塔數量</label><input type="number" id="wtCount" value="0" min="0" class="w-full border-gray-300 rounded p-2 border"></div>
+                </div>
+
+                <div id="acBrandSection" class="hidden">
+                    <label class="block text-sm font-bold text-indigo-600">❄️ 冷氣品牌備註</label>
+                    <input type="text" id="acBrand" placeholder="例如：大金、日立" class="mt-1 block w-full border-indigo-300 rounded-lg p-2.5 border bg-indigo-50">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">
+                    <div><label class="block text-sm font-semibold text-gray-600">總收費</label><input type="number" id="totalAmount" required placeholder="輸入收費金額" class="w-full border-gray-300 rounded-lg p-2.5 border text-green-600 font-bold"></div>
+                    <div><label class="block text-sm font-semibold text-gray-600">小幫手支出</label><input type="number" id="assistantPay" placeholder="點擊即可輸入" class="w-full border-gray-300 rounded-lg p-2.5 border text-red-500"></div>
+                </div>
+
+                <div><label class="block text-sm font-semibold text-gray-600">備註</label><textarea id="note" rows="2" placeholder="其他細節描述" class="w-full border-gray-300 rounded-lg p-2.5 border outline-none focus:ring-2 focus:ring-indigo-500"></textarea></div>
+
+                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 shadow-md transition transform active:scale-95">確認儲存紀錄</button>
+            </form>
+        </section>
+
+        <section id="listPage" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-green-500">
+                    <h3 class="text-gray-500 text-xs font-bold uppercase">本月統計</h3>
+                    <div class="mt-2 space-y-1 text-sm">
+                        <div class="flex justify-between"><span>總營收:</span><span class="font-bold text-gray-800" id="mRev">$0</span></div>
+                        <div class="flex justify-between"><span>小幫手:</span><span class="font-bold text-red-500" id="mExp">$0</span></div>
+                        <div class="flex justify-between border-t pt-1 font-bold text-indigo-600"><span>淨實收:</span><span id="mNet">$0</span></div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-indigo-500 lg:col-span-2">
+                    <h3 class="text-gray-500 text-xs font-bold uppercase" id="yearTitle">2026 年度統計</h3>
+                    <div class="grid grid-cols-3 gap-4 mt-2">
+                        <div><p class="text-xs text-gray-400">總營收</p><p class="text-lg font-bold text-gray-800" id="yRev">$0</p></div>
+                        <div><p class="text-xs text-gray-400">總支出</p><p class="text-lg font-bold text-red-500" id="yExp">$0</p></div>
+                        <div><p class="text-xs text-gray-400 font-bold text-indigo-600">淨利</p><p class="text-lg font-bold text-indigo-600" id="yNet">$0</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-wrap gap-4 items-end">
+                <div class="flex-1 min-w-[200px]"><label class="text-xs font-bold text-gray-600">搜尋關鍵字</label><input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="姓名/地址/品牌/備註" class="w-full border rounded p-2 outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></div>
+                <div class="w-40"><label class="text-xs font-bold text-gray-600">月份</label><input type="month" id="monthFilter" onchange="filterRecords()" class="w-full border rounded p-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"></div>
+                <div class="w-32"><label class="text-xs font-bold text-gray-600">項目</label><select id="typeFilter" onchange="filterRecords()" class="w-full border rounded p-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"><option value="all">全部</option><option value="ac">冷氣</option><option value="wm">洗衣機</option><option value="wt">水塔</option></select></div>
+                <button onclick="exportToCSV()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium">匯出 Excel</button>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+                        <thead class="bg-gray-50 text-gray-500 font-bold uppercase">
+                            <tr>
+                                <th class="px-6 py-4">預約時間</th>
+                                <th class="px-6 py-4">客戶資料</th>
+                                <th class="px-6 py-4">施工地址</th>
+                                <th class="px-6 py-4">項目明細</th>
+                                <th class="px-6 py-4 text-right">營收明細</th>
+                                <th class="px-6 py-4 text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordList" class="divide-y divide-gray-200 text-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTyt_nIV1h_MFRhQoT9PHFMXhus1jQVL4",
+            authDomain: "ac-records-b8c40.firebaseapp.com",
+            projectId: "ac-records-b8c40",
+            storageBucket: "ac-records-b8c40.firebasestorage.app",
+            messagingSenderId: "471993362594",
+            appId: "1:471993362594:web:1be7e72af1021760c64ffb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const recordsCol = collection(db, "cleaningRecords");
+        let allRecords = [];
+        let currentFiltered = [];
+
+        window.showPage = (id) => {
+            document.getElementById('formPage').classList.toggle('hidden', id !== 'formPage');
+            document.getElementById('listPage').classList.toggle('hidden', id !== 'listPage');
+        };
+
+        window.toggleAcBrand = () => {
+            document.getElementById('acBrandSection').classList.toggle('hidden', document.getElementById('acCount').value <= 0);
+        };
+
+        document.getElementById('recordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const record = {
+                bookingTime: document.getElementById('bookingTime').value,
+                customerName: document.getElementById('customerName').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value || '未填寫',
+                acCount: parseInt(document.getElementById('acCount').value) || 0,
+                acBrand: document.getElementById('acBrand').value || '',
+                wmCount: parseInt(document.getElementById('wmCount').value) || 0,
+                wtCount: parseInt(document.getElementById('wtCount').value) || 0,
+                totalAmount: parseInt(document.getElementById('totalAmount').value) || 0,
+                assistantPay: parseInt(document.getElementById('assistantPay').value) || 0,
+                note: document.getElementById('note').value || ''
+            };
+            try {
+                await addDoc(recordsCol, record);
+                alert('✅ 紀錄成功！');
+                e.target.reset(); 
+                toggleAcBrand(); 
+                showPage('listPage');
+            } catch (err) { alert('儲存失敗'); }
+        });
+
+        onSnapshot(query(recordsCol, orderBy("bookingTime", "desc")), (snap) => {
+            allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            filterRecords();
+        });
+
+        window.filterRecords = () => {
+            const kw = document.getElementById('searchKeyword').value.toLowerCase();
+            const mon = document.getElementById('monthFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            let mRev = 0, mExp = 0, yRev = 0, yExp = 0;
+
+            currentFiltered = allRecords.filter(i => {
+                const iY = i.bookingTime.split('-')[0];
+                const iM = i.bookingTime.substring(0, 7);
+                if (iY === "2026") { yRev += i.totalAmount; yExp += i.assistantPay; }
+                if (mon && iM === mon) { mRev += i.totalAmount; mExp += i.assistantPay; }
+                const matchType = type==='all' || (type==='ac'&&i.acCount>0) || (type==='wm'&&i.wmCount>0) || (type==='wt'&&i.wtCount>0);
+                const searchStr = `${i.customerName} ${i.phone} ${i.address} ${i.acBrand} ${i.note}`.toLowerCase();
+                return searchStr.includes(kw) && (mon ? iM === mon : true) && matchType;
+            });
+
+            document.getElementById('mRev').innerText = `$${mRev.toLocaleString()}`;
+            document.getElementById('mExp').innerText = `$${mExp.toLocaleString()}`;
+            document.getElementById('mNet').innerText = `$${(mRev - mExp).toLocaleString()}`;
+            document.getElementById('yRev').innerText = `$${yRev.toLocaleString()}`;
+            document.getElementById('yExp').innerText = `$${yExp.toLocaleString()}`;
+            document.getElementById('yNet').innerText = `$${(yRev - yExp).toLocaleString()}`;
+            renderRecords(currentFiltered);
+        };
+
+        function renderRecords(data) {
+            const list = document.getElementById('recordList');
+            list.innerHTML = data.map(i => {
+                let detail = [];
+                if(i.acCount > 0) {
+                    let brandPart = i.acBrand ? `<br><span class="text-[10px] font-bold text-blue-800">品牌: ${i.acBrand}</span>` : "";
+                    detail.push(`<div class="bg-blue-50 text-blue-700 px-2 py-1 rounded my-1">冷氣: ${i.acCount} 台${brandPart}</div>`);
+                }
+                if(i.wmCount > 0) detail.push(`<div class="bg-green-50 text-green-700 px-2 py-1 rounded my-1">洗衣機: ${i.wmCount} 台</div>`);
+                if(i.wtCount > 0) detail.push(`<div class="bg-cyan-50 text-cyan-700 px-2 py-1 rounded my-1">水塔: ${i.wtCount} 口</div>`);
+
+                let notePart = i.note ? `<div class="mt-2 p-1.5 bg-gray-50 border-l-2 border-gray-300 text-[11px] text-gray-500 italic">備註: ${i.note}</div>` : "";
+                let net = i.totalAmount - i.assistantPay;
+
+                return `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-medium whitespace-nowrap">${i.bookingTime.replace('T',' ')}</td>
+                    <td class="px-6 py-4"><b>${i.customerName}</b><br><span class="text-xs text-gray-500">${i.phone}</span></td>
+                    <td class="px-6 py-4 text-xs max-w-[180px] leading-relaxed text-gray-500">${i.address}</td>
+                    <td class="px-6 py-4 text-xs">${detail.join('')}${notePart}</td>
+                    <td class="px-6 py-4 text-right font-medium whitespace-nowrap">
+                        <div class="text-gray-400 text-xs">收: $${i.totalAmount.toLocaleString()}</div>
+                        <div class="text-red-300 text-xs">支: $${i.assistantPay.toLocaleString()}</div>
+                        <div class="mt-1 bg-green-50 text-green-700 font-bold px-2 py-1 rounded inline-block">淨: $${net.toLocaleString()}</div>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="deleteRec('${i.id}')" class="text-red-300 hover:text-red-600 transition p-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        window.deleteRec = async (id) => { if(confirm('確定要刪除嗎？')) await deleteDoc(doc(db, "cleaningRecords", id)); };
+
+        window.exportToCSV = () => {
+            let csv = "\uFEFF預約時間,客戶,電話,地址,冷氣,品牌,洗衣機,水塔,總收費,小幫手支出,淨收入,備註\n";
+            currentFiltered.forEach(i => {
+                csv += `${i.bookingTime},${i.customerName},${i.phone},${i.address.replace(/,/g,' ')},${i.acCount},${i.acBrand},${i.wmCount},${i.wtCount},${i.totalAmount},${i.assistantPay},${i.totalAmount - i.assistantPay},${i.note.replace(/\n/g,' ').replace(/,/g,' ')}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `清洗紀錄報表_${new Date().toLocaleDateString()}.csv`;
+            link.click();
+        };
+    </script>
+</body>
+</html>
