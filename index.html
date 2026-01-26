@@ -59,7 +59,7 @@
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-lg font-bold tracking-widest">冷氣清洗紀錄系統</h1>
             <div class="flex space-x-2">
-                <button onclick="showPage('formPage')" class="px-5 py-2 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-sm font-medium active:scale-95">填寫</button>
+                <button onclick="prepareNewForm()" class="px-5 py-2 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-sm font-medium active:scale-95">填寫</button>
                 <button onclick="showPage('listPage')" class="px-5 py-2 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-sm font-medium active:scale-95">清單</button>
             </div>
         </div>
@@ -229,6 +229,7 @@
         const db = getFirestore(app);
         const recordsCol = collection(db, "cleaningRecords");
         let allRecords = [];
+        let editingId = null; // 記錄目前是否在修改狀態
 
         document.getElementById('monthFilter').value = new Date().toISOString().substring(0, 7);
 
@@ -237,15 +238,21 @@
             document.getElementById('listPage').classList.toggle('hidden', id !== 'listPage');
         };
 
+        // 點擊導覽列「填寫」時，重設表單與修改狀態
+        window.prepareNewForm = () => {
+            editingId = null;
+            document.getElementById('recordForm').reset();
+            toggleAcBrand();
+            showPage('formPage');
+        };
+
         window.toggleAcBrand = () => {
             document.getElementById('acBrandSection').classList.toggle('hidden', document.getElementById('acCount').value <= 0);
         };
 
-        // 月份切換按鈕修正
         window.changeMonth = (offset) => {
             const input = document.getElementById('monthFilter');
             let [year, month] = input.value.split('-').map(Number);
-            // JavaScript Date 物件月份從 0 開始，故 month 需要 -1
             let currentDate = new Date(year, month - 1);
             currentDate.setMonth(currentDate.getMonth() + offset);
             
@@ -337,8 +344,16 @@
                 payment: 'unpaid'
             };
             try {
-                await addDoc(recordsCol, record);
-                alert('已儲存');
+                if (editingId) {
+                    // 若有 editingId，執行更新
+                    await updateDoc(doc(db, "cleaningRecords", editingId), record);
+                    alert('已更新成功');
+                    editingId = null; // 清除編輯狀態
+                } else {
+                    // 否則，執行新增
+                    await addDoc(recordsCol, record);
+                    alert('已儲存成功');
+                }
                 e.target.reset(); 
                 toggleAcBrand();
                 showPage('listPage');
@@ -487,6 +502,7 @@
         window.editRec = (id) => {
             const r = allRecords.find(x => x.id === id);
             if(!r) return;
+            editingId = id; // 設置目前正在編輯的 ID
             document.getElementById('bookingTime').value = r.bookingTime;
             document.getElementById('customerName').value = r.customerName;
             document.getElementById('phone').value = r.phone || "";
