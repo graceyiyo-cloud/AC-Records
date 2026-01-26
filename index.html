@@ -11,7 +11,7 @@
         }
         .hidden { display: none; }
         /* 已完成狀態的樣式 */
-        .completed-row { background-color: #f0fdf4 !important; border-left: 4px solid #22c55e !important; }
+        .completed-row { background-color: #f8fafc !important; border-left: 4px solid #64748b !important; opacity: 0.8; }
         
         @media (max-width: 768px) {
             thead { display: none; }
@@ -22,7 +22,7 @@
                 background: white;
                 padding: 1rem;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                border: 1px solid #edf2f7;
+                border: 1px solid #e2e8f0;
             }
             td { 
                 display: block; 
@@ -30,23 +30,23 @@
                 padding: 0.2rem 0 !important;
                 border: none !important;
                 text-align: left;
-                color: #374151;
+                color: #475569;
             }
             
             td[data-label="預約時間"]::before { content: "預約時間："; font-weight: 700; }
             td[data-label="服務明細"]::before { content: "服務明細："; font-weight: 700; }
             
             td[data-label="客戶"]::before { content: ""; }
-            td[data-label="客戶"] { font-weight: 700; font-size: 1.15rem; color: #111827; }
+            td[data-label="客戶"] { font-weight: 700; font-size: 1.15rem; color: #1e293b; }
             
             td[data-label="聯絡資訊"]::before { content: ""; }
-            td[data-label="聯絡資訊"] { font-size: 0.85rem; color: #6b7280; margin-bottom: 4px; }
+            td[data-label="聯絡資訊"] { font-size: 0.85rem; color: #64748b; margin-bottom: 4px; }
             
             td[data-label="金額帳目"]::before { content: ""; }
-            td[data-label="金額帳目"] { padding-top: 8px !important; border-top: 1px dashed #f3f4f6 !important; margin-top: 4px; color: #374151; }
+            td[data-label="金額帳目"] { padding-top: 8px !important; border-top: 1px dashed #e2e8f0 !important; margin-top: 4px; color: #475569; }
 
             td.action-cell {
-                border-top: 1px solid #f9fafb !important;
+                border-top: 1px solid #f1f5f9 !important;
                 margin-top: 0.8rem;
                 padding-top: 0.8rem !important;
                 display: flex;
@@ -58,131 +58,131 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen text-gray-800">
+<body class="bg-[#fdfbf7] min-h-screen text-slate-700">
 
-    <nav class="bg-indigo-600 text-white p-4 shadow-lg sticky top-0 z-50">
+    <nav class="bg-slate-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-lg font-bold">冷氣清洗紀錄系統</h1>
+            <h1 class="text-lg font-bold tracking-wider">冷氣清洗紀錄系統</h1>
             <div class="flex space-x-3">
-                <button onclick="showPage('formPage')" class="px-6 py-2 bg-indigo-500 hover:bg-indigo-700 border border-indigo-300 rounded-lg shadow-sm transition-all text-sm font-bold active:scale-95">填寫</button>
-                <button onclick="showPage('listPage')" class="px-6 py-2 bg-indigo-500 hover:bg-indigo-700 border border-indigo-300 rounded-lg shadow-sm transition-all text-sm font-bold active:scale-95">清單</button>
+                <button onclick="showPage('formPage')" class="px-6 py-2 bg-slate-500 hover:bg-slate-400 border border-slate-400 rounded-lg shadow-sm transition-all text-sm font-bold active:scale-95">填寫</button>
+                <button onclick="showPage('listPage')" class="px-6 py-2 bg-slate-500 hover:bg-slate-400 border border-slate-400 rounded-lg shadow-sm transition-all text-sm font-bold active:scale-95">清單</button>
             </div>
         </div>
     </nav>
 
     <div class="container mx-auto px-3 md:px-4 py-6">
         
-        <section id="formPage" class="max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">📝 新增紀錄</h2>
+        <section id="formPage" class="max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
+            <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">📝 新增紀錄</h2>
             <form id="recordForm" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600">預約日期時間</label>
-                        <input type="datetime-local" id="bookingTime" required class="mt-1 block w-full border-gray-300 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <label class="block text-sm font-semibold text-slate-500">預約日期時間</label>
+                        <input type="datetime-local" id="bookingTime" required class="mt-1 block w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600">客戶姓名</label>
-                        <input type="text" id="customerName" required class="mt-1 block w-full border-gray-300 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <label class="block text-sm font-semibold text-slate-500">客戶姓名</label>
+                        <input type="text" id="customerName" required class="mt-1 block w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600">連絡電話</label>
-                        <input type="tel" id="phone" required class="mt-1 block w-full border-gray-300 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <label class="block text-sm font-semibold text-slate-500">連絡電話</label>
+                        <input type="tel" id="phone" required class="mt-1 block w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600">施工地址</label>
-                        <input type="text" id="address" placeholder="選填項目" class="mt-1 block w-full border-gray-300 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <label class="block text-sm font-semibold text-slate-500">施工地址</label>
+                        <input type="text" id="address" placeholder="選填項目" class="mt-1 block w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-3 bg-gray-50 p-4 rounded-xl">
+                <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase">冷氣</label>
-                        <input type="number" id="acCount" value="0" min="0" onfocus="this.select()" oninput="toggleAcBrand()" class="w-full rounded-lg p-2 border border-gray-200 text-sm font-bold">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">冷氣</label>
+                        <input type="number" id="acCount" value="0" min="0" onfocus="this.select()" oninput="toggleAcBrand()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase">洗衣機</label>
-                        <input type="number" id="wmCount" value="0" min="0" onfocus="this.select()" class="w-full rounded-lg p-2 border border-gray-200 text-sm font-bold">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">洗衣機</label>
+                        <input type="number" id="wmCount" value="0" min="0" onfocus="this.select()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase">水塔</label>
-                        <input type="number" id="wtCount" value="0" min="0" onfocus="this.select()" class="w-full rounded-lg p-2 border border-gray-200 text-sm font-bold">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">水塔</label>
+                        <input type="number" id="wtCount" value="0" min="0" onfocus="this.select()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
                     </div>
                 </div>
 
                 <div id="acBrandSection" class="hidden">
-                    <label class="block text-sm font-bold text-indigo-600">❄️ 冷氣品牌備註</label>
-                    <input type="text" id="acBrand" placeholder="例如：大金*2、華菱*1" class="mt-1 block w-full border-indigo-200 rounded-xl p-3 border bg-indigo-50 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <label class="block text-sm font-bold text-emerald-700">❄️ 冷氣品牌備註</label>
+                    <input type="text" id="acBrand" placeholder="例如：大金*2、華菱*1" class="mt-1 block w-full border-emerald-100 rounded-xl p-3 border bg-emerald-50/50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
-                    <div><label class="block text-sm font-semibold text-gray-600">總收費</label><input type="number" id="totalAmount" required placeholder="請輸入金額" onfocus="this.select()" class="w-full border-gray-300 rounded-xl p-3 border font-bold"></div>
-                    <div><label class="block text-sm font-semibold text-gray-600">小幫手支出</label><input type="number" id="assistantPay" placeholder="請輸入金額" onfocus="this.select()" class="w-full border-gray-300 rounded-xl p-3 border font-bold"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                    <div><label class="block text-sm font-semibold text-slate-500">總收費</label><input type="number" id="totalAmount" required placeholder="請輸入金額" onfocus="this.select()" class="w-full border-slate-200 rounded-xl p-3 border font-bold"></div>
+                    <div><label class="block text-sm font-semibold text-slate-500">小幫手支出</label><input type="number" id="assistantPay" placeholder="請輸入金額" onfocus="this.select()" class="w-full border-slate-200 rounded-xl p-3 border font-bold"></div>
                 </div>
 
-                <div><label class="block text-sm font-semibold text-gray-600">其他備註</label><textarea id="note" rows="2" class="w-full border-gray-300 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea></div>
+                <div><label class="block text-sm font-semibold text-slate-500">其他備註</label><textarea id="note" rows="2" class="w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea></div>
 
-                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg transition active:scale-95">確認儲存紀錄</button>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-md transition active:scale-95">確認儲存紀錄</button>
             </form>
         </section>
 
         <section id="listPage" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-left">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-green-500">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase">本月統計</h3>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500">
+                    <h3 class="text-slate-400 text-xs font-bold uppercase">本月統計</h3>
                     <div class="mt-2 space-y-1 text-sm">
-                        <div class="flex justify-between"><span>總營收:</span><span class="font-bold text-gray-800" id="mRev">$0</span></div>
-                        <div class="flex justify-between text-red-500"><span>小幫手:</span><span class="font-bold" id="mExp">$0</span></div>
-                        <div class="flex justify-between border-t pt-1 font-bold text-indigo-600"><span>淨實收:</span><span id="mNet">$0</span></div>
+                        <div class="flex justify-between"><span>總營收:</span><span class="font-bold text-slate-800" id="mRev">$0</span></div>
+                        <div class="flex justify-between text-rose-500/80"><span>小幫手:</span><span class="font-bold" id="mExp">$0</span></div>
+                        <div class="flex justify-between border-t border-slate-50 pt-1 font-bold text-emerald-700"><span>淨實收:</span><span id="mNet">$0</span></div>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-indigo-500 md:col-span-2">
-                    <h3 class="text-gray-400 text-xs font-bold uppercase" id="yearTitle">2026 年度統計</h3>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-slate-400 md:col-span-2">
+                    <h3 class="text-slate-400 text-xs font-bold uppercase" id="yearTitle">2026 年度統計</h3>
                     <div class="grid grid-cols-3 gap-2 mt-2">
-                        <div><p class="text-[10px] text-gray-400">總營收</p><p class="text-sm font-bold text-gray-800" id="yRev">$0</p></div>
-                        <div><p class="text-[10px] text-gray-400">支出</p><p class="text-sm font-bold text-red-500" id="yExp">$0</p></div>
-                        <div><p class="text-[10px] text-indigo-400 font-bold">淨利</p><p class="text-sm font-bold text-indigo-600" id="yNet">$0</p></div>
+                        <div><p class="text-[10px] text-slate-400">總營收</p><p class="text-sm font-bold text-slate-800" id="yRev">$0</p></div>
+                        <div><p class="text-[10px] text-slate-400">支出</p><p class="text-sm font-bold text-rose-500/80" id="yExp">$0</p></div>
+                        <div><p class="text-[10px] text-emerald-600 font-bold">淨利</p><p class="text-sm font-bold text-emerald-700" id="yNet">$0</p></div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white p-3 md:p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 space-y-3">
+            <div class="bg-white p-3 md:p-4 rounded-2xl shadow-sm border border-slate-100 mb-6 space-y-3">
                 <div class="flex flex-nowrap items-center gap-2">
                     <div class="flex-[3] min-w-0">
-                        <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名/地址/品牌" class="w-full bg-gray-50 border-none rounded-xl p-2.5 md:p-3 text-xs md:text-sm outline-none">
+                        <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名/地址/品牌" class="w-full bg-slate-50 border-none rounded-xl p-2.5 md:p-3 text-xs md:text-sm outline-none focus:ring-1 focus:ring-slate-200">
                     </div>
                     <div class="flex-[2] min-w-0">
-                        <input type="month" id="monthFilter" onchange="filterRecords()" class="w-full bg-gray-50 border-none rounded-xl p-2.5 md:p-3 text-xs md:text-sm outline-none">
+                        <input type="month" id="monthFilter" onchange="filterRecords()" class="w-full bg-slate-50 border-none rounded-xl p-2.5 md:p-3 text-xs md:text-sm outline-none focus:ring-1 focus:ring-slate-200">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
-                    <select id="typeFilter" onchange="filterRecords()" class="bg-gray-50 border-none rounded-xl p-2 md:p-2.5 text-[10px] md:text-xs outline-none">
+                    <select id="typeFilter" onchange="filterRecords()" class="bg-slate-50 border-none rounded-xl p-2 md:p-2.5 text-[10px] md:text-xs outline-none">
                         <option value="all">全部類別</option>
                         <option value="ac">冷氣</option>
                         <option value="wm">洗衣機</option>
                         <option value="wt">水塔</option>
                     </select>
-                    <select id="statusFilter" onchange="filterRecords()" class="bg-gray-50 border-none rounded-xl p-2 md:p-2.5 text-[10px] md:text-xs outline-none">
+                    <select id="statusFilter" onchange="filterRecords()" class="bg-slate-50 border-none rounded-xl p-2 md:p-2.5 text-[10px] md:text-xs outline-none">
                         <option value="all">全部進度</option>
                         <option value="completed">已完成</option>
                         <option value="pending">未完成</option>
                     </select>
-                    <select id="paymentFilter" onchange="filterRecords()" class="bg-gray-50 border-none rounded-xl p-2 md:p-2.5 text-[10px] md:text-xs outline-none">
+                    <select id="paymentFilter" onchange="filterRecords()" class="bg-slate-50 border-none rounded-xl p-2 md:p-2.5 text-[10px] md:text-xs outline-none">
                         <option value="all">全部款項</option>
                         <option value="paid">已收款</option>
                         <option value="unpaid">待收款</option>
                     </select>
                 </div>
                 <div class="flex justify-end">
-                    <button onclick="exportToCSV()" class="bg-green-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-xl text-[10px] md:text-xs font-bold transition active:scale-95">匯出報表</button>
+                    <button onclick="exportToCSV()" class="bg-slate-500 hover:bg-slate-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-xl text-[10px] md:text-xs font-bold transition active:scale-95">匯出報表</button>
                 </div>
             </div>
 
             <div class="overflow-hidden">
                 <table class="min-w-full text-sm">
-                    <thead class="bg-gray-100 text-gray-500 font-bold">
+                    <thead class="bg-slate-50 text-slate-500 font-bold">
                         <tr>
                             <th class="px-6 py-4 text-left">預約時間</th>
                             <th class="px-6 py-4 text-left">客戶</th>
@@ -192,7 +192,7 @@
                             <th class="px-6 py-4 text-center">操作</th>
                         </tr>
                     </thead>
-                    <tbody id="recordList" class="divide-y divide-gray-100"></tbody>
+                    <tbody id="recordList" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </section>
@@ -317,25 +317,25 @@
                 let statusClass = isComp ? 'completed-row' : '';
 
                 return `
-                <tr class="hover:bg-gray-50 transition ${statusClass}">
-                    <td data-label="預約時間" class="px-6 py-4 font-medium">${i.bookingTime.replace('T',' ')}</td>
-                    <td data-label="客戶" class="px-6 py-4 font-bold text-gray-900">${i.customerName}</td>
-                    <td data-label="聯絡資訊" class="px-6 py-4">${i.phone}<br>${i.address}</td>
-                    <td data-label="服務明細" class="px-6 py-4">${services.join('、') || '無項目'}</td>
-                    <td data-label="金額帳目" class="px-6 py-4">
+                <tr class="hover:bg-slate-50 transition ${statusClass}">
+                    <td data-label="預約時間" class="px-6 py-4 font-medium text-slate-600">${i.bookingTime.replace('T',' ')}</td>
+                    <td data-label="客戶" class="px-6 py-4 font-bold text-slate-900">${i.customerName}</td>
+                    <td data-label="聯絡資訊" class="px-6 py-4 text-slate-500">${i.phone}<br>${i.address}</td>
+                    <td data-label="服務明細" class="px-6 py-4 text-slate-600">${services.join('、') || '無項目'}</td>
+                    <td data-label="金額帳目" class="px-6 py-4 text-slate-600 font-medium">
                         收入 ${i.totalAmount.toLocaleString()} - 支出 ${i.assistantPay.toLocaleString()} = 淨入 ${net.toLocaleString()}
                     </td>
                     <td class="px-6 py-4 text-center action-cell">
-                        <button onclick="toggleDone('${i.id}', '${i.status}')" class="flex items-center gap-1 ${isComp ? 'text-gray-400 bg-gray-50 border-gray-200' : 'text-green-600 bg-green-50 border-green-100'} px-2 py-1.5 rounded-lg border text-[10px] md:text-xs font-bold">
-                            <span>✅</span><span>${isComp ? '已完成' : '未完成'}</span>
+                        <button onclick="toggleDone('${i.id}', '${i.status}')" class="flex items-center gap-1 ${isComp ? 'text-slate-400 bg-slate-50 border-slate-200' : 'text-emerald-700 bg-emerald-50 border-emerald-100'} px-2 py-1.5 rounded-lg border text-[10px] md:text-xs font-bold">
+                            <span>${isComp ? '✔️' : '⭕'}</span><span>${isComp ? '已完成' : '未完成'}</span>
                         </button>
-                        <button onclick="togglePayment('${i.id}', '${i.payment}')" class="flex items-center gap-1 ${isPaid ? 'text-gray-400 bg-gray-50 border-gray-200' : 'text-blue-600 bg-blue-50 border-blue-100'} px-2 py-1.5 rounded-lg border text-[10px] md:text-xs font-bold">
-                            <span>💰</span><span>${isPaid ? '已收款' : '待收款'}</span>
+                        <button onclick="togglePayment('${i.id}', '${i.payment}')" class="flex items-center gap-1 ${isPaid ? 'text-slate-400 bg-slate-50 border-slate-200' : 'text-amber-700 bg-amber-50 border-amber-100'} px-2 py-1.5 rounded-lg border text-[10px] md:text-xs font-bold">
+                            <span>${isPaid ? '💰' : '⏳'}</span><span>${isPaid ? '已收款' : '待收款'}</span>
                         </button>
-                        <button onclick="editRec('${i.id}')" class="flex items-center gap-1 text-indigo-600 bg-indigo-50 px-2 py-1.5 rounded-lg border border-indigo-100 text-[10px] md:text-xs font-bold">
+                        <button onclick="editRec('${i.id}')" class="flex items-center gap-1 text-slate-600 bg-slate-100 px-2 py-1.5 rounded-lg border border-slate-200 text-[10px] md:text-xs font-bold">
                             <span>✏️</span><span>修改</span>
                         </button>
-                        <button onclick="deleteRec('${i.id}')" class="flex items-center gap-1 text-red-400 bg-red-50 px-2 py-1.5 rounded-lg border border-red-100 text-[10px] md:text-xs font-bold">
+                        <button onclick="deleteRec('${i.id}')" class="flex items-center gap-1 text-rose-400 bg-rose-50 px-2 py-1.5 rounded-lg border border-rose-100 text-[10px] md:text-xs font-bold">
                             <span>🗑️</span><span>刪除</span>
                         </button>
                     </td>
