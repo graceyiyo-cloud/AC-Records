@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>冷氣清洗紀錄系統</title>
+    <title>冷氣清洗紀錄</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* 整體字體加大約 10% */
@@ -69,17 +69,17 @@
 
     <nav class="bg-slate-600 text-white py-2 px-4 shadow-md sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-lg font-bold tracking-widest">冷氣清洗紀錄系統</h1>
+            <h1 class="text-lg font-bold tracking-widest">冷氣清洗紀錄</h1>
             <div class="flex space-x-2">
-                <button onclick="prepareNewForm()" class="px-4 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap">填寫</button>
                 <button onclick="showPage('listPage')" class="px-4 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap">清單</button>
+                <button onclick="prepareNewForm()" class="px-4 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap">填寫</button>
             </div>
         </div>
     </nav>
 
     <div class="container mx-auto px-3 md:px-4 py-6">
         
-        <section id="formPage" class="max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
+        <section id="formPage" class="hidden max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">📝 新增紀錄</h2>
             <form id="recordForm" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -135,7 +135,7 @@
             </form>
         </section>
 
-        <section id="listPage" class="hidden">
+        <section id="listPage">
             <div class="flex flex-col gap-4 mb-6 max-w-4xl">
                 <div class="bg-slate-700 p-4 rounded-2xl shadow-sm border-l-4 border-slate-400 text-white max-w-md flex items-center">
                     <div class="flex flex-col text-[10px] font-bold uppercase tracking-widest text-slate-400 mr-4 border-r border-slate-600 pr-3 leading-tight">
@@ -381,7 +381,7 @@
             document.getElementById('allExp').innerText = `$${aExp.toLocaleString()}`;
             document.getElementById('allNet').innerText = `$${(aRev - aExp).toLocaleString()}`;
 
-            // 更新本月統計 (顯示方式已改為與年度一致)
+            // 更新本月統計
             document.getElementById('mRev').innerText = `$${mRev.toLocaleString()}`;
             document.getElementById('mExp').innerText = `$${mExp.toLocaleString()}`;
             document.getElementById('mNet').innerText = `$${(mRev - mExp).toLocaleString()}`;
