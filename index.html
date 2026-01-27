@@ -24,43 +24,51 @@
             line-height: 1.5;
         }
 
-        @media (max-width: 768px) {
-            thead { display: none; }
-            tr { 
-                display: block; 
-                margin-bottom: 1rem; 
-                border-radius: 12px;
-                background: white;
-                padding: 1rem;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-                border: 1px solid #e2e8f0;
-            }
-            td { 
-                display: block; 
-                width: 100%;
-                padding: 0.25rem 0 !important;
-                border: none !important;
-                text-align: left;
-                color: #475569;
-            }
-            td[data-label="預約時間"]::before { content: "時間："; font-weight: 700; color: #64748b; }
-            td[data-label="服務明細"]::before { content: "明細："; font-weight: 700; color: #64748b; }
-            td[data-label="客戶"] { font-weight: 700; font-size: 1.1rem; color: #1e293b; padding-bottom: 0.5rem !important; }
-            td[data-label="金額帳目"] { 
-                padding-top: 0.75rem !important; 
-                margin-top: 0.5rem;
-                border-top: 1px dashed #e2e8f0 !important; 
-                color: #475569; 
-                font-size: 0.85rem;
-            }
-            td.action-cell {
-                border-top: 1px solid #f1f5f9 !important;
-                margin-top: 0.75rem;
-                padding-top: 0.75rem !important;
-                display: flex;
-                justify-content: flex-end;
-                gap: 6px;
-                flex-wrap: wrap;
+        /* 全裝置統一使用卡片式佈局 */
+        thead { display: none; }
+        tr { 
+            display: block; 
+            margin-bottom: 1rem; 
+            border-radius: 12px;
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+        }
+        td { 
+            display: block; 
+            width: 100%;
+            padding: 0.25rem 0 !important;
+            border: none !important;
+            text-align: left;
+            color: #475569;
+        }
+        td[data-label="預約時間"]::before { content: "時間："; font-weight: 700; color: #64748b; }
+        td[data-label="服務明細"]::before { content: "明細："; font-weight: 700; color: #64748b; }
+        td[data-label="客戶"] { font-weight: 700; font-size: 1.1rem; color: #1e293b; padding-bottom: 0.5rem !important; }
+        td[data-label="金額帳目"] { 
+            padding-top: 0.75rem !important; 
+            margin-top: 0.5rem;
+            border-top: 1px dashed #e2e8f0 !important; 
+            color: #475569; 
+            font-size: 0.85rem;
+        }
+        td.action-cell {
+            border-top: 1px solid #f1f5f9 !important;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem !important;
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* 電腦版寬度調整為 1/2 */
+        @media (min-width: 1024px) {
+            .desktop-half-width {
+                max-width: 50% !important;
+                margin-left: auto;
+                margin-right: auto;
             }
         }
     </style>
@@ -92,7 +100,6 @@
                         <input type="text" id="customerName" required class="block w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all">
                     </div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">連絡電話</label>
@@ -103,7 +110,6 @@
                         <input type="text" id="address" placeholder="" class="block w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all">
                     </div>
                 </div>
-
                 <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">冷氣台數</label>
@@ -118,26 +124,22 @@
                         <input type="number" id="wtCount" value="0" min="0" onfocus="this.select()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold text-slate-700">
                     </div>
                 </div>
-
                 <div id="acBrandSection" class="hidden">
                     <label class="block text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">❄️ 冷氣品牌與規格備註</label>
                     <input type="text" id="acBrand" placeholder="例如：大金*2、華菱*1" class="block w-full border-emerald-100 rounded-xl p-3 border bg-emerald-50/30 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none">
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                     <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">總收費</label><input type="number" id="totalAmount" required placeholder="金額" onfocus="this.select()" class="w-full border-slate-200 rounded-xl p-3 border font-bold text-slate-700"></div>
                     <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">小幫手支出</label><input type="number" id="assistantPay" placeholder="金額" onfocus="this.select()" class="w-full border-slate-200 rounded-xl p-3 border font-bold text-slate-700"></div>
                 </div>
-
                 <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">其他備註</label><textarea id="note" rows="3" class="w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"></textarea></div>
-
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-md transition-all active:scale-[0.98]">確認儲存紀錄</button>
             </form>
         </section>
 
-        <section id="listPage">
-            <div class="flex flex-col gap-4 mb-6 max-w-4xl">
-                <div class="bg-slate-700 p-4 rounded-2xl shadow-sm border-l-4 border-slate-400 text-white max-w-md flex items-center">
+        <section id="listPage" class="desktop-half-width">
+            <div class="flex flex-col gap-4 mb-6">
+                <div class="bg-slate-700 p-4 rounded-2xl shadow-sm border-l-4 border-slate-400 text-white flex items-center">
                     <div class="flex flex-col text-[10px] font-bold uppercase tracking-widest text-slate-400 mr-4 border-r border-slate-600 pr-3 leading-tight">
                         <span>全</span><span>部</span><span>年</span><span>份</span><span>總</span><span>累</span><span>計</span>
                     </div>
@@ -155,7 +157,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-slate-400 max-w-md space-y-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-slate-400 space-y-6">
                     <div>
                         <div class="flex justify-between items-start">
                             <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest" id="yearTitle">年度統計</h3>
@@ -187,7 +189,7 @@
                     <div class="flex-[3]">
                         <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名、地址或機型內容..." class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-slate-100">
                     </div>
-                    <div class="flex-[2] flex items-center gap-1 max-w-xs">
+                    <div class="flex-[2] flex items-center gap-1">
                         <button onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-3 rounded-xl transition-all">◀</button>
                         <input type="month" id="monthFilter" onchange="filterRecords()" class="flex-1 bg-slate-50 border-none rounded-xl p-3 text-sm outline-none text-center">
                         <button onclick="changeMonth(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-3 rounded-xl transition-all">▶</button>
@@ -215,16 +217,6 @@
 
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
-                    <thead class="bg-slate-50 text-slate-400 font-bold">
-                        <tr>
-                            <th class="px-6 py-4 text-left tracking-wider">時間</th>
-                            <th class="px-6 py-4 text-left tracking-wider">客戶</th>
-                            <th class="px-6 py-4 text-left tracking-wider">施工資訊</th>
-                            <th class="px-6 py-4 text-left tracking-wider">明細內容</th>
-                            <th class="px-6 py-4 text-left tracking-wider">金額帳目</th>
-                            <th class="px-6 py-4 text-center tracking-wider">操作</th>
-                        </tr>
-                    </thead>
                     <tbody id="recordList" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
@@ -373,7 +365,6 @@
 
             const sorted = baseFiltered.sort((a, b) => b.bookingTime.localeCompare(a.bookingTime));
 
-            // 更新全部年份統計
             document.getElementById('allAc').innerText = aAc.toLocaleString();
             document.getElementById('allWm').innerText = aWm.toLocaleString();
             document.getElementById('allWt').innerText = aWt.toLocaleString();
@@ -381,13 +372,11 @@
             document.getElementById('allExp').innerText = `$${aExp.toLocaleString()}`;
             document.getElementById('allNet').innerText = `$${(aRev - aExp).toLocaleString()}`;
 
-            // 更新本月統計
             document.getElementById('mRev').innerText = `$${mRev.toLocaleString()}`;
             document.getElementById('mExp').innerText = `$${mExp.toLocaleString()}`;
             document.getElementById('mNet').innerText = `$${(mRev - mExp).toLocaleString()}`;
             document.getElementById('mCounts').innerText = `冷${mAc} / 洗${mWm} / 水${mWt}`;
             
-            // 更新年度統計
             document.getElementById('yRev').innerText = `$${yRev.toLocaleString()}`;
             document.getElementById('yExp').innerText = `$${yExp.toLocaleString()}`;
             document.getElementById('yNet').innerText = `$${(yRev - yExp).toLocaleString()}`;
@@ -399,7 +388,7 @@
         function renderRecords(data) {
             const list = document.getElementById('recordList');
             if (data.length === 0) {
-                list.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-slate-400 italic">此月份尚無紀錄</td></tr>`;
+                list.innerHTML = `<tr><td class="px-6 py-10 text-center text-slate-400 italic">此月份尚無紀錄</td></tr>`;
                 return;
             }
             list.innerHTML = data.map(i => {
@@ -423,8 +412,6 @@
                         ${hasValidPhone && hasValidAddress ? '<br>' : ''}
                         ${hasValidAddress ? `<span class="text-xs">${i.address}</span>` : ''}
                     </td>`;
-                } else {
-                    contactInfo = ""; 
                 }
 
                 return `
