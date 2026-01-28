@@ -24,6 +24,16 @@
             line-height: 1.5;
         }
 
+        /* 亮點提示動畫 */
+        @keyframes highlight-fade {
+            0% { background-color: #fef08a; transform: scale(1.02); }
+            100% { background-color: white; transform: scale(1); }
+        }
+        .highlight-target {
+            animation: highlight-fade 2s ease-out;
+            z-index: 10;
+        }
+
         /* 全裝置統一使用卡片式佈局 */
         thead { display: none; }
         tr { 
@@ -34,6 +44,7 @@
             padding: 1rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
         }
         td { 
             display: block; 
@@ -181,6 +192,15 @@
                             <div><p class="text-[10px] text-emerald-600 font-bold mb-1">本月淨利</p><p class="text-sm font-bold text-emerald-700" id="mNet">$0</p></div>
                         </div>
                     </div>
+
+                    <div id="unpaidSection" class="border-t border-amber-100 pt-4 bg-amber-50/30 -mx-5 px-5 pb-2 hidden">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-amber-600 text-[10px] font-bold uppercase tracking-widest">⚠️ 本月待收款明細 (點擊姓名跳轉)</h3>
+                            <button onclick="quickFilterUnpaid()" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md hover:bg-amber-200 transition-colors font-bold">查看全部待收</button>
+                        </div>
+                        <div id="unpaidList" class="space-y-1 text-[11px] text-amber-800">
+                            </div>
+                    </div>
                 </div>
             </div>
 
@@ -272,6 +292,25 @@
             filterRecords();
         };
 
+        window.quickFilterUnpaid = () => {
+            document.getElementById('paymentFilter').value = 'unpaid';
+            filterRecords();
+            document.getElementById('recordList').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // 新增：跳轉到特定紀錄功能
+        window.scrollToRecord = (id) => {
+            // 如果當前有過濾條件可能導致該紀錄被隱藏，先清除過濾(可選，這裡採取直接尋找)
+            const element = document.getElementById(`rec-${id}`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                element.classList.add('highlight-target');
+                setTimeout(() => element.classList.remove('highlight-target'), 2000);
+            } else {
+                alert("該紀錄在目前的篩選條件下被隱藏了，請切換篩選條件再試一次。");
+            }
+        };
+
         document.getElementById('recordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const record = {
@@ -319,6 +358,7 @@
             let mRev = 0, mExp = 0, mAc = 0, mWm = 0, mWt = 0;
             let yRev = 0, yExp = 0, yAc = 0, yWm = 0, yWt = 0;
             let aAc = 0, aWm = 0, aWt = 0, aRev = 0, aExp = 0;
+            let mUnpaidDetails = []; 
             
             const filterYear = mon ? mon.split('-')[0] : new Date().getFullYear().toString();
             const filterMonthName = mon ? mon.split('-')[1] : (new Date().getMonth() + 1).toString().padStart(2, '0');
@@ -351,6 +391,10 @@
                     mAc += (i.acCount || 0);
                     mWm += (i.wmCount || 0);
                     mWt += (i.wtCount || 0);
+                    
+                    if (i.payment === 'unpaid') {
+                        mUnpaidDetails.push({ id: i.id, name: i.customerName, amount: i.totalAmount });
+                    }
                 }
                 
                 const searchStr = `${i.customerName} ${i.phone} ${i.address} ${i.acBrand} ${i.note}`.toLowerCase();
@@ -362,6 +406,22 @@
 
                 return matchSearch && matchMonth && matchType && matchStatus && matchPayment;
             });
+
+            const unpaidSection = document.getElementById('unpaidSection');
+            const unpaidList = document.getElementById('unpaidList');
+            if (mUnpaidDetails.length > 0) {
+                unpaidSection.classList.remove('hidden');
+                unpaidList.innerHTML = mUnpaidDetails.map(item => `
+                    <div class="flex justify-between border-b border-amber-100/50 py-1">
+                        <button onclick="scrollToRecord('${item.id}')" class="text-left hover:underline decoration-amber-400 font-medium">
+                            • ${item.name}
+                        </button>
+                        <span class="font-bold">$${item.amount.toLocaleString()}</span>
+                    </div>
+                `).join('');
+            } else {
+                unpaidSection.classList.add('hidden');
+            }
 
             const sorted = baseFiltered.sort((a, b) => b.bookingTime.localeCompare(a.bookingTime));
 
@@ -415,7 +475,7 @@
                 }
 
                 return `
-                <tr class="hover:bg-slate-50 transition ${statusClass}">
+                <tr id="rec-${i.id}" class="hover:bg-slate-50 transition ${statusClass}">
                     <td data-label="預約時間" class="px-6 py-4 font-medium text-slate-500">${i.bookingTime.replace('T',' ')}</td>
                     <td data-label="客戶" class="px-6 py-4 font-bold text-slate-900">${i.customerName}</td>
                     ${contactInfo}
