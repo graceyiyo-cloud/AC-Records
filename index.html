@@ -54,8 +54,10 @@
             text-align: left;
             color: #475569;
         }
-        td[data-label="預約時間"]::before { content: "時間："; font-weight: 700; color: #64748b; }
-        td[data-label="服務明細"]::before { content: "明細："; font-weight: 700; color: #64748b; }
+        /* 移除「時間：」與「明細：」前綴文字 */
+        td[data-label="預約時間"]::before { content: ""; }
+        td[data-label="服務明細"]::before { content: ""; }
+        
         td[data-label="客戶"] { font-weight: 700; font-size: 1.1rem; color: #1e293b; padding-bottom: 0.5rem !important; }
         td[data-label="金額帳目"] { 
             padding-top: 0.75rem !important; 
@@ -210,9 +212,9 @@
                         <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名、地址或機型內容..." class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-slate-100">
                     </div>
                     <div class="flex-[2] flex items-center gap-1">
-                        <button onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-3 rounded-xl transition-all">◀</button>
-                        <input type="month" id="monthFilter" onchange="filterRecords()" class="flex-1 bg-slate-50 border-none rounded-xl p-3 text-sm outline-none text-center">
-                        <button onclick="changeMonth(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-3 rounded-xl transition-all">▶</button>
+                        <button onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none">◀</button>
+                        <input type="month" id="monthFilter" onchange="filterRecords()" class="flex-1 bg-slate-50 border-none rounded-xl p-2 text-sm outline-none text-center font-medium h-[42px]">
+                        <button onclick="changeMonth(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none">▶</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-3 md:flex gap-2">
@@ -300,7 +302,6 @@
 
         // 新增：跳轉到特定紀錄功能
         window.scrollToRecord = (id) => {
-            // 如果當前有過濾條件可能導致該紀錄被隱藏，先清除過濾(可選，這裡採取直接尋找)
             const element = document.getElementById(`rec-${id}`);
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth', block: 'center' });
