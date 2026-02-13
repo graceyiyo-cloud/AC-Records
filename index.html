@@ -263,7 +263,6 @@
         const recordsCol = collection(db, "cleaningRecords");
         let allRecords = [];
         let editingId = null;
-        let lastScrollPos = 0; // 用於記憶滾動位置
 
         document.getElementById('monthFilter').value = new Date().toISOString().substring(0, 7);
 
@@ -315,6 +314,8 @@
 
         document.getElementById('recordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // 基礎資料物件
             const record = {
                 bookingTime: document.getElementById('bookingTime').value,
                 customerName: document.getElementById('customerName').value,
@@ -326,16 +327,24 @@
                 wtCount: parseInt(document.getElementById('wtCount').value) || 0,
                 totalAmount: parseInt(document.getElementById('totalAmount').value) || 0,
                 assistantPay: parseInt(document.getElementById('assistantPay').value) || 0,
-                note: document.getElementById('note').value || '',
-                status: 'pending',
-                payment: 'unpaid'
+                note: document.getElementById('note').value || ''
             };
+
             try {
                 if (editingId) {
+                    // 【修正點】：編輯模式下，從 allRecords 找回原本的狀態，不重設為初始值
+                    const originalRecord = allRecords.find(r => r.id === editingId);
+                    if (originalRecord) {
+                        record.status = originalRecord.status;
+                        record.payment = originalRecord.payment;
+                    }
                     await updateDoc(doc(db, "cleaningRecords", editingId), record);
                     alert('已更新成功');
                     editingId = null;
                 } else {
+                    // 新增模式才給予預設初始狀態
+                    record.status = 'pending';
+                    record.payment = 'unpaid';
                     await addDoc(recordsCol, record);
                     alert('已儲存成功');
                 }
@@ -348,11 +357,6 @@
         onSnapshot(recordsCol, (snap) => {
             allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             filterRecords();
-            // 數據更新後恢復滾動位置
-            if (lastScrollPos > 0) {
-                window.scrollTo(0, lastScrollPos);
-                lastScrollPos = 0;
-            }
         });
 
         window.filterRecords = () => {
@@ -513,13 +517,11 @@
         }
 
         window.toggleDone = async (id, currentStatus) => {
-            lastScrollPos = window.scrollY; // 紀錄目前位置
             const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
             await updateDoc(doc(db, "cleaningRecords", id), { status: newStatus });
         };
 
         window.togglePayment = async (id, currentPayment) => {
-            lastScrollPos = window.scrollY; // 紀錄目前位置
             const newPayment = currentPayment === 'paid' ? 'unpaid' : 'paid';
             await updateDoc(doc(db, "cleaningRecords", id), { payment: newPayment });
         };
