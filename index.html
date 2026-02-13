@@ -263,6 +263,7 @@
         const recordsCol = collection(db, "cleaningRecords");
         let allRecords = [];
         let editingId = null;
+        let lastScrollPos = 0; // 用於記憶滾動位置
 
         document.getElementById('monthFilter').value = new Date().toISOString().substring(0, 7);
 
@@ -347,6 +348,11 @@
         onSnapshot(recordsCol, (snap) => {
             allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             filterRecords();
+            // 數據更新後恢復滾動位置
+            if (lastScrollPos > 0) {
+                window.scrollTo(0, lastScrollPos);
+                lastScrollPos = 0;
+            }
         });
 
         window.filterRecords = () => {
@@ -507,11 +513,13 @@
         }
 
         window.toggleDone = async (id, currentStatus) => {
+            lastScrollPos = window.scrollY; // 紀錄目前位置
             const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
             await updateDoc(doc(db, "cleaningRecords", id), { status: newStatus });
         };
 
         window.togglePayment = async (id, currentPayment) => {
+            lastScrollPos = window.scrollY; // 紀錄目前位置
             const newPayment = currentPayment === 'paid' ? 'unpaid' : 'paid';
             await updateDoc(doc(db, "cleaningRecords", id), { payment: newPayment });
         };
