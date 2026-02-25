@@ -12,7 +12,7 @@
         .hidden { display: none; }
         .completed-row { background-color: #f8fafc !important; border-left: 4px solid #94a3b8 !important; opacity: 0.85; }
         
-        .note-display { white-space: pre-wrap; word-break: break-all; display: block; line-height: 1.5; }
+        .note-display { white-space: pre-wrap; word-break: break-all; display: block; line-height: 1.3; }
 
         @keyframes highlight-fade {
             0% { background-color: #fef08a; transform: scale(1.02); }
@@ -27,9 +27,9 @@
             padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
         }
-        td { display: block; width: 100%; padding: 0.25rem 0 !important; border: none !important; text-align: left; color: #475569; }
+        td { display: block; width: 100%; padding: 0.15rem 0 !important; border: none !important; text-align: left; color: #475569; }
         
-        td[data-label="客戶"] { font-weight: 700; font-size: 1.1rem; color: #1e293b; padding-bottom: 0.5rem !important; }
+        td[data-label="客戶"] { font-weight: 700; font-size: 1.1rem; color: #1e293b; padding-bottom: 0.2rem !important; }
         td[data-label="金額帳目"] { 
             padding-top: 0.75rem !important; margin-top: 0.5rem;
             border-top: 1px dashed #e2e8f0 !important; color: #475569; font-size: 0.85rem;
@@ -92,15 +92,15 @@
                 <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">冷氣台數</label>
-                        <input type="number" id="acCount" value="0" min="0" oninput="handleAcCountChange()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
+                        <input type="number" id="acCount" value="0" min="0" onfocus="this.select()" oninput="handleAcCountChange()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">洗衣機</label>
-                        <input type="number" id="wmCount" value="0" min="0" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
+                        <input type="number" id="wmCount" value="0" min="0" onfocus="this.select()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">水塔</label>
-                        <input type="number" id="wtCount" value="0" min="0" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
+                        <input type="number" id="wtCount" value="0" min="0" onfocus="this.select()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
                     </div>
                 </div>
 
@@ -123,7 +123,7 @@
                 <datalist id="assistantNamesList"></datalist>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">總收費</label><input type="number" id="totalAmount" required class="w-full border-slate-200 rounded-xl p-3 border font-bold"></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">總收費</label><input type="number" id="totalAmount" required onfocus="this.select()" class="w-full border-slate-200 rounded-xl p-3 border font-bold"></div>
                     <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">小幫手總支出</label><input type="number" id="assistantPay" value="0" readonly class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border font-bold text-rose-500"></div>
                 </div>
                 <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">其他備註</label><textarea id="note" rows="3" class="w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"></textarea></div>
@@ -280,8 +280,8 @@
             div.className = "grid grid-cols-12 gap-2 items-center ac-detail-row mb-2";
             div.innerHTML = `
                 <div class="col-span-5"><input type="text" placeholder="廠牌" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div>
-                <div class="col-span-3"><input type="number" value="${val}" oninput="calcTotalFromDetails()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div>
-                <div class="col-span-3"><input type="number" placeholder="單價" oninput="calcTotalFromDetails()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div>
+                <div class="col-span-3"><input type="number" value="${val}" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div>
+                <div class="col-span-3"><input type="number" placeholder="單價" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div>
                 <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcTotalFromDetails();" class="text-rose-400 font-bold">×</button></div>
             `;
             container.appendChild(div);
@@ -303,7 +303,7 @@
             div.className = "grid grid-cols-12 gap-2 items-center assistant-detail-row mb-2";
             div.innerHTML = `
                 <div class="col-span-6"><input type="text" value="${name}" list="assistantNamesList" placeholder="名字" class="as-name-input w-full rounded-lg p-2 border border-rose-100 text-sm"></div>
-                <div class="col-span-5"><input type="number" value="${amount}" oninput="calcAssistantTotal()" class="as-amount-input w-full rounded-lg p-2 border border-rose-100 text-sm font-bold text-rose-600"></div>
+                <div class="col-span-5"><input type="number" value="${amount}" onfocus="this.select()" oninput="calcAssistantTotal()" class="as-amount-input w-full rounded-lg p-2 border border-rose-100 text-sm font-bold text-rose-600"></div>
                 <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcAssistantTotal();" class="text-rose-400 font-bold">×</button></div>
             `;
             container.appendChild(div);
@@ -419,15 +419,12 @@
                         }
                     });
                 } else {
-                    // 有金額但完全沒填寫明細的舊資料
                     unclassified += totalPay;
                 }
             });
 
             const container = document.getElementById('assistantSummaryList');
             let html = "";
-
-            // 排序：金額高的在前
             const sortedNames = Object.keys(summary).sort((a, b) => summary[b] - summary[a]);
             
             sortedNames.forEach(name => {
@@ -449,6 +446,18 @@
             if (html === "") html = "<p class='text-center text-slate-400 py-4'>尚無小幫手支出紀錄</p>";
             container.innerHTML = html;
         }
+
+        window.copyText = (text, btn) => {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✔️';
+                btn.classList.add('text-emerald-500');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('text-emerald-500');
+                }, 1500);
+            });
+        };
 
         window.filterRecords = () => {
             const kw = document.getElementById('searchKeyword').value.toLowerCase();
@@ -519,15 +528,21 @@
                 return `
                 <tr id="rec-${i.id}" class="${isComp ? 'completed-row' : ''}">
                     <td data-label="預約時間" class="px-6 py-4 time-display">${i.bookingTime.replace('T',' ')}</td>
-                    <td data-label="客戶" class="px-6 py-4 font-bold text-slate-900">${i.customerName}</td>
-                    <td class="px-6 py-1 text-slate-500 text-xs">
-                        ${i.phone ? `📞${i.phone}` : ''} ${i.address ? `📍${i.address}` : ''}
+                    <td data-label="客戶" class="px-6 py-4 flex items-center gap-2">
+                        <span class="font-bold text-slate-900">${i.customerName}</span>
+                        ${i.phone ? `<span class="text-[12px] text-slate-400 font-normal">📞${i.phone}</span>` : ''}
                     </td>
-                    <td data-label="服務明細" class="px-6 py-4 text-slate-600">
-                        ${services.join('、')}
-                        ${i.acBrand ? `<br><span class="text-[11px] text-slate-400 note-display">#${i.acBrand}</span>` : ''}
-                        ${asDisplay ? `<br><div class="text-[11px] text-rose-500 font-medium">${asDisplay}</div>` : ''}
-                        ${i.note ? `<br><span class="text-[11px] text-slate-400 note-display">備註: ${i.note}</span>` : ''}
+                    <td class="px-6 py-1 text-slate-500 text-xs flex items-center gap-1.5">
+                        ${i.address ? `
+                            <span>📍${i.address}</span>
+                            <button onclick="copyText('${i.address}', this)" class="bg-slate-100 p-1 rounded-md hover:bg-slate-200 transition-colors text-[10px]">📋</button>
+                        ` : ''}
+                    </td>
+                    <td data-label="服務明細" class="px-6 py-2 text-slate-600">
+                        <div class="leading-tight">${services.join('、')}</div>
+                        ${i.acBrand ? `<div class="text-[11px] text-slate-400 note-display mt-0.5">#${i.acBrand}</div>` : ''}
+                        ${asDisplay ? `<div class="text-[11px] text-rose-500 font-medium mt-0.5">${asDisplay}</div>` : ''}
+                        ${i.note ? `<div class="text-[11px] text-slate-400 note-display mt-0.5">備註: ${i.note}</div>` : ''}
                     </td>
                     <td data-label="金額帳目" class="px-6 py-4 text-slate-600 font-medium">
                         收 ${i.totalAmount.toLocaleString()} - 支 ${i.assistantPay.toLocaleString()} = <span class="text-emerald-700 font-bold">淨 ${(i.totalAmount - i.assistantPay).toLocaleString()}</span>
@@ -574,7 +589,7 @@
                     if (m) {
                         const div = document.createElement('div');
                         div.className = "grid grid-cols-12 gap-2 items-center ac-detail-row mb-2";
-                        div.innerHTML = `<div class="col-span-5"><input type="text" value="${m[1]}" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-3"><input type="number" value="${m[2]}" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div><div class="col-span-3"><input type="number" value="${m[3]||''}" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400">×</button></div>`;
+                        div.innerHTML = `<div class="col-span-5"><input type="text" value="${m[1]}" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-3"><input type="number" value="${m[2]}" onfocus="this.select()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div><div class="col-span-3"><input type="number" value="${m[3]||''}" onfocus="this.select()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400">×</button></div>`;
                         acContainer.appendChild(div);
                     }
                 });
