@@ -44,6 +44,12 @@
         @media (min-width: 1024px) {
             .desktop-half-width { max-width: 50% !important; margin-left: auto; margin-right: auto; }
         }
+
+        /* 小幫手統計浮窗樣式 */
+        #assistantSummaryModal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 100; width: 90%; max-width: 350px;
+        }
     </style>
 </head>
 <body class="bg-[#faf9f6] min-h-screen text-slate-700">
@@ -127,7 +133,7 @@
 
         <section id="listPage" class="desktop-half-width">
             
-            <div class="bg-slate-700 p-4 rounded-2xl shadow-sm border-l-4 border-slate-400 text-white flex items-center mb-4">
+            <div class="bg-slate-700 p-4 rounded-2xl shadow-sm border-l-4 border-slate-400 text-white flex items-center mb-4 relative">
                 <div class="flex flex-col text-[10px] font-bold uppercase tracking-widest text-slate-400 mr-4 border-r border-slate-600 pr-3 leading-tight">
                     <span>全</span><span>部</span><span>年</span><span>份</span><span>總</span><span>累</span><span>計</span>
                 </div>
@@ -139,9 +145,26 @@
                     </div>
                     <div class="grid grid-cols-3 gap-2 text-center">
                         <div><p class="text-[10px] text-slate-400">總收入</p><p class="text-sm font-bold" id="allRev">$0</p></div>
-                        <div><p class="text-[10px] text-slate-400">小幫手</p><p class="text-sm font-bold text-rose-300" id="allExp">$0</p></div>
+                        <div class="relative group">
+                            <p class="text-[10px] text-slate-400">小幫手</p>
+                            <button onclick="toggleAssistantModal()" class="text-sm font-bold text-rose-300 underline decoration-rose-300/40" id="allExp">$0</button>
+                        </div>
                         <div><p class="text-[10px] text-emerald-300">淨實收</p><p class="text-sm font-bold text-emerald-300" id="allNet">$0</p></div>
                     </div>
+                </div>
+                <button onclick="toggleAssistantModal()" class="absolute -right-2 -top-2 bg-rose-500 text-white text-[10px] px-2 py-1 rounded-full shadow-lg border-2 border-white animate-pulse">薪資明細</button>
+            </div>
+
+            <div id="assistantSummaryOverlay" onclick="toggleAssistantModal()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[90]"></div>
+            <div id="assistantSummaryModal" class="hidden bg-white rounded-2xl shadow-2xl p-5 border border-slate-200">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h4 class="font-bold text-slate-800 text-sm">🤝 小幫手薪資總計 (全期)</h4>
+                    <button onclick="toggleAssistantModal()" class="text-slate-400 text-xl">&times;</button>
+                </div>
+                <div id="assistantSummaryList" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                    </div>
+                <div class="mt-4 pt-3 border-t text-[10px] text-slate-400 text-center">
+                    點擊背景或叉叉可關閉
                 </div>
             </div>
 
@@ -359,6 +382,72 @@
             const names = new Set();
             allRecords.forEach(r => { if (r.assistantDetail) r.assistantDetail.split(',').forEach(s => names.add(s.split(':')[0])); });
             document.getElementById('assistantNamesList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+        }
+
+        window.toggleAssistantModal = () => {
+            const modal = document.getElementById('assistantSummaryModal');
+            const overlay = document.getElementById('assistantSummaryOverlay');
+            const isHidden = modal.classList.contains('hidden');
+            
+            if (isHidden) {
+                renderAssistantSummary();
+                modal.classList.remove('hidden');
+                overlay.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+                overlay.classList.add('hidden');
+            }
+        };
+
+        function renderAssistantSummary() {
+            const summary = {};
+            let unclassified = 0;
+
+            allRecords.forEach(r => {
+                const totalPay = parseInt(r.assistantPay) || 0;
+                if (totalPay <= 0) return;
+
+                if (r.assistantDetail) {
+                    const details = r.assistantDetail.split(',');
+                    details.forEach(detail => {
+                        const [name, amount] = detail.split(':');
+                        const amt = parseInt(amount) || 0;
+                        if (name) {
+                            summary[name] = (summary[name] || 0) + amt;
+                        } else {
+                            unclassified += amt;
+                        }
+                    });
+                } else {
+                    // 有金額但完全沒填寫明細的舊資料
+                    unclassified += totalPay;
+                }
+            });
+
+            const container = document.getElementById('assistantSummaryList');
+            let html = "";
+
+            // 排序：金額高的在前
+            const sortedNames = Object.keys(summary).sort((a, b) => summary[b] - summary[a]);
+            
+            sortedNames.forEach(name => {
+                html += `
+                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="font-bold text-slate-700">👤 ${name}</span>
+                    <span class="font-black text-rose-500">$${summary[name].toLocaleString()}</span>
+                </div>`;
+            });
+
+            if (unclassified > 0) {
+                html += `
+                <div class="flex justify-between items-center bg-amber-50 p-3 rounded-xl border border-amber-100">
+                    <span class="font-bold text-amber-700">❓ 未分類 / 舊紀錄</span>
+                    <span class="font-black text-amber-600">$${unclassified.toLocaleString()}</span>
+                </div>`;
+            }
+
+            if (html === "") html = "<p class='text-center text-slate-400 py-4'>尚無小幫手支出紀錄</p>";
+            container.innerHTML = html;
         }
 
         window.filterRecords = () => {
