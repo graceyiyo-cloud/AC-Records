@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>冷氣清洗紀錄</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         /* 整體字體加大約 10% */
         html { font-size: 110%; }
@@ -50,6 +51,10 @@
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             z-index: 100; width: 90%; max-width: 350px;
         }
+
+        /* Lucide 圖示統一微調 */
+        .lucide { width: 14px; height: 14px; stroke-width: 2; display: inline-block; vertical-align: -2px; }
+        .btn-icon { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
     </style>
 </head>
 <body class="bg-[#faf9f6] min-h-screen text-slate-700">
@@ -58,8 +63,12 @@
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-lg font-bold tracking-widest">冷氣清洗紀錄</h1>
             <div class="flex space-x-2">
-                <button onclick="showPage('listPage')" class="px-4 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap">清單</button>
-                <button onclick="prepareNewForm()" class="px-4 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap">填寫</button>
+                <button onclick="showPage('listPage')" class="flex items-center px-4 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap">
+                    <i data-lucide="list" class="btn-icon"></i>清單
+                </button>
+                <button onclick="prepareNewForm()" class="flex items-center px-4 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap">
+                    <i data-lucide="pen-line" class="btn-icon"></i>填寫
+                </button>
             </div>
         </div>
     </nav>
@@ -67,7 +76,9 @@
     <div class="container mx-auto px-3 md:px-4 py-6">
         
         <section id="formPage" class="hidden max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
-            <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">📝 新增紀錄</h2>
+            <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">
+                <i data-lucide="clipboard-list" class="w-6 h-6"></i> 新增紀錄
+            </h2>
             <form id="recordForm" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -106,7 +117,7 @@
 
                 <div id="acBrandSection" class="hidden space-y-2 bg-emerald-50/30 p-4 rounded-xl border border-emerald-100">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-bold text-emerald-600 uppercase tracking-wider">❄️ 冷氣明細</label>
+                        <label class="block text-xs font-bold text-emerald-600 uppercase tracking-wider"><i data-lucide="snowflake" class="lucide mr-1"></i> 冷氣明細</label>
                         <button type="button" onclick="addAcDetailRow()" class="text-[10px] bg-emerald-600 text-white px-2 py-1 rounded shadow-sm">+ 增加明細</button>
                     </div>
                     <div id="acDetailsContainer" class="space-y-2"></div>
@@ -114,7 +125,7 @@
 
                 <div class="space-y-2 bg-rose-50/30 p-4 rounded-xl border border-rose-100">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-bold text-rose-600 uppercase tracking-wider">🤝 小幫手明細</label>
+                        <label class="block text-xs font-bold text-rose-600 uppercase tracking-wider"><i data-lucide="users" class="lucide mr-1"></i> 小幫手明細</label>
                         <button type="button" onclick="addAssistantRow()" class="text-[10px] bg-rose-500 text-white px-2 py-1 rounded shadow-sm">+ 增加小幫手</button>
                     </div>
                     <div id="assistantDetailsContainer" class="space-y-2"></div>
@@ -152,14 +163,18 @@
                         <div><p class="text-[10px] text-emerald-300">淨實收</p><p class="text-sm font-bold text-emerald-300" id="allNet">$0</p></div>
                     </div>
                 </div>
-                <button onclick="toggleAssistantModal()" class="absolute -right-2 -top-2 bg-rose-500 text-white text-[10px] px-2 py-1 rounded-full shadow-lg border-2 border-white animate-pulse">薪資明細</button>
+                <button onclick="toggleAssistantModal()" class="absolute -right-2 -top-2 bg-rose-500 text-white text-[10px] px-3 py-1.5 rounded-full shadow-lg border-2 border-white animate-pulse flex items-center gap-1">
+                    <i data-lucide="banknote" class="w-3 h-3"></i>薪資明細
+                </button>
             </div>
 
             <div id="assistantSummaryOverlay" onclick="toggleAssistantModal()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[90]"></div>
             <div id="assistantSummaryModal" class="hidden bg-white rounded-2xl shadow-2xl p-5 border border-slate-200">
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h4 class="font-bold text-slate-800 text-sm">🤝 小幫手薪資總計 (全期)</h4>
-                    <button onclick="toggleAssistantModal()" class="text-slate-400 text-xl">&times;</button>
+                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i data-lucide="handshake" class="w-4 h-4"></i> 小幫手薪資總計 (全期)
+                    </h4>
+                    <button onclick="toggleAssistantModal()" class="text-slate-400 text-xl hover:text-slate-600">&times;</button>
                 </div>
                 <div id="assistantSummaryList" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
                     </div>
@@ -195,7 +210,9 @@
 
                 <div id="unpaidSection" class="border-t border-amber-100 pt-4 bg-amber-50/30 -mx-5 px-5 pb-2 hidden">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-amber-600 text-[10px] font-bold uppercase tracking-widest">⚠️ 本月待收款明細 (點擊姓名跳轉)</h3>
+                        <h3 class="text-amber-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                            <i data-lucide="alert-circle" class="w-3 h-3"></i> 本月待收款明細 (點擊姓名跳轉)
+                        </h3>
                         <button onclick="quickFilterUnpaid()" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md hover:bg-amber-200 transition-colors font-bold">查看全部待收</button>
                     </div>
                     <div id="unpaidList" class="space-y-1 text-[11px] text-amber-800"></div>
@@ -204,11 +221,16 @@
 
             <div class="bg-white p-3 md:p-5 rounded-2xl shadow-sm border border-slate-100 mb-6 space-y-4">
                 <div class="flex flex-col md:flex-row gap-3">
-                    <div class="flex-[3]"><input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名、地址或機型內容..." class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-slate-100"></div>
+                    <div class="flex-[3] relative">
+                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </div>
+                        <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名、地址或機型內容..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
+                    </div>
                     <div class="flex-[2] flex items-center gap-1">
-                        <button onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none">◀</button>
+                        <button onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                         <input type="month" id="monthFilter" onchange="filterRecords()" class="flex-1 bg-slate-50 border-none rounded-xl p-2 text-sm outline-none text-center font-medium h-[42px]">
-                        <button onclick="changeMonth(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none">▶</button>
+                        <button onclick="changeMonth(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
@@ -241,11 +263,17 @@
         let allRecords = [];
         let editingId = null;
 
+        // 初始化圖示
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+
         document.getElementById('monthFilter').value = new Date().toISOString().substring(0, 7);
 
         window.showPage = (id) => {
             document.getElementById('formPage').classList.toggle('hidden', id !== 'formPage');
             document.getElementById('listPage').classList.toggle('hidden', id !== 'listPage');
+            lucide.createIcons(); // 重新渲染圖示
         };
 
         window.prepareNewForm = () => {
@@ -266,6 +294,7 @@
 
         window.toggleAcBrand = () => {
             document.getElementById('acBrandSection').classList.toggle('hidden', document.getElementById('acCount').value <= 0);
+            lucide.createIcons();
         };
 
         window.addAcDetailRow = (val = "") => {
@@ -282,7 +311,7 @@
                 <div class="col-span-5"><input type="text" placeholder="廠牌" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div>
                 <div class="col-span-3"><input type="number" value="${val}" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div>
                 <div class="col-span-3"><input type="number" placeholder="單價" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div>
-                <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcTotalFromDetails();" class="text-rose-400 font-bold">×</button></div>
+                <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcTotalFromDetails();" class="text-rose-400 font-bold text-lg">&times;</button></div>
             `;
             container.appendChild(div);
         };
@@ -304,7 +333,7 @@
             div.innerHTML = `
                 <div class="col-span-6"><input type="text" value="${name}" list="assistantNamesList" placeholder="名字" class="as-name-input w-full rounded-lg p-2 border border-rose-100 text-sm"></div>
                 <div class="col-span-5"><input type="number" value="${amount}" onfocus="this.select()" oninput="calcAssistantTotal()" class="as-amount-input w-full rounded-lg p-2 border border-rose-100 text-sm font-bold text-rose-600"></div>
-                <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcAssistantTotal();" class="text-rose-400 font-bold">×</button></div>
+                <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcAssistantTotal();" class="text-rose-400 font-bold text-lg">&times;</button></div>
             `;
             container.appendChild(div);
         };
@@ -397,6 +426,7 @@
                 modal.classList.add('hidden');
                 overlay.classList.add('hidden');
             }
+            lucide.createIcons();
         };
 
         function renderAssistantSummary() {
@@ -430,7 +460,7 @@
             sortedNames.forEach(name => {
                 html += `
                 <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
-                    <span class="font-bold text-slate-700">👤 ${name}</span>
+                    <span class="font-bold text-slate-700 flex items-center gap-2"><i data-lucide="user" class="w-4 h-4 text-slate-400"></i>${name}</span>
                     <span class="font-black text-rose-500">$${summary[name].toLocaleString()}</span>
                 </div>`;
             });
@@ -438,7 +468,7 @@
             if (unclassified > 0) {
                 html += `
                 <div class="flex justify-between items-center bg-amber-50 p-3 rounded-xl border border-amber-100">
-                    <span class="font-bold text-amber-700">❓ 未分類 / 舊紀錄</span>
+                    <span class="font-bold text-amber-700 flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4 text-amber-400"></i>未分類 / 舊紀錄</span>
                     <span class="font-black text-amber-600">$${unclassified.toLocaleString()}</span>
                 </div>`;
             }
@@ -449,12 +479,12 @@
 
         window.copyText = (text, btn) => {
             navigator.clipboard.writeText(text).then(() => {
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '✔️';
-                btn.classList.add('text-emerald-500');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="text-emerald-500 w-[10px] h-[10px]"></i>';
+                lucide.createIcons();
                 setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.classList.remove('text-emerald-500');
+                    btn.innerHTML = originalHTML;
+                    lucide.createIcons();
                 }, 1500);
             });
         };
@@ -530,12 +560,14 @@
                     <td data-label="預約時間" class="px-6 py-4 time-display">${i.bookingTime.replace('T',' ')}</td>
                     <td data-label="客戶" class="px-6 py-4 flex items-center gap-2">
                         <span class="font-bold text-slate-900">${i.customerName}</span>
-                        ${i.phone ? `<span class="text-[12px] text-slate-400 font-normal">📞${i.phone}</span>` : ''}
+                        ${i.phone ? `<span class="text-[12px] text-slate-400 font-normal flex items-center gap-0.5"><i data-lucide="phone" class="w-3 h-3"></i>${i.phone}</span>` : ''}
                     </td>
                     <td class="px-6 py-1 text-slate-500 text-xs flex items-center gap-1.5">
                         ${i.address ? `
-                            <span>📍${i.address}</span>
-                            <button onclick="copyText('${i.address}', this)" class="bg-slate-100 p-1 rounded-md hover:bg-slate-200 transition-colors text-[10px]">📋</button>
+                            <span class="flex items-center gap-0.5"><i data-lucide="map-pin" class="w-3 h-3"></i>${i.address}</span>
+                            <button onclick="copyText('${i.address}', this)" class="bg-slate-100 p-1 rounded-md hover:bg-slate-200 transition-colors">
+                                <i data-lucide="copy" class="w-2.5 h-2.5"></i>
+                            </button>
                         ` : ''}
                     </td>
                     <td data-label="服務明細" class="px-6 py-2 text-slate-600">
@@ -549,16 +581,23 @@
                     </td>
                     <td class="px-6 py-4 action-cell">
                         <button onclick="toggleDone('${i.id}', '${i.status}')" class="flex items-center gap-1 ${isComp ? 'text-slate-400 bg-slate-50 border-slate-200' : 'text-emerald-700 bg-emerald-50 border-emerald-100'} px-2 py-1.5 rounded-lg border text-[10px] font-bold">
-                            <span>${isComp ? '✔️ 已完成' : '⭕ 未完成'}</span>
+                            <i data-lucide="${isComp ? 'check-circle' : 'circle'}" class="w-3 h-3"></i>
+                            <span>${isComp ? '已完成' : '未完成'}</span>
                         </button>
                         <button onclick="togglePayment('${i.id}', '${i.payment}')" class="flex items-center gap-1 ${isPaid ? 'text-slate-400 bg-slate-50 border-slate-200' : 'text-amber-700 bg-amber-50 border-amber-100'} px-2 py-1.5 rounded-lg border text-[10px] font-bold">
-                            <span>${isPaid ? '💰 已收款' : '⏳ 待收款'}</span>
+                            <i data-lucide="${isPaid ? 'banknote' : 'clock'}" class="w-3 h-3"></i>
+                            <span>${isPaid ? '已收款' : '待收款'}</span>
                         </button>
-                        <button onclick="editRec('${i.id}')" class="text-slate-600 bg-slate-100 px-2 py-1.5 rounded-lg border text-[10px] font-bold">✏️ 修改</button>
-                        <button onclick="deleteRec('${i.id}')" class="text-rose-400 bg-rose-50 px-2 py-1.5 rounded-lg border text-[10px] font-bold">🗑️ 刪除</button>
+                        <button onclick="editRec('${i.id}')" class="flex items-center gap-1 text-slate-600 bg-slate-100 px-2 py-1.5 rounded-lg border text-[10px] font-bold">
+                            <i data-lucide="edit-2" class="w-3 h-3"></i>修改
+                        </button>
+                        <button onclick="deleteRec('${i.id}')" class="flex items-center gap-1 text-rose-400 bg-rose-50 px-2 py-1.5 rounded-lg border text-[10px] font-bold">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>刪除
+                        </button>
                     </td>
                 </tr>`;
             }).join('');
+            lucide.createIcons(); // 動態更新後重新初始化圖示
         }
 
         window.scrollToRecord = (id) => {
@@ -589,7 +628,7 @@
                     if (m) {
                         const div = document.createElement('div');
                         div.className = "grid grid-cols-12 gap-2 items-center ac-detail-row mb-2";
-                        div.innerHTML = `<div class="col-span-5"><input type="text" value="${m[1]}" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-3"><input type="number" value="${m[2]}" onfocus="this.select()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div><div class="col-span-3"><input type="number" value="${m[3]||''}" onfocus="this.select()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400">×</button></div>`;
+                        div.innerHTML = `<div class="col-span-5"><input type="text" value="${m[1]}" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-3"><input type="number" value="${m[2]}" onfocus="this.select()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div><div class="col-span-3"><input type="number" value="${m[3]||''}" onfocus="this.select()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400 font-bold text-lg">&times;</button></div>`;
                         acContainer.appendChild(div);
                     }
                 });
