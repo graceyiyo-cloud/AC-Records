@@ -129,6 +129,8 @@
                         <button type="button" onclick="addAssistantRow()" class="text-[10px] bg-rose-500 text-white px-2 py-1 rounded shadow-sm">+ 增加小幫手</button>
                     </div>
                     <div id="assistantDetailsContainer" class="space-y-2"></div>
+                    <div id="quickAssistantTags" class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-rose-100/50">
+                        </div>
                 </div>
 
                 <datalist id="assistantNamesList"></datalist>
@@ -250,8 +252,8 @@
 
         const firebaseConfig = {
             apiKey: "AIzaSyDTyt_nIV1h_MFRhQoT9PHFMXhus1jQVL4",
-            authDomain: "ac-records-b8c40.firebaseapp.com",
             projectId: "ac-records-b8c40",
+            authDomain: "ac-records-b8c40.firebaseapp.com",
             storageBucket: "ac-records-b8c40.firebasestorage.app",
             messagingSenderId: "471993362594",
             appId: "1:471993362594:web:1be7e72af1021760c64ffb"
@@ -262,6 +264,7 @@
         const recordsCol = collection(db, "cleaningRecords");
         let allRecords = [];
         let editingId = null;
+        let knownAssistantNames = []; // 存儲不重疊的小幫手名稱
 
         // 初始化圖示
         document.addEventListener('DOMContentLoaded', () => {
@@ -282,6 +285,7 @@
             document.getElementById('acDetailsContainer').innerHTML = '';
             document.getElementById('assistantDetailsContainer').innerHTML = '';
             toggleAcBrand();
+            updateQuickAssistantTags();
             showPage('formPage');
         };
 
@@ -331,17 +335,38 @@
             const div = document.createElement('div');
             div.className = "grid grid-cols-12 gap-2 items-center assistant-detail-row mb-2";
             div.innerHTML = `
-                <div class="col-span-6"><input type="text" value="${name}" list="assistantNamesList" placeholder="名字" class="as-name-input w-full rounded-lg p-2 border border-rose-100 text-sm"></div>
+                <div class="col-span-6"><input type="text" value="${name}" list="assistantNamesList" placeholder="名字" class="as-name-input w-full rounded-lg p-2 border border-rose-100 text-sm" oninput="updateQuickAssistantTags()"></div>
                 <div class="col-span-5"><input type="number" value="${amount}" onfocus="this.select()" oninput="calcAssistantTotal()" class="as-amount-input w-full rounded-lg p-2 border border-rose-100 text-sm font-bold text-rose-600"></div>
-                <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcAssistantTotal();" class="text-rose-400 font-bold text-lg">&times;</button></div>
+                <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcAssistantTotal(); updateQuickAssistantTags();" class="text-rose-400 font-bold text-lg">&times;</button></div>
             `;
             container.appendChild(div);
+            updateQuickAssistantTags();
         };
 
         window.calcAssistantTotal = () => {
             let total = 0;
             document.querySelectorAll('.as-amount-input').forEach(input => total += (parseInt(input.value) || 0));
             document.getElementById('assistantPay').value = total;
+        };
+
+        // 更新快速點選標籤
+        window.updateQuickAssistantTags = () => {
+            const container = document.getElementById('quickAssistantTags');
+            const currentNamesInForm = Array.from(document.querySelectorAll('.as-name-input')).map(input => input.value.trim());
+            
+            // 過濾掉已經在表單裡的名字
+            const availableNames = knownAssistantNames.filter(name => !currentNamesInForm.includes(name));
+            
+            if (availableNames.length === 0) {
+                container.innerHTML = '<span class="text-[10px] text-rose-300">無更多常用名字</span>';
+                return;
+            }
+
+            container.innerHTML = availableNames.map(name => `
+                <button type="button" onclick="addAssistantRow('${name}')" class="px-2 py-1 bg-white border border-rose-200 text-rose-600 rounded text-[10px] hover:bg-rose-50 transition-colors font-medium">
+                    + ${name}
+                </button>
+            `).join('');
         };
 
         window.toggleDone = async (id, currentStatus) => {
@@ -409,8 +434,17 @@
 
         function updateAssistantDatalist() {
             const names = new Set();
-            allRecords.forEach(r => { if (r.assistantDetail) r.assistantDetail.split(',').forEach(s => names.add(s.split(':')[0])); });
-            document.getElementById('assistantNamesList').innerHTML = Array.from(names).map(n => `<option value="${n}">`).join('');
+            allRecords.forEach(r => { 
+                if (r.assistantDetail) {
+                    r.assistantDetail.split(',').forEach(s => {
+                        const name = s.split(':')[0];
+                        if (name) names.add(name);
+                    });
+                } 
+            });
+            knownAssistantNames = Array.from(names).sort();
+            document.getElementById('assistantNamesList').innerHTML = knownAssistantNames.map(n => `<option value="${n}">`).join('');
+            updateQuickAssistantTags();
         }
 
         window.toggleAssistantModal = () => {
@@ -639,6 +673,7 @@
                 r.assistantDetail.split(',').forEach(s => { const [name, amt] = s.split(':'); addAssistantRow(name, amt); });
             }
             toggleAcBrand();
+            updateQuickAssistantTags();
             showPage('formPage');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
