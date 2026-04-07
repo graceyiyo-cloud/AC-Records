@@ -213,61 +213,69 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-slate-400 space-y-6 mb-4">
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest" id="yearTitle">年度統計</h3>
-                            <div class="text-[10px] text-slate-400">年度數量: <span class="text-slate-700 font-bold" id="yCounts">冷0 / 洗0 / 水0</span></div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 mt-2 text-center">
-                            <div><p class="text-[10px] text-slate-400 mb-1">年度總營收</p><p class="text-lg font-bold text-slate-800" id="yRev">$0</p></div>
-                            <div><p class="text-[10px] text-slate-400 mb-1">年度支出</p><p class="text-lg font-bold text-rose-400" id="yExp">$0</p></div>
-                            <div><p class="text-[10px] text-emerald-600 font-bold mb-1">年度淨利</p><p class="text-lg font-bold text-emerald-700" id="yNet">$0</p></div>
-                        </div>
-
-                        <!-- 年度 PASS 案件分類統計 -->
-                        <div id="passYearSummarySection" class="mt-3 pt-3 border-t border-indigo-100 bg-indigo-50/20 -mx-5 px-5 hidden">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                    <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (年度)
-                                </h3>
-                                <span class="text-[10px] text-indigo-400 font-bold" id="passYearTotal">總額 $0</span>
+                <!-- 統計資訊卡片區 -->
+                <div class="space-y-3 mb-4">
+                    <!-- 年度統計卡片 (Slate 風格) -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-slate-400">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest" id="yearTitle">年度統計</h3>
+                                <div class="text-[10px] text-slate-400">年度數量: <span class="text-slate-700 font-bold" id="yCounts">冷0 / 洗0 / 水0</span></div>
                             </div>
-                            <div id="passYearSummaryList" class="grid grid-cols-2 gap-2 pb-2"></div>
+                            <div class="grid grid-cols-3 gap-2 mt-2 text-center">
+                                <div><p class="text-[10px] text-slate-400 mb-1">年度總營收</p><p class="text-lg font-bold text-slate-800" id="yRev">$0</p></div>
+                                <div><p class="text-[10px] text-slate-400 mb-1">年度支出</p><p class="text-lg font-bold text-rose-400" id="yExp">$0</p></div>
+                                <div><p class="text-[10px] text-emerald-600 font-bold mb-1">年度淨利</p><p class="text-lg font-bold text-emerald-700" id="yNet">$0</p></div>
+                            </div>
+
+                            <!-- 年度 PASS 案件分類統計 -->
+                            <div id="passYearSummarySection" class="mt-3 pt-3 border-t border-indigo-100 bg-indigo-50/20 -mx-5 px-5 hidden">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                        <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (年度)
+                                    </h3>
+                                    <span class="text-[10px] text-indigo-400 font-bold" id="passYearTotal">總額 $0</span>
+                                </div>
+                                <div id="passYearSummaryList" class="grid grid-cols-2 gap-2 pb-2"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="border-t border-slate-100 pt-4">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest" id="monthTitle">本月統計</h3>
-                            <div class="text-[10px] text-slate-400">月度數量: <span class="text-slate-700 font-bold" id="mCounts">冷0 / 洗0 / 水0</span></div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 mt-2 text-center">
-                            <div><p class="text-[10px] text-slate-400 mb-1">本月總營收</p><p class="text-lg font-bold text-slate-800" id="mRev">$0</p></div>
-                            <div><p class="text-[10px] text-slate-400 mb-1">本月支出</p><p class="text-lg font-bold text-rose-400" id="mExp">$0</p></div>
-                            <div><p class="text-[10px] text-emerald-600 font-bold mb-1">本月淨利</p><p class="text-lg font-bold text-emerald-700" id="mNet">$0</p></div>
-                        </div>
-                        
-                        <!-- 月度 PASS 案件分類統計 -->
-                        <div id="passSummarySection" class="mt-3 pt-3 border-t border-indigo-100 bg-indigo-50/20 -mx-5 px-5 hidden">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                    <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (月度)
-                                </h3>
-                                <span class="text-[10px] text-indigo-400 font-bold" id="passMonthTotal">總額 $0</span>
+                    <!-- 月度統計卡片 (Emerald 風格) -->
+                    <div class="bg-emerald-50/40 p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-emerald-600 text-[10px] font-bold uppercase tracking-widest" id="monthTitle">本月統計</h3>
+                                <div class="text-[10px] text-emerald-600/70">月度數量: <span class="text-emerald-800 font-bold" id="mCounts">冷0 / 洗0 / 水0</span></div>
                             </div>
-                            <div id="passSummaryList" class="grid grid-cols-2 gap-2 pb-2"></div>
+                            <div class="grid grid-cols-3 gap-2 mt-2 text-center">
+                                <div><p class="text-[10px] text-emerald-600/70 mb-1">本月總營收</p><p class="text-lg font-bold text-emerald-900" id="mRev">$0</p></div>
+                                <div><p class="text-[10px] text-emerald-600/70 mb-1">本月支出</p><p class="text-lg font-bold text-rose-500" id="mExp">$0</p></div>
+                                <div><p class="text-[10px] text-emerald-600 font-bold mb-1">本月淨利</p><p class="text-lg font-bold text-emerald-700" id="mNet">$0</p></div>
+                            </div>
+                            
+                            <!-- 月度 PASS 案件分類統計 -->
+                            <div id="passSummarySection" class="mt-3 pt-3 border-t border-emerald-100 bg-white/40 -mx-5 px-5 hidden">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="text-emerald-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                        <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (月度)
+                                    </h3>
+                                    <span class="text-[10px] text-emerald-600 font-bold" id="passMonthTotal">總額 $0</span>
+                                </div>
+                                <div id="passSummaryList" class="grid grid-cols-2 gap-2 pb-2"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div id="unpaidSection" class="border-t border-amber-100 pt-4 bg-amber-50/30 -mx-5 px-5 pb-2 hidden">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="text-amber-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                <i data-lucide="alert-circle" class="w-3 h-3"></i> 本月待收款明細 (點擊姓名跳轉)
-                            </h3>
-                            <button onclick="quickFilterUnpaid()" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md hover:bg-amber-200 transition-colors font-bold">查看全部待收</button>
+                        <!-- 待收款明細 (移入月度卡片底部) -->
+                        <div id="unpaidSection" class="border-t border-amber-200 mt-4 pt-4 -mx-5 px-5 pb-2 hidden">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-amber-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                    <i data-lucide="alert-circle" class="w-3 h-3"></i> 本月待收款明細 (點擊姓名跳轉)
+                                </h3>
+                                <button onclick="quickFilterUnpaid()" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md hover:bg-amber-200 transition-colors font-bold">查看全部待收</button>
+                            </div>
+                            <div id="unpaidList" class="space-y-1 text-[11px] text-amber-900"></div>
                         </div>
-                        <div id="unpaidList" class="space-y-1 text-[11px] text-amber-800"></div>
                     </div>
                 </div>
 
@@ -277,12 +285,13 @@
                             <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
                                 <i data-lucide="search" class="w-4 h-4"></i>
                             </div>
-                            <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名、地址、機型所 PASS 對象..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
+                            <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名、地址、機型、PASS..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
                         </div>
-                        <div class="flex-[2] flex items-center gap-1">
+                        <div class="flex-[3] flex items-center gap-1">
                             <button onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                             <input type="month" id="monthFilter" onchange="filterRecords()" class="flex-1 bg-slate-50 border-none rounded-xl p-2 text-sm outline-none text-center font-medium h-[42px]">
                             <button onclick="changeMonth(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            <button onclick="clearMonthFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none" title="清除年月篩選"><i data-lucide="calendar-x" class="w-4 h-4"></i></button>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
@@ -628,6 +637,11 @@
             });
         };
 
+        window.clearMonthFilter = () => {
+            document.getElementById('monthFilter').value = "";
+            filterRecords();
+        };
+
         window.filterRecords = () => {
             const kw = document.getElementById('searchKeyword').value.toLowerCase();
             const mon = document.getElementById('monthFilter').value;
@@ -635,6 +649,7 @@
             const status = document.getElementById('statusFilter').value;
             const payment = document.getElementById('paymentFilter').value;
 
+            // 統計數據變數 (僅受時間過濾影響，不受關鍵字影響)
             let mRev = 0, mExp = 0, mAc = 0, mWm = 0, mWt = 0;
             let yRev = 0, yExp = 0, yAc = 0, yWm = 0, yWt = 0;
             let aAc = 0, aWm = 0, aWt = 0, aRev = 0, aExp = 0;
@@ -643,41 +658,55 @@
             let yPassSummary = {}; 
             
             const filterYear = mon ? mon.split('-')[0] : new Date().getFullYear().toString();
-            const filterMonthName = mon ? mon.split('-')[1] : (new Date().getMonth() + 1).toString().padStart(2, '0');
+            const filterMonthName = mon ? mon.split('-')[1] : "全部";
             document.getElementById('yearTitle').innerText = `${filterYear} 年度統計`;
-            document.getElementById('monthTitle').innerText = `${filterMonthName} 月份統計`;
+            document.getElementById('monthTitle').innerText = mon ? `${filterMonthName} 月份統計` : "全期統計";
 
             allRecords.forEach(r => {
+                // 全部累積計算
                 aAc += (r.acCount || 0); aWm += (r.wmCount || 0); aWt += (r.wtCount || 0);
                 aRev += (r.totalAmount || 0); aExp += (r.assistantPay || 0);
+
+                const iY = r.bookingTime.split('-')[0];
+                const iM = r.bookingTime.substring(0, 7);
+                const iQty = (r.acCount || 0) + (r.wmCount || 0) + (r.wtCount || 0);
+
+                // 年度統計計算 (不受列表篩選影響)
+                if (iY === filterYear) { 
+                    yRev += r.totalAmount; yExp += r.assistantPay; yAc += (r.acCount || 0); yWm += (r.wmCount || 0); yWt += (r.wtCount || 0); 
+                    if (r.passFrom) {
+                        yPassSummary[r.passFrom] = (yPassSummary[r.passFrom] || { qty: 0, rev: 0, exp: 0 });
+                        yPassSummary[r.passFrom].qty += iQty;
+                        yPassSummary[r.passFrom].rev += r.totalAmount;
+                        yPassSummary[r.passFrom].exp += r.assistantPay;
+                    }
+                }
+
+                // 月度統計計算 (不受列表篩選影響)
+                if (!mon || iM === mon) { 
+                    mRev += r.totalAmount; mExp += r.assistantPay; mAc += (r.acCount || 0); mWm += (r.wmCount || 0); mWt += (r.wtCount || 0);
+                    if (r.payment === 'unpaid') mUnpaidDetails.push({ id: r.id, name: r.customerName, amount: r.totalAmount });
+                    if (r.passFrom) {
+                        mPassSummary[r.passFrom] = (mPassSummary[r.passFrom] || { qty: 0, rev: 0, exp: 0 });
+                        mPassSummary[r.passFrom].qty += iQty;
+                        mPassSummary[r.passFrom].rev += r.totalAmount;
+                        mPassSummary[r.passFrom].exp += r.assistantPay;
+                    }
+                }
             });
 
+            // 列表資料過濾 (受所有篩選器影響)
             const baseFiltered = allRecords.filter(i => {
-                const iY = i.bookingTime.split('-')[0];
                 const iM = i.bookingTime.substring(0, 7);
-                const iQty = (i.acCount || 0) + (i.wmCount || 0) + (i.wtCount || 0);
-
-                if (iY === filterYear) { 
-                    yRev += i.totalAmount; yExp += i.assistantPay; yAc += (i.acCount || 0); yWm += (i.wmCount || 0); yWt += (i.wtCount || 0); 
-                    if (i.passFrom) {
-                        yPassSummary[i.passFrom] = (yPassSummary[i.passFrom] || { qty: 0, rev: 0, exp: 0 });
-                        yPassSummary[i.passFrom].qty += iQty;
-                        yPassSummary[i.passFrom].rev += i.totalAmount;
-                        yPassSummary[i.passFrom].exp += i.assistantPay;
-                    }
-                }
-                if (mon && iM === mon) { 
-                    mRev += i.totalAmount; mExp += i.assistantPay; mAc += (i.acCount || 0); mWm += (i.wmCount || 0); mWt += (i.wtCount || 0);
-                    if (i.payment === 'unpaid') mUnpaidDetails.push({ id: i.id, name: i.customerName, amount: i.totalAmount });
-                    if (i.passFrom) {
-                        mPassSummary[i.passFrom] = (mPassSummary[i.passFrom] || { qty: 0, rev: 0, exp: 0 });
-                        mPassSummary[i.passFrom].qty += iQty;
-                        mPassSummary[i.passFrom].rev += i.totalAmount;
-                        mPassSummary[i.passFrom].exp += i.assistantPay;
-                    }
-                }
                 const searchStr = `${i.customerName} ${i.address} ${i.acBrand} ${i.assistantDetail || ''} ${i.passFrom || ''} ${i.note}`.toLowerCase();
-                return searchStr.includes(kw) && (mon ? iM === mon : true) && (type === 'all' || (type === 'ac' && i.acCount > 0) || (type === 'wm' && i.wmCount > 0) || (type === 'wt' && i.wtCount > 0)) && (status === 'all' || i.status === status) && (payment === 'all' || i.payment === payment);
+                
+                const matchSearch = searchStr.includes(kw);
+                const matchMonth = (!mon || iM === mon);
+                const matchType = (type === 'all' || (type === 'ac' && i.acCount > 0) || (type === 'wm' && i.wmCount > 0) || (type === 'wt' && i.wtCount > 0));
+                const matchStatus = (status === 'all' || i.status === status);
+                const matchPayment = (payment === 'all' || i.payment === payment);
+
+                return matchSearch && matchMonth && matchType && matchStatus && matchPayment;
             });
 
             // 渲染年度 PASS 統計
@@ -713,15 +742,15 @@
                     passTotalAmt += mPassSummary[k].rev;
                     const net = mPassSummary[k].rev - mPassSummary[k].exp;
                     return `
-                    <div class="flex flex-col bg-white p-2 rounded-lg border border-indigo-100">
+                    <div class="flex flex-col bg-white p-2 rounded-lg border border-emerald-100">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] text-indigo-500 font-bold truncate max-w-[60%]">${k}</span>
-                            <span class="text-[10px] text-slate-400 font-bold">${mPassSummary[k].qty}台</span>
+                            <span class="text-[10px] text-emerald-600 font-bold truncate max-w-[60%]">${k}</span>
+                            <span class="text-[10px] text-emerald-400 font-bold">${mPassSummary[k].qty}台</span>
                         </div>
-                        <div class="text-[9px] space-y-0.5 text-slate-500">
+                        <div class="text-[9px] space-y-0.5 text-emerald-800/70">
                             <div class="flex justify-between"><span>收:</span><span>$${mPassSummary[k].rev.toLocaleString()}</span></div>
                             <div class="flex justify-between"><span>支:</span><span>$${mPassSummary[k].exp.toLocaleString()}</span></div>
-                            <div class="flex justify-between border-t border-indigo-50 pt-0.5 font-bold text-indigo-700"><span>淨:</span><span>$${net.toLocaleString()}</span></div>
+                            <div class="flex justify-between border-t border-emerald-50 pt-0.5 font-bold text-emerald-700"><span>淨:</span><span>$${net.toLocaleString()}</span></div>
                         </div>
                     </div>`;
                 }).join('');
@@ -741,6 +770,7 @@
             document.getElementById('yCounts').innerText = `冷${yAc} / 洗${yWm} / 水${yWt}`;
 
             renderRecords(baseFiltered.sort((a, b) => b.bookingTime.localeCompare(a.bookingTime)));
+            lucide.createIcons();
         };
 
         function renderRecords(data) {
@@ -854,7 +884,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        window.changeMonth = (o) => { const i = document.getElementById('monthFilter'); let [y, m] = i.value.split('-').map(Number); let d = new Date(y, m - 1); d.setMonth(d.getMonth() + o); i.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; filterRecords(); };
+        window.changeMonth = (o) => { const i = document.getElementById('monthFilter'); if (!i.value) i.value = new Date().toISOString().substring(0, 7); let [y, m] = i.value.split('-').map(Number); let d = new Date(y, m - 1); d.setMonth(d.getMonth() + o); i.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; filterRecords(); };
         window.quickFilterUnpaid = () => { document.getElementById('paymentFilter').value = 'unpaid'; filterRecords(); };
         window.deleteRec = async (id) => { if(confirm('確定要刪除嗎？')) await deleteDoc(doc(db, "cleaningRecords", id)); };
     </script>
