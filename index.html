@@ -73,7 +73,7 @@
         </div>
     </nav>
 
-    <div class="container mx-auto px-3 md:px-4 py-6">
+    <div class="container mx-auto px-1.5 md:px-4 py-6">
         
         <section id="formPage" class="hidden max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
             <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">
@@ -129,11 +129,22 @@
                         <button type="button" onclick="addAssistantRow()" class="text-[10px] bg-rose-500 text-white px-2 py-1 rounded shadow-sm">+ 增加小幫手</button>
                     </div>
                     <div id="assistantDetailsContainer" class="space-y-2"></div>
-                    <div id="quickAssistantTags" class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-rose-100/50">
-                        </div>
+                    <div id="quickAssistantTags" class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-rose-100/50"></div>
+                </div>
+
+                <!-- PASS 案件區塊 -->
+                <div class="space-y-2 bg-indigo-50/30 p-4 rounded-xl border border-indigo-100">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider"><i data-lucide="forward" class="lucide mr-1"></i> PASS 案件設定</label>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="passFrom" list="passNamesList" placeholder="輸入 PASS 來源對象名稱" class="flex-1 rounded-lg p-2 border border-indigo-100 text-sm" oninput="updateQuickPassTags()">
+                    </div>
+                    <div id="quickPassTags" class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-indigo-100/50"></div>
                 </div>
 
                 <datalist id="assistantNamesList"></datalist>
+                <datalist id="passNamesList"></datalist>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                     <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">總收費</label><input type="number" id="totalAmount" required onfocus="this.select()" class="w-full border-slate-200 rounded-xl p-3 border font-bold"></div>
@@ -165,9 +176,6 @@
                         <div><p class="text-[10px] text-emerald-300">淨實收</p><p class="text-sm font-bold text-emerald-300" id="allNet">$0</p></div>
                     </div>
                 </div>
-                <button onclick="toggleAssistantModal()" class="absolute -right-2 -top-2 bg-rose-500 text-white text-[10px] px-3 py-1.5 rounded-full shadow-lg border-2 border-white animate-pulse flex items-center gap-1">
-                    <i data-lucide="banknote" class="w-3 h-3"></i>薪資明細
-                </button>
             </div>
 
             <div id="assistantSummaryOverlay" onclick="toggleAssistantModal()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[90]"></div>
@@ -178,8 +186,7 @@
                     </h4>
                     <button onclick="toggleAssistantModal()" class="text-slate-400 text-xl hover:text-slate-600">&times;</button>
                 </div>
-                <div id="assistantSummaryList" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-                    </div>
+                <div id="assistantSummaryList" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1"></div>
                 <div class="mt-4 pt-3 border-t text-[10px] text-slate-400 text-center">
                     點擊背景或叉叉可關閉
                 </div>
@@ -196,6 +203,17 @@
                         <div><p class="text-[10px] text-slate-400 mb-1">年度支出</p><p class="text-lg font-bold text-rose-400" id="yExp">$0</p></div>
                         <div><p class="text-[10px] text-emerald-600 font-bold mb-1">年度淨利</p><p class="text-lg font-bold text-emerald-700" id="yNet">$0</p></div>
                     </div>
+
+                    <!-- 年度 PASS 案件分類統計 -->
+                    <div id="passYearSummarySection" class="mt-3 pt-3 border-t border-indigo-100 bg-indigo-50/20 -mx-5 px-5 hidden">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (年度)
+                            </h3>
+                            <span class="text-[10px] text-indigo-400 font-bold" id="passYearTotal">總額 $0</span>
+                        </div>
+                        <div id="passYearSummaryList" class="grid grid-cols-2 gap-2 pb-2"></div>
+                    </div>
                 </div>
 
                 <div class="border-t border-slate-100 pt-4">
@@ -207,6 +225,17 @@
                         <div><p class="text-[10px] text-slate-400 mb-1">本月總營收</p><p class="text-lg font-bold text-slate-800" id="mRev">$0</p></div>
                         <div><p class="text-[10px] text-slate-400 mb-1">本月支出</p><p class="text-lg font-bold text-rose-400" id="mExp">$0</p></div>
                         <div><p class="text-[10px] text-emerald-600 font-bold mb-1">本月淨利</p><p class="text-lg font-bold text-emerald-700" id="mNet">$0</p></div>
+                    </div>
+                    
+                    <!-- 月度 PASS 案件分類統計 -->
+                    <div id="passSummarySection" class="mt-3 pt-3 border-t border-indigo-100 bg-indigo-50/20 -mx-5 px-5 hidden">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (月度)
+                            </h3>
+                            <span class="text-[10px] text-indigo-400 font-bold" id="passMonthTotal">總額 $0</span>
+                        </div>
+                        <div id="passSummaryList" class="grid grid-cols-2 gap-2 pb-2"></div>
                     </div>
                 </div>
 
@@ -227,7 +256,7 @@
                         <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
                             <i data-lucide="search" class="w-4 h-4"></i>
                         </div>
-                        <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名、地址或機型內容..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
+                        <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名、地址、機型所 PASS 對象..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
                     </div>
                     <div class="flex-[2] flex items-center gap-1">
                         <button onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
@@ -264,7 +293,8 @@
         const recordsCol = collection(db, "cleaningRecords");
         let allRecords = [];
         let editingId = null;
-        let knownAssistantNames = []; // 存儲不重疊的小幫手名稱
+        let knownAssistantNames = []; 
+        let knownPassNames = []; // 存儲不重疊的 PASS 對象名稱
 
         // 初始化圖示
         document.addEventListener('DOMContentLoaded', () => {
@@ -276,7 +306,7 @@
         window.showPage = (id) => {
             document.getElementById('formPage').classList.toggle('hidden', id !== 'formPage');
             document.getElementById('listPage').classList.toggle('hidden', id !== 'listPage');
-            lucide.createIcons(); // 重新渲染圖示
+            lucide.createIcons(); 
         };
 
         window.prepareNewForm = () => {
@@ -284,8 +314,10 @@
             document.getElementById('recordForm').reset();
             document.getElementById('acDetailsContainer').innerHTML = '';
             document.getElementById('assistantDetailsContainer').innerHTML = '';
+            document.getElementById('passFrom').value = '';
             toggleAcBrand();
             updateQuickAssistantTags();
+            updateQuickPassTags();
             showPage('formPage');
         };
 
@@ -349,23 +381,29 @@
             document.getElementById('assistantPay').value = total;
         };
 
-        // 更新快速點選標籤
         window.updateQuickAssistantTags = () => {
             const container = document.getElementById('quickAssistantTags');
             const currentNamesInForm = Array.from(document.querySelectorAll('.as-name-input')).map(input => input.value.trim());
-            
-            // 過濾掉已經在表單裡的名字
             const availableNames = knownAssistantNames.filter(name => !currentNamesInForm.includes(name));
-            
             if (availableNames.length === 0) {
                 container.innerHTML = '<span class="text-[10px] text-rose-300">無更多常用名字</span>';
                 return;
             }
-
             container.innerHTML = availableNames.map(name => `
-                <button type="button" onclick="addAssistantRow('${name}')" class="px-2 py-1 bg-white border border-rose-200 text-rose-600 rounded text-[10px] hover:bg-rose-50 transition-colors font-medium">
-                    + ${name}
-                </button>
+                <button type="button" onclick="addAssistantRow('${name}')" class="px-2 py-1 bg-white border border-rose-200 text-rose-600 rounded text-[10px] hover:bg-rose-50 transition-colors font-medium">+ ${name}</button>
+            `).join('');
+        };
+
+        window.updateQuickPassTags = () => {
+            const container = document.getElementById('quickPassTags');
+            const currentName = document.getElementById('passFrom').value.trim();
+            const availableNames = knownPassNames.filter(name => name !== currentName);
+            if (availableNames.length === 0) {
+                container.innerHTML = '<span class="text-[10px] text-indigo-300">尚無常用對象</span>';
+                return;
+            }
+            container.innerHTML = availableNames.map(name => `
+                <button type="button" onclick="document.getElementById('passFrom').value='${name}'; updateQuickPassTags();" class="px-2 py-1 bg-white border border-indigo-200 text-indigo-600 rounded text-[10px] hover:bg-indigo-50 transition-colors font-medium">${name}</button>
             `).join('');
         };
 
@@ -404,6 +442,7 @@
                 address: document.getElementById('address').value || "",
                 acCount: totalAc, acBrand: acDetailsArray.join('+'),
                 assistantDetail: assistantArray.join(','),
+                passFrom: document.getElementById('passFrom').value.trim(),
                 wmCount: parseInt(document.getElementById('wmCount').value) || 0,
                 wtCount: parseInt(document.getElementById('wtCount').value) || 0,
                 totalAmount: parseInt(document.getElementById('totalAmount').value) || 0,
@@ -428,30 +467,34 @@
 
         onSnapshot(recordsCol, (snap) => {
             allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            updateAssistantDatalist();
+            updateDatalists();
             filterRecords();
         });
 
-        function updateAssistantDatalist() {
-            const names = new Set();
+        function updateDatalists() {
+            const asNames = new Set();
+            const psNames = new Set();
             allRecords.forEach(r => { 
                 if (r.assistantDetail) {
                     r.assistantDetail.split(',').forEach(s => {
                         const name = s.split(':')[0];
-                        if (name) names.add(name);
+                        if (name) asNames.add(name);
                     });
                 } 
+                if (r.passFrom) psNames.add(r.passFrom);
             });
-            knownAssistantNames = Array.from(names).sort();
+            knownAssistantNames = Array.from(asNames).sort();
+            knownPassNames = Array.from(psNames).sort();
             document.getElementById('assistantNamesList').innerHTML = knownAssistantNames.map(n => `<option value="${n}">`).join('');
+            document.getElementById('passNamesList').innerHTML = knownPassNames.map(n => `<option value="${n}">`).join('');
             updateQuickAssistantTags();
+            updateQuickPassTags();
         }
 
         window.toggleAssistantModal = () => {
             const modal = document.getElementById('assistantSummaryModal');
             const overlay = document.getElementById('assistantSummaryOverlay');
             const isHidden = modal.classList.contains('hidden');
-            
             if (isHidden) {
                 renderAssistantSummary();
                 modal.classList.remove('hidden');
@@ -466,31 +509,22 @@
         function renderAssistantSummary() {
             const summary = {};
             let unclassified = 0;
-
             allRecords.forEach(r => {
                 const totalPay = parseInt(r.assistantPay) || 0;
                 if (totalPay <= 0) return;
-
                 if (r.assistantDetail) {
                     const details = r.assistantDetail.split(',');
                     details.forEach(detail => {
                         const [name, amount] = detail.split(':');
                         const amt = parseInt(amount) || 0;
-                        if (name) {
-                            summary[name] = (summary[name] || 0) + amt;
-                        } else {
-                            unclassified += amt;
-                        }
+                        if (name) { summary[name] = (summary[name] || 0) + amt; } 
+                        else { unclassified += amt; }
                     });
-                } else {
-                    unclassified += totalPay;
-                }
+                } else { unclassified += totalPay; }
             });
-
             const container = document.getElementById('assistantSummaryList');
             let html = "";
             const sortedNames = Object.keys(summary).sort((a, b) => summary[b] - summary[a]);
-            
             sortedNames.forEach(name => {
                 html += `
                 <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -498,7 +532,6 @@
                     <span class="font-black text-rose-500">$${summary[name].toLocaleString()}</span>
                 </div>`;
             });
-
             if (unclassified > 0) {
                 html += `
                 <div class="flex justify-between items-center bg-amber-50 p-3 rounded-xl border border-amber-100">
@@ -506,7 +539,6 @@
                     <span class="font-black text-amber-600">$${unclassified.toLocaleString()}</span>
                 </div>`;
             }
-
             if (html === "") html = "<p class='text-center text-slate-400 py-4'>尚無小幫手支出紀錄</p>";
             container.innerHTML = html;
         }
@@ -516,10 +548,7 @@
                 const originalHTML = btn.innerHTML;
                 btn.innerHTML = '<i data-lucide="check" class="text-emerald-500 w-[10px] h-[10px]"></i>';
                 lucide.createIcons();
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
-                    lucide.createIcons();
-                }, 1500);
+                setTimeout(() => { btn.innerHTML = originalHTML; lucide.createIcons(); }, 1500);
             });
         };
 
@@ -534,6 +563,8 @@
             let yRev = 0, yExp = 0, yAc = 0, yWm = 0, yWt = 0;
             let aAc = 0, aWm = 0, aWt = 0, aRev = 0, aExp = 0;
             let mUnpaidDetails = []; 
+            let mPassSummary = {}; // 月度 PASS 統計
+            let yPassSummary = {}; // 年度 PASS 統計
             
             const filterYear = mon ? mon.split('-')[0] : new Date().getFullYear().toString();
             const filterMonthName = mon ? mon.split('-')[1] : (new Date().getMonth() + 1).toString().padStart(2, '0');
@@ -548,14 +579,78 @@
             const baseFiltered = allRecords.filter(i => {
                 const iY = i.bookingTime.split('-')[0];
                 const iM = i.bookingTime.substring(0, 7);
-                if (iY === filterYear) { yRev += i.totalAmount; yExp += i.assistantPay; yAc += (i.acCount || 0); yWm += (i.wmCount || 0); yWt += (i.wtCount || 0); }
+                const iQty = (i.acCount || 0) + (i.wmCount || 0) + (i.wtCount || 0);
+
+                if (iY === filterYear) { 
+                    yRev += i.totalAmount; yExp += i.assistantPay; yAc += (i.acCount || 0); yWm += (i.wmCount || 0); yWt += (i.wtCount || 0); 
+                    if (i.passFrom) {
+                        yPassSummary[i.passFrom] = (yPassSummary[i.passFrom] || { qty: 0, rev: 0, exp: 0 });
+                        yPassSummary[i.passFrom].qty += iQty;
+                        yPassSummary[i.passFrom].rev += i.totalAmount;
+                        yPassSummary[i.passFrom].exp += i.assistantPay;
+                    }
+                }
                 if (mon && iM === mon) { 
                     mRev += i.totalAmount; mExp += i.assistantPay; mAc += (i.acCount || 0); mWm += (i.wmCount || 0); mWt += (i.wtCount || 0);
                     if (i.payment === 'unpaid') mUnpaidDetails.push({ id: i.id, name: i.customerName, amount: i.totalAmount });
+                    if (i.passFrom) {
+                        mPassSummary[i.passFrom] = (mPassSummary[i.passFrom] || { qty: 0, rev: 0, exp: 0 });
+                        mPassSummary[i.passFrom].qty += iQty;
+                        mPassSummary[i.passFrom].rev += i.totalAmount;
+                        mPassSummary[i.passFrom].exp += i.assistantPay;
+                    }
                 }
-                const searchStr = `${i.customerName} ${i.address} ${i.acBrand} ${i.assistantDetail || ''} ${i.note}`.toLowerCase();
+                const searchStr = `${i.customerName} ${i.address} ${i.acBrand} ${i.assistantDetail || ''} ${i.passFrom || ''} ${i.note}`.toLowerCase();
                 return searchStr.includes(kw) && (mon ? iM === mon : true) && (type === 'all' || (type === 'ac' && i.acCount > 0) || (type === 'wm' && i.wmCount > 0) || (type === 'wt' && i.wtCount > 0)) && (status === 'all' || i.status === status) && (payment === 'all' || i.payment === payment);
             });
+
+            // 渲染年度 PASS 統計
+            const passYearSortedKeys = Object.keys(yPassSummary).sort((a,b) => yPassSummary[b].rev - yPassSummary[a].rev);
+            if (passYearSortedKeys.length > 0) {
+                document.getElementById('passYearSummarySection').classList.remove('hidden');
+                let passYearTotalAmt = 0;
+                document.getElementById('passYearSummaryList').innerHTML = passYearSortedKeys.map(k => {
+                    passYearTotalAmt += yPassSummary[k].rev;
+                    const net = yPassSummary[k].rev - yPassSummary[k].exp;
+                    return `
+                    <div class="flex flex-col bg-white p-2 rounded-lg border border-indigo-100">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] text-indigo-500 font-bold truncate max-w-[60%]">${k}</span>
+                            <span class="text-[10px] text-slate-400 font-bold">${yPassSummary[k].qty}台</span>
+                        </div>
+                        <div class="text-[9px] space-y-0.5 text-slate-500">
+                            <div class="flex justify-between"><span>收:</span><span>$${yPassSummary[k].rev.toLocaleString()}</span></div>
+                            <div class="flex justify-between"><span>支:</span><span>$${yPassSummary[k].exp.toLocaleString()}</span></div>
+                            <div class="flex justify-between border-t border-indigo-50 pt-0.5 font-bold text-indigo-700"><span>淨:</span><span>$${net.toLocaleString()}</span></div>
+                        </div>
+                    </div>`;
+                }).join('');
+                document.getElementById('passYearTotal').innerText = `總額 $${passYearTotalAmt.toLocaleString()}`;
+            } else { document.getElementById('passYearSummarySection').classList.add('hidden'); }
+
+            // 渲染月度 PASS 統計
+            const passSortedKeys = Object.keys(mPassSummary).sort((a,b) => mPassSummary[b].rev - mPassSummary[a].rev);
+            if (passSortedKeys.length > 0) {
+                document.getElementById('passSummarySection').classList.remove('hidden');
+                let passTotalAmt = 0;
+                document.getElementById('passSummaryList').innerHTML = passSortedKeys.map(k => {
+                    passTotalAmt += mPassSummary[k].rev;
+                    const net = mPassSummary[k].rev - mPassSummary[k].exp;
+                    return `
+                    <div class="flex flex-col bg-white p-2 rounded-lg border border-indigo-100">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] text-indigo-500 font-bold truncate max-w-[60%]">${k}</span>
+                            <span class="text-[10px] text-slate-400 font-bold">${mPassSummary[k].qty}台</span>
+                        </div>
+                        <div class="text-[9px] space-y-0.5 text-slate-500">
+                            <div class="flex justify-between"><span>收:</span><span>$${mPassSummary[k].rev.toLocaleString()}</span></div>
+                            <div class="flex justify-between"><span>支:</span><span>$${mPassSummary[k].exp.toLocaleString()}</span></div>
+                            <div class="flex justify-between border-t border-indigo-50 pt-0.5 font-bold text-indigo-700"><span>淨:</span><span>$${net.toLocaleString()}</span></div>
+                        </div>
+                    </div>`;
+                }).join('');
+                document.getElementById('passMonthTotal').innerText = `總額 $${passTotalAmt.toLocaleString()}`;
+            } else { document.getElementById('passSummarySection').classList.add('hidden'); }
 
             if (mUnpaidDetails.length > 0) {
                 document.getElementById('unpaidSection').classList.remove('hidden');
@@ -591,7 +686,10 @@
 
                 return `
                 <tr id="rec-${i.id}" class="${isComp ? 'completed-row' : ''}">
-                    <td data-label="預約時間" class="px-6 py-4 time-display">${i.bookingTime.replace('T',' ')}</td>
+                    <td data-label="預約時間" class="px-6 py-4 time-display flex justify-between items-center">
+                        <span>${i.bookingTime.replace('T',' ')}</span>
+                        ${i.passFrom ? `<span class="text-indigo-500 font-bold flex items-center gap-1"><i data-lucide="forward" class="w-3 h-3"></i>PASS: ${i.passFrom}</span>` : '<span></span>'}
+                    </td>
                     <td data-label="客戶" class="px-6 py-4 flex items-center gap-2">
                         <span class="font-bold text-slate-900">${i.customerName}</span>
                         ${i.phone ? `<span class="text-[12px] text-slate-400 font-normal flex items-center gap-0.5"><i data-lucide="phone" class="w-3 h-3"></i>${i.phone}</span>` : ''}
@@ -631,7 +729,7 @@
                     </td>
                 </tr>`;
             }).join('');
-            lucide.createIcons(); // 動態更新後重新初始化圖示
+            lucide.createIcons();
         }
 
         window.scrollToRecord = (id) => {
@@ -653,6 +751,7 @@
             document.getElementById('totalAmount').value = r.totalAmount;
             document.getElementById('assistantPay').value = r.assistantPay;
             document.getElementById('note').value = r.note;
+            document.getElementById('passFrom').value = r.passFrom || "";
             
             const acContainer = document.getElementById('acDetailsContainer');
             acContainer.innerHTML = '';
@@ -674,6 +773,7 @@
             }
             toggleAcBrand();
             updateQuickAssistantTags();
+            updateQuickPassTags();
             showPage('formPage');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
