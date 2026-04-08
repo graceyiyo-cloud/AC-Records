@@ -167,12 +167,17 @@
                     <datalist id="assistantNamesList"></datalist>
                     <datalist id="passNamesList"></datalist>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-                        <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">總收費</label><input type="number" id="totalAmount" required onfocus="this.select()" class="w-full border-slate-200 rounded-xl p-3 border font-bold"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+                        <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">總收費</label><input type="number" id="totalAmount" required onfocus="this.select()" oninput="calcFormNet()" class="w-full border-slate-200 rounded-xl p-3 border font-bold"></div>
                         <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">小幫手總支出</label><input type="number" id="assistantPay" value="0" readonly class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border font-bold text-rose-500"></div>
+                        <div><label class="block text-xs font-bold text-emerald-600 uppercase mb-1">預估淨利</label><input type="text" id="formNetProfit" value="$0" readonly class="w-full bg-emerald-50 border-emerald-100 rounded-xl p-3 border font-bold text-emerald-700"></div>
                     </div>
                     <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">其他備註</label><textarea id="note" rows="3" class="w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"></textarea></div>
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-md transition-all active:scale-[0.98]">確認儲存紀錄</button>
+                    
+                    <div class="flex gap-3">
+                        <button type="button" onclick="showPage('listPage')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-4 rounded-xl transition-all active:scale-[0.98] border border-slate-200/50">返回清單</button>
+                        <button type="submit" class="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-md transition-all active:scale-[0.98]">確認儲存紀錄</button>
+                    </div>
                 </form>
             </section>
 
@@ -188,13 +193,13 @@
                             <div><p class="text-[10px] text-slate-400">洗衣機</p><p class="text-xl font-bold" id="allWm">0</p></div>
                             <div><p class="text-[10px] text-slate-400">水塔</p><p class="text-xl font-bold" id="allWt">0</p></div>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 text-center">
-                            <div><p class="text-[10px] text-slate-400">總收入</p><p class="text-sm font-bold" id="allRev">$0</p></div>
+                        <div class="grid grid-cols-3 gap-2 text-center items-end">
+                            <div><p class="text-[10px] text-slate-400 mb-1">總收入</p><p class="text-sm font-bold leading-tight" id="allRev">$0</p></div>
                             <div class="relative group">
-                                <p class="text-[10px] text-slate-400">小幫手</p>
-                                <button onclick="toggleAssistantModal()" class="text-sm font-bold text-rose-300 underline decoration-rose-300/40" id="allExp">$0</button>
+                                <p class="text-[10px] text-slate-400 mb-1">小幫手</p>
+                                <button onclick="showAllAssistantDetails()" class="text-sm font-bold text-rose-300 underline decoration-rose-300/40 leading-tight p-0 inline-block bg-transparent border-none" id="allExp">$0</button>
                             </div>
-                            <div><p class="text-[10px] text-emerald-300">淨實收</p><p class="text-sm font-bold text-emerald-300" id="allNet">$0</p></div>
+                            <div><p class="text-[10px] text-emerald-300 mb-1">淨實收</p><p class="text-sm font-bold text-emerald-300 leading-tight" id="allNet">$0</p></div>
                         </div>
                     </div>
                 </div>
@@ -203,7 +208,7 @@
                 <div id="assistantSummaryModal" class="hidden bg-white rounded-2xl shadow-2xl p-5 border border-slate-200">
                     <div class="flex justify-between items-center mb-4 border-b pb-2">
                         <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                            <i data-lucide="handshake" class="w-4 h-4"></i> 小幫手薪資總計 (全期)
+                            <i data-lucide="handshake" class="w-4 h-4"></i> <span id="assistantModalTitle">小幫手薪資總計 (全期)</span>
                         </h4>
                         <button onclick="toggleAssistantModal()" class="text-slate-400 text-xl hover:text-slate-600">&times;</button>
                     </div>
@@ -224,7 +229,7 @@
                             </div>
                             <div class="grid grid-cols-3 gap-2 mt-2 text-center">
                                 <div><p class="text-[10px] text-slate-400 mb-1">年度總營收</p><p class="text-lg font-bold text-slate-800" id="yRev">$0</p></div>
-                                <div><p class="text-[10px] text-slate-400 mb-1">年度支出</p><p class="text-lg font-bold text-rose-400" id="yExp">$0</p></div>
+                                <div><p class="text-[10px] text-slate-400 mb-1">年度支出</p><button onclick="showYearAssistantDetails()" class="text-lg font-bold text-rose-400 underline decoration-rose-400/40 leading-tight p-0 inline-block bg-transparent border-none" id="yExp">$0</button></div>
                                 <div><p class="text-[10px] text-emerald-600 font-bold mb-1">年度淨利</p><p class="text-lg font-bold text-emerald-700" id="yNet">$0</p></div>
                             </div>
 
@@ -236,7 +241,7 @@
                                     </h3>
                                     <span class="text-[10px] text-indigo-400 font-bold" id="passYearTotal">總額 $0</span>
                                 </div>
-                                <div id="passYearSummaryList" class="grid grid-cols-2 gap-2 pb-2"></div>
+                                <div id="passYearSummaryList" class="grid grid-cols-1 gap-2 pb-2"></div>
                             </div>
                         </div>
                     </div>
@@ -250,7 +255,7 @@
                             </div>
                             <div class="grid grid-cols-3 gap-2 mt-2 text-center">
                                 <div><p class="text-[10px] text-emerald-600/70 mb-1">本月總營收</p><p class="text-lg font-bold text-emerald-900" id="mRev">$0</p></div>
-                                <div><p class="text-[10px] text-emerald-600/70 mb-1">本月支出</p><p class="text-lg font-bold text-rose-500" id="mExp">$0</p></div>
+                                <div><p class="text-[10px] text-emerald-600/70 mb-1">本月支出</p><button onclick="showMonthAssistantDetails()" class="text-lg font-bold text-rose-500 underline decoration-rose-500/40 leading-tight p-0 inline-block bg-transparent border-none" id="mExp">$0</button></div>
                                 <div><p class="text-[10px] text-emerald-600 font-bold mb-1">本月淨利</p><p class="text-lg font-bold text-emerald-700" id="mNet">$0</p></div>
                             </div>
                             
@@ -262,7 +267,7 @@
                                     </h3>
                                     <span class="text-[10px] text-emerald-600 font-bold" id="passMonthTotal">總額 $0</span>
                                 </div>
-                                <div id="passSummaryList" class="grid grid-cols-2 gap-2 pb-2"></div>
+                                <div id="passSummaryList" class="grid grid-cols-1 gap-2 pb-2"></div>
                             </div>
                         </div>
 
@@ -332,6 +337,10 @@
         let knownPassNames = [];
         let snapshotUnsubscribe = null;
 
+        // 篩選快取，供支出浮窗使用
+        let currentYearRecords = [];
+        let currentMonthRecords = [];
+
         // 授權清單
         const allowedEmails = ['eroraror@gmail.com', 'graceyiyo@gmail.com'];
 
@@ -371,7 +380,6 @@
                 await signInWithPopup(auth, provider);
             } catch (error) {
                 console.error("Login failed", error);
-                // 顯示具體錯誤，幫助使用者在 Firebase Console 診斷
                 errorEl.innerText = `⚠️ 登入失敗！\n錯誤代碼: ${error.code}\n請檢查 Firebase Console 是否啟動 Google 登入並加入授權網域。`;
                 errorEl.classList.remove('hidden');
             }
@@ -406,6 +414,7 @@
             document.getElementById('acDetailsContainer').innerHTML = '';
             document.getElementById('assistantDetailsContainer').innerHTML = '';
             document.getElementById('passFrom').value = '';
+            document.getElementById('formNetProfit').value = '$0';
             toggleAcBrand();
             updateQuickAssistantTags();
             updateQuickPassTags();
@@ -450,7 +459,10 @@
                 const price = parseInt(row.querySelector('.ac-price-input').value) || 0;
                 total += (qty * price);
             });
-            if (total > 0) document.getElementById('totalAmount').value = total;
+            if (total > 0) {
+                document.getElementById('totalAmount').value = total;
+                calcFormNet();
+            }
         };
 
         window.addAssistantRow = (name = "", amount = "") => {
@@ -464,12 +476,20 @@
             `;
             container.appendChild(div);
             updateQuickAssistantTags();
+            calcAssistantTotal();
         };
 
         window.calcAssistantTotal = () => {
             let total = 0;
             document.querySelectorAll('.as-amount-input').forEach(input => total += (parseInt(input.value) || 0));
             document.getElementById('assistantPay').value = total;
+            calcFormNet();
+        };
+
+        window.calcFormNet = () => {
+            const rev = parseInt(document.getElementById('totalAmount').value) || 0;
+            const exp = parseInt(document.getElementById('assistantPay').value) || 0;
+            document.getElementById('formNetProfit').value = `$${(rev - exp).toLocaleString()}`;
         };
 
         window.updateQuickAssistantTags = () => {
@@ -576,12 +596,14 @@
             updateQuickPassTags();
         }
 
-        window.toggleAssistantModal = () => {
+        window.toggleAssistantModal = (title = "小幫手薪資總計 (全期)", records = allRecords) => {
             const modal = document.getElementById('assistantSummaryModal');
             const overlay = document.getElementById('assistantSummaryOverlay');
+            const titleEl = document.getElementById('assistantModalTitle');
             const isHidden = modal.classList.contains('hidden');
             if (isHidden) {
-                renderAssistantSummary();
+                titleEl.innerText = title;
+                renderAssistantSummary(records);
                 modal.classList.remove('hidden');
                 overlay.classList.remove('hidden');
             } else {
@@ -591,10 +613,23 @@
             lucide.createIcons();
         };
 
-        function renderAssistantSummary() {
+        // 三個快速開啟浮窗的入口
+        window.showAllAssistantDetails = () => {
+            toggleAssistantModal("小幫手薪資總計 (全期)", allRecords);
+        };
+        window.showYearAssistantDetails = () => {
+            const title = document.getElementById('yearTitle').innerText;
+            toggleAssistantModal(`${title} 小幫手薪資`, currentYearRecords);
+        };
+        window.showMonthAssistantDetails = () => {
+            const title = document.getElementById('monthTitle').innerText;
+            toggleAssistantModal(`${title} 小幫手薪資`, currentMonthRecords);
+        };
+
+        function renderAssistantSummary(records) {
             const summary = {};
             let unclassified = 0;
-            allRecords.forEach(r => {
+            records.forEach(r => {
                 const totalPay = parseInt(r.assistantPay) || 0;
                 if (totalPay <= 0) return;
                 if (r.assistantDetail) {
@@ -624,7 +659,7 @@
                     <span class="font-black text-amber-600">$${unclassified.toLocaleString()}</span>
                 </div>`;
             }
-            if (html === "") html = "<p class='text-center text-slate-400 py-4'>尚無小幫手支出紀錄</p>";
+            if (html === "") html = "<p class='text-center text-slate-400 py-4'>該期間尚無小幫手支出紀錄</p>";
             container.innerHTML = html;
         }
 
@@ -657,6 +692,10 @@
             let mPassSummary = {}; 
             let yPassSummary = {}; 
             
+            // 重置篩選快取
+            currentYearRecords = [];
+            currentMonthRecords = [];
+
             const filterYear = mon ? mon.split('-')[0] : new Date().getFullYear().toString();
             const filterMonthName = mon ? mon.split('-')[1] : "全部";
             document.getElementById('yearTitle').innerText = `${filterYear} 年度統計`;
@@ -673,6 +712,7 @@
 
                 // 年度統計計算 (不受列表篩選影響)
                 if (iY === filterYear) { 
+                    currentYearRecords.push(r);
                     yRev += r.totalAmount; yExp += r.assistantPay; yAc += (r.acCount || 0); yWm += (r.wmCount || 0); yWt += (r.wtCount || 0); 
                     if (r.passFrom) {
                         yPassSummary[r.passFrom] = (yPassSummary[r.passFrom] || { qty: 0, rev: 0, exp: 0 });
@@ -684,6 +724,7 @@
 
                 // 月度統計計算 (不受列表篩選影響)
                 if (!mon || iM === mon) { 
+                    currentMonthRecords.push(r);
                     mRev += r.totalAmount; mExp += r.assistantPay; mAc += (r.acCount || 0); mWm += (r.wmCount || 0); mWt += (r.wtCount || 0);
                     if (r.payment === 'unpaid') mUnpaidDetails.push({ id: r.id, name: r.customerName, amount: r.totalAmount });
                     if (r.passFrom) {
@@ -718,15 +759,15 @@
                     passYearTotalAmt += yPassSummary[k].rev;
                     const net = yPassSummary[k].rev - yPassSummary[k].exp;
                     return `
-                    <div class="flex flex-col bg-white p-2 rounded-lg border border-indigo-100">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] text-indigo-500 font-bold truncate max-w-[60%]">${k}</span>
-                            <span class="text-[10px] text-slate-400 font-bold">${yPassSummary[k].qty}台</span>
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-indigo-100 gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="text-sm text-indigo-600 font-bold truncate">${k}</span>
+                            <span class="text-[11px] bg-indigo-50 px-1.5 py-0.5 rounded text-indigo-400 font-bold whitespace-nowrap">${yPassSummary[k].qty}台</span>
                         </div>
-                        <div class="text-[9px] space-y-0.5 text-slate-500">
-                            <div class="flex justify-between"><span>收:</span><span>$${yPassSummary[k].rev.toLocaleString()}</span></div>
-                            <div class="flex justify-between"><span>支:</span><span>$${yPassSummary[k].exp.toLocaleString()}</span></div>
-                            <div class="flex justify-between border-t border-indigo-50 pt-0.5 font-bold text-indigo-700"><span>淨:</span><span>$${net.toLocaleString()}</span></div>
+                        <div class="text-[11px] flex items-center gap-3 text-slate-500 whitespace-nowrap">
+                            <span>收:$${yPassSummary[k].rev.toLocaleString()}</span>
+                            <span>支:$${yPassSummary[k].exp.toLocaleString()}</span>
+                            <span class="font-bold text-indigo-700 bg-indigo-50/50 px-2 py-0.5 rounded">淨:$${net.toLocaleString()}</span>
                         </div>
                     </div>`;
                 }).join('');
@@ -742,15 +783,15 @@
                     passTotalAmt += mPassSummary[k].rev;
                     const net = mPassSummary[k].rev - mPassSummary[k].exp;
                     return `
-                    <div class="flex flex-col bg-white p-2 rounded-lg border border-emerald-100">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] text-emerald-600 font-bold truncate max-w-[60%]">${k}</span>
-                            <span class="text-[10px] text-emerald-400 font-bold">${mPassSummary[k].qty}台</span>
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-emerald-100 gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="text-sm text-emerald-700 font-bold truncate">${k}</span>
+                            <span class="text-[11px] bg-emerald-50 px-1.5 py-0.5 rounded text-emerald-500 font-bold whitespace-nowrap">${mPassSummary[k].qty}台</span>
                         </div>
-                        <div class="text-[9px] space-y-0.5 text-emerald-800/70">
-                            <div class="flex justify-between"><span>收:</span><span>$${mPassSummary[k].rev.toLocaleString()}</span></div>
-                            <div class="flex justify-between"><span>支:</span><span>$${mPassSummary[k].exp.toLocaleString()}</span></div>
-                            <div class="flex justify-between border-t border-emerald-50 pt-0.5 font-bold text-emerald-700"><span>淨:</span><span>$${net.toLocaleString()}</span></div>
+                        <div class="text-[11px] flex items-center gap-3 text-emerald-800/70 whitespace-nowrap">
+                            <span>收:$${mPassSummary[k].rev.toLocaleString()}</span>
+                            <span>支:$${mPassSummary[k].exp.toLocaleString()}</span>
+                            <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">淨:$${net.toLocaleString()}</span>
                         </div>
                     </div>`;
                 }).join('');
@@ -867,7 +908,7 @@
                     if (m) {
                         const div = document.createElement('div');
                         div.className = "grid grid-cols-12 gap-2 items-center ac-detail-row mb-2";
-                        div.innerHTML = `<div class="col-span-5"><input type="text" value="${m[1]}" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-3"><input type="number" value="${m[2]}" onfocus="this.select()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div><div class="col-span-3"><input type="number" value="${m[3]||''}" onfocus="this.select()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400 font-bold text-lg">&times;</button></div>`;
+                        div.innerHTML = `<div class="col-span-5"><input type="text" value="${m[1]}" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-3"><input type="number" value="${m[2]}" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div><div class="col-span-3"><input type="number" value="${m[3]||''}" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcTotalFromDetails();" class="text-rose-400 font-bold text-lg">&times;</button></div>`;
                         acContainer.appendChild(div);
                     }
                 });
@@ -880,6 +921,7 @@
             toggleAcBrand();
             updateQuickAssistantTags();
             updateQuickPassTags();
+            calcFormNet();
             showPage('formPage');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
