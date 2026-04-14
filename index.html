@@ -6,6 +6,7 @@
     <title>冷氣清洗紀錄</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* 整體字體加大約 10% */
         html { font-size: 110%; }
@@ -59,7 +60,6 @@
 </head>
 <body class="bg-[#faf9f6] min-h-screen text-slate-700">
 
-    <!-- 登入頁面 -->
     <section id="authPage" class="fixed inset-0 z-[100] bg-slate-100 flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 w-full max-w-sm text-center">
             <div class="w-16 h-16 bg-slate-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -153,7 +153,6 @@
                         <div id="quickAssistantTags" class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-rose-100/50"></div>
                     </div>
 
-                    <!-- PASS 案件區塊 -->
                     <div class="space-y-2 bg-indigo-50/30 p-4 rounded-xl border border-indigo-100">
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider"><i data-lucide="forward" class="lucide mr-1"></i> PASS 案件設定</label>
@@ -184,7 +183,7 @@
             <section id="listPage" class="desktop-half-width">
                 
                 <div class="bg-slate-700 p-4 rounded-2xl shadow-sm border-l-4 border-slate-400 text-white flex items-center mb-4 relative">
-                    <div class="flex flex-col text-[10px] font-bold uppercase tracking-widest text-slate-400 mr-4 border-r border-slate-600 pr-3 leading-tight">
+                    <div class="flex flex-col text-[10px] font-bold uppercase tracking-widest text-slate-400 mr-4 border-r border-slate-600 pr-3 text-center leading-tight">
                         <span>全</span><span>部</span><span>年</span><span>份</span><span>總</span><span>累</span><span>計</span>
                     </div>
                     <div class="flex-1">
@@ -218,9 +217,7 @@
                     </div>
                 </div>
 
-                <!-- 統計資訊卡片區 -->
                 <div class="space-y-3 mb-4">
-                    <!-- 年度統計卡片 (Slate 風格) -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-slate-400">
                         <div>
                             <div class="flex justify-between items-start">
@@ -233,7 +230,6 @@
                                 <div><p class="text-[10px] text-emerald-600 font-bold mb-1">年度淨利</p><p class="text-lg font-bold text-emerald-700" id="yNet">$0</p></div>
                             </div>
 
-                            <!-- 年度 PASS 案件分類統計 -->
                             <div id="passYearSummarySection" class="mt-3 pt-3 border-t border-indigo-100 bg-indigo-50/20 -mx-5 px-5 hidden">
                                 <div class="flex justify-between items-center mb-2">
                                     <h3 class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
@@ -246,7 +242,6 @@
                         </div>
                     </div>
 
-                    <!-- 月度統計卡片 (Emerald 風格) -->
                     <div class="bg-emerald-50/40 p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500">
                         <div>
                             <div class="flex justify-between items-start">
@@ -259,7 +254,6 @@
                                 <div><p class="text-[10px] text-emerald-600 font-bold mb-1">本月淨利</p><p class="text-lg font-bold text-emerald-700" id="mNet">$0</p></div>
                             </div>
                             
-                            <!-- 月度 PASS 案件分類統計 -->
                             <div id="passSummarySection" class="mt-3 pt-3 border-t border-emerald-100 bg-white/40 -mx-5 px-5 hidden">
                                 <div class="flex justify-between items-center mb-2">
                                     <h3 class="text-emerald-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
@@ -271,7 +265,6 @@
                             </div>
                         </div>
 
-                        <!-- 待收款明細 (移入月度卡片底部) -->
                         <div id="unpaidSection" class="border-t border-amber-200 mt-4 pt-4 -mx-5 px-5 pb-2 hidden">
                             <div class="flex justify-between items-center mb-2">
                                 <h3 class="text-amber-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
@@ -818,7 +811,8 @@
             const list = document.getElementById('recordList');
             list.innerHTML = data.map(i => {
                 let services = [];
-                if(i.acCount > 0) services.push(`冷氣${i.acCount}台`);
+                const acTitle = `冷氣${i.acCount}台`;
+                if(i.acCount > 0) services.push(i.acBrand ? `${acTitle}：${i.acBrand}` : acTitle);
                 if(i.wmCount > 0) services.push(`洗衣機${i.wmCount}台`);
                 if(i.wtCount > 0) services.push(`水塔${i.wtCount}口`);
 
@@ -851,9 +845,8 @@
                     </td>
                     <td data-label="服務明細" class="px-6 py-2 text-slate-600">
                         <div class="leading-tight">${services.join('、')}</div>
-                        ${i.acBrand ? `<div class="text-[11px] text-slate-400 note-display mt-0.5">#${i.acBrand}</div>` : ''}
-                        ${asDisplay ? `<div class="text-[11px] text-rose-500 font-medium mt-0.5">${asDisplay}</div>` : ''}
                         ${i.note ? `<div class="text-[11px] text-slate-400 note-display mt-0.5">備註: ${i.note}</div>` : ''}
+                        ${asDisplay ? `<div class="text-[11px] text-rose-500 font-medium mt-0.5">${asDisplay}</div>` : ''}
                     </td>
                     <td data-label="金額帳目" class="px-6 py-4 text-slate-600 font-medium">
                         收 ${i.totalAmount.toLocaleString()} - 支 ${i.assistantPay.toLocaleString()} = <span class="text-emerald-700 font-bold">淨 ${(i.totalAmount - i.assistantPay).toLocaleString()}</span>
@@ -867,11 +860,14 @@
                             <i data-lucide="${isPaid ? 'banknote' : 'clock'}" class="w-3 h-3"></i>
                             <span>${isPaid ? '已收款' : '待收款'}</span>
                         </button>
-                        <button onclick="editRec('${i.id}')" class="flex items-center gap-1 text-slate-600 bg-slate-100 px-2 py-1.5 rounded-lg border text-[10px] font-bold">
-                            <i data-lucide="edit-2" class="w-3 h-3"></i>修改
+                        <button onclick="downloadRec('${i.id}')" class="flex items-center gap-1 text-indigo-600 bg-indigo-50 px-2 py-1.5 rounded-lg border border-indigo-100 text-[10px] font-bold" title="截圖">
+                            <i data-lucide="image" class="w-3 h-3"></i>
                         </button>
-                        <button onclick="deleteRec('${i.id}')" class="flex items-center gap-1 text-rose-400 bg-rose-50 px-2 py-1.5 rounded-lg border text-[10px] font-bold">
-                            <i data-lucide="trash-2" class="w-3 h-3"></i>刪除
+                        <button onclick="editRec('${i.id}')" class="flex items-center gap-1 text-slate-600 bg-slate-100 px-2 py-1.5 rounded-lg border text-[10px] font-bold" title="修改">
+                            <i data-lucide="edit-2" class="w-3 h-3"></i>
+                        </button>
+                        <button onclick="deleteRec('${i.id}')" class="flex items-center gap-1 text-rose-400 bg-rose-50 px-2 py-1.5 rounded-lg border text-[10px] font-bold" title="刪除">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>
                         </button>
                     </td>
                 </tr>`;
@@ -929,6 +925,45 @@
         window.changeMonth = (o) => { const i = document.getElementById('monthFilter'); if (!i.value) i.value = new Date().toISOString().substring(0, 7); let [y, m] = i.value.split('-').map(Number); let d = new Date(y, m - 1); d.setMonth(d.getMonth() + o); i.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; filterRecords(); };
         window.quickFilterUnpaid = () => { document.getElementById('paymentFilter').value = 'unpaid'; filterRecords(); };
         window.deleteRec = async (id) => { if(confirm('確定要刪除嗎？')) await deleteDoc(doc(db, "cleaningRecords", id)); };
+
+        // 截圖自動下載優化功能
+        window.downloadRec = (id) => {
+            const el = document.getElementById(`rec-${id}`);
+            const actionCell = el.querySelector('.action-cell');
+            
+            // 1. 暫時隱藏按鈕區域
+            actionCell.style.display = 'none';
+            
+            // 2. 執行截圖
+            html2canvas(el, {
+                scale: 2, // 提高畫質
+                backgroundColor: "#ffffff",
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                // 3. 還原按鈕區域
+                actionCell.style.display = 'flex';
+                
+                // 4. 將畫布轉換為 Blob 以進行「真正的」靜默下載
+                canvas.toBlob((blob) => {
+                    const name = el.querySelector('[data-label="客戶"] span').innerText;
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `清洗紀錄_${name}_${id.substring(0,4)}.png`;
+                    
+                    // 必須插入 DOM 才能在某些瀏覽器中穩定觸發 click
+                    document.body.appendChild(link);
+                    link.click();
+                    
+                    // 下載後清理
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                }, 'image/png');
+            });
+        };
     </script>
 </body>
 </html>
