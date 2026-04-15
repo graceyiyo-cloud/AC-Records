@@ -935,19 +935,32 @@
         window.downloadRec = (id) => {
             const el = document.getElementById(`rec-${id}`);
             const actionCell = el.querySelector('.action-cell');
+            const contentTds = el.querySelectorAll('td:not(.action-cell)');
             
-            // 1. 暫時隱藏按鈕區域
+            // 1. 暫時隱藏按鈕區域，並強制將卡片底色設為純白
             actionCell.style.display = 'none';
+            el.style.setProperty('background-color', '#ffffff', 'important');
+            
+            // 將內容文字向上偏移 10px
+            contentTds.forEach(td => {
+                td.style.setProperty('position', 'relative', 'important');
+                td.style.setProperty('top', '-10px', 'important');
+            });
             
             // 2. 執行截圖
             html2canvas(el, {
                 scale: 2, // 提高畫質
-                backgroundColor: "#ffffff",
+                backgroundColor: "#ffffff", // 確保 canvas 外框也是白色
                 useCORS: true,
                 logging: false
             }).then(canvas => {
-                // 3. 還原按鈕區域
+                // 3. 還原按鈕區域、卡片底色與文字位移
                 actionCell.style.display = 'flex';
+                el.style.removeProperty('background-color');
+                contentTds.forEach(td => {
+                    td.style.removeProperty('position');
+                    td.style.removeProperty('top');
+                });
                 
                 // 4. 將畫布轉換為 Blob 以進行「真正的」靜默下載
                 canvas.toBlob((blob) => {
