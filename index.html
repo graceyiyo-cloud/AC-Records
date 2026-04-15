@@ -12,7 +12,8 @@
         html { font-size: 110%; }
         body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif; }
         .hidden { display: none; }
-        .completed-row { background-color: #f8fafc !important; border-left: 4px solid #94a3b8 !important; opacity: 0.85; }
+        /* 提升已完成狀態的視覺對比度 */
+        .completed-row { background-color: #f1f5f9 !important; border-left: 5px solid #64748b !important; opacity: 0.95; }
         
         .note-display { white-space: pre-wrap; word-break: break-all; display: block; line-height: 1.3; }
 
@@ -22,26 +23,30 @@
         }
         .highlight-target { animation: highlight-fade 2s ease-out; z-index: 10; }
 
-        /* 全裝置統一使用卡片式佈局 */
+        /* 全裝置統一使用卡片式佈局 - 針對手機版面進行清晰度優化 */
         thead { display: none; }
         tr { 
-            display: block; margin-bottom: 1rem; border-radius: 12px; background: white;
-            padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e8f0;
+            display: block; margin-bottom: 1.25rem; border-radius: 12px; background: white;
+            padding: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;
             transition: all 0.3s ease;
         }
-        td { display: block; width: 100%; padding: 0.15rem 0 !important; border: none !important; text-align: left; color: #475569; }
+        /* 增加儲存格的上下空間，並加深基礎文字顏色 */
+        td { display: block; width: 100%; padding: 0.35rem 0 !important; border: none !important; text-align: left; color: #334155; }
         
-        td[data-label="客戶"] { font-weight: 700; font-size: 1.1rem; color: #1e293b; padding-bottom: 0.2rem !important; }
+        /* 客戶名稱加大加粗，增加對比 */
+        td[data-label="客戶"] { font-weight: 800; font-size: 1.2rem; color: #0f172a; padding-bottom: 0.3rem !important; }
+        /* 金額帳目增加明顯分隔線與粗體 */
         td[data-label="金額帳目"] { 
             padding-top: 0.75rem !important; margin-top: 0.5rem;
-            border-top: 1px dashed #e2e8f0 !important; color: #475569; font-size: 0.85rem;
+            border-top: 2px dashed #cbd5e1 !important; color: #1e293b; font-size: 0.9rem; font-weight: 700;
         }
         td.action-cell {
-            border-top: 1px solid #f1f5f9 !important; margin-top: 0.75rem;
-            padding-top: 0.75rem !important; display: flex; justify-content: flex-end; gap: 6px; flex-wrap: wrap;
+            border-top: 1px solid #e2e8f0 !important; margin-top: 0.75rem;
+            padding-top: 0.75rem !important; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;
         }
 
-        .time-display { font-size: 0.8rem; color: #64748b; }
+        /* 預約時間增加底線做為頭部資訊區隔 */
+        .time-display { font-size: 0.85rem; color: #475569; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem !important; margin-bottom: 0.25rem; }
 
         @media (min-width: 1024px) {
             .desktop-half-width { max-width: 50% !important; margin-left: auto; margin-right: auto; }
