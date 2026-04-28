@@ -13,7 +13,7 @@
 
     <link rel="apple-touch-icon" href="./icon.png">
     
-    <link rel="manifest" href='data:application/manifest+json,{"name":"冷氣清洗紀錄","short_name":"冷氣紀錄","start_url":".","display":"standalone","background_color":"#faf9f6","theme_color":"#475569","icons":[{"src":"./icon.png","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"冷氣清洗紀錄","short_name":"冷氣紀錄","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#475569","icons":[{"src":"./icon.png","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -21,10 +21,17 @@
     <style>
         /* 整體字體加大約 10% */
         html { font-size: 110%; }
-        body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif; }
+        body { 
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif; 
+            background-color: #ffffff !important;
+        }
         .hidden { display: none; }
-        /* 提升已完成狀態的視覺對比度 */
-        .completed-row { background-color: #f1f5f9 !important; border-left: 5px solid #64748b !important; opacity: 0.95; }
+        /* 恢復已完成狀態的視覺對比度與左側灰藍色線條 */
+        .completed-row { 
+            background-color: #f1f5f9 !important; 
+            border-left: 5px solid #64748b !important; 
+            opacity: 0.95; 
+        }
         
         .note-display { white-space: pre-wrap; word-break: break-all; display: block; line-height: 1.3; }
 
@@ -37,27 +44,43 @@
         /* 全裝置統一使用卡片式佈局 - 針對手機版面進行清晰度優化 */
         thead { display: none; }
         tr { 
-            display: block; margin-bottom: 1.25rem; border-radius: 12px; background: white;
-            padding: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;
+            display: block; margin-bottom: 0.5rem; 
+            border-radius: 12px; background: white;
+            padding: 1rem; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;
             transition: all 0.3s ease;
         }
         /* 增加儲存格的上下空間，並加深基礎文字顏色 */
-        td { display: block; width: 100%; padding: 0.35rem 0 !important; border: none !important; text-align: left; color: #334155; }
+        td { 
+            display: block; width: 100%; 
+            padding: 0.15rem 0 !important; 
+            border: none !important; text-align: left; color: #334155; 
+        }
         
         /* 客戶名稱加大加粗，增加對比 */
-        td[data-label="客戶"] { font-weight: 800; font-size: 1.2rem; color: #0f172a; padding-bottom: 0.3rem !important; }
-        /* 金額帳目增加明顯分隔線與粗體 */
+        td[data-label="客戶"] { 
+            font-weight: 800; font-size: 1.2rem; color: #0f172a; 
+            padding-bottom: 0.1rem !important; 
+        }
+        /* 金額帳目增加明顯分隔線與粗體，並增加與上方文字的距離 */
         td[data-label="金額帳目"] { 
-            padding-top: 0.75rem !important; margin-top: 0.5rem;
+            padding-top: 0.75rem !important; 
+            margin-top: 0.75rem; 
             border-top: 2px dashed #cbd5e1 !important; color: #1e293b; font-size: 0.9rem; font-weight: 700;
         }
         td.action-cell {
-            border-top: 1px solid #e2e8f0 !important; margin-top: 0.75rem;
-            padding-top: 0.75rem !important; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;
+            border-top: 1px solid #e2e8f0 !important; 
+            margin-top: 0.5rem; 
+            padding-top: 0.5rem !important; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;
         }
 
         /* 預約時間增加底線做為頭部資訊區隔 */
-        .time-display { font-size: 0.85rem; color: #475569; font-weight: 600; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem !important; margin-bottom: 0.25rem; }
+        .time-display { 
+            font-size: 0.85rem; color: #475569; font-weight: 600; 
+            border-bottom: 1px solid #f1f5f9; 
+            padding-bottom: 0.25rem !important; 
+            margin-bottom: 0.1rem; 
+        }
 
         @media (min-width: 1024px) {
             .desktop-half-width { max-width: 50% !important; margin-left: auto; margin-right: auto; }
@@ -288,7 +311,7 @@
                                 </h3>
                                 <button onclick="quickFilterUnpaid()" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md hover:bg-amber-200 transition-colors font-bold">查看全部待收</button>
                             </div>
-                            <div id="unpaidList" class="space-y-1 text-[11px] text-amber-900"></div>
+                            <div id="unpaidList" class="space-y-1.5 text-amber-900"></div>
                         </div>
                     </div>
                 </div>
@@ -809,7 +832,7 @@
 
             if (mUnpaidDetails.length > 0) {
                 document.getElementById('unpaidSection').classList.remove('hidden');
-                document.getElementById('unpaidList').innerHTML = mUnpaidDetails.map(item => `<div class="flex justify-between py-1"><button onclick="scrollToRecord('${item.id}')" class="text-left hover:underline decoration-amber-400 font-medium">• ${item.name}</button><span class="font-bold">$${item.amount.toLocaleString()}</span></div>`).join('');
+                document.getElementById('unpaidList').innerHTML = mUnpaidDetails.map(item => `<div class="flex justify-between py-1.5 items-center"><button onclick="scrollToRecord('${item.id}')" class="text-left hover:underline decoration-amber-400 font-bold text-[14px]">• ${item.name}</button><span class="font-bold text-[15px]">$${item.amount.toLocaleString()}</span></div>`).join('');
             } else { document.getElementById('unpaidSection').classList.add('hidden'); }
 
             document.getElementById('allAc').innerText = aAc; document.getElementById('allWm').innerText = aWm; document.getElementById('allWt').innerText = aWt;
@@ -947,16 +970,27 @@
             const el = document.getElementById(`rec-${id}`);
             const actionCell = el.querySelector('.action-cell');
             const contentTds = el.querySelectorAll('td:not(.action-cell)');
+            const customerTd = el.querySelector('td[data-label="客戶"]'); // 鎖定客戶名稱欄位
             
-            // 1. 暫時隱藏按鈕區域，並強制將卡片底色設為純白
+            // 使用渲染後的 SVG 類名 (.lucide-phone, .lucide-map-pin) 才能確實抓到圖示
+            const iconsToHide = el.querySelectorAll('.lucide-phone, .lucide-map-pin, button[onclick^="copyText"]');
+            
+            // 1. 隱藏按鈕區、圖示，處理底色與邊框
             actionCell.style.display = 'none';
+            iconsToHide.forEach(icon => icon.style.display = 'none');
             el.style.setProperty('background-color', '#ffffff', 'important');
+            el.style.setProperty('border-left', 'none', 'important'); // 截圖時隱藏左側線條
             
-            // 將內容文字向上偏移 10px
+            // 將內容文字向上偏移改為 -10px
             contentTds.forEach(td => {
                 td.style.setProperty('position', 'relative', 'important');
                 td.style.setProperty('top', '-10px', 'important');
             });
+
+            // 特別針對客戶名稱賦予向上拉近的負間距，這會自然將底下所有元素一併往上帶
+            if (customerTd) {
+                customerTd.style.setProperty('margin-top', '-10px', 'important');
+            }
             
             // 2. 執行截圖
             html2canvas(el, {
@@ -965,15 +999,20 @@
                 useCORS: true,
                 logging: false
             }).then(canvas => {
-                // 3. 還原按鈕區域、卡片底色與文字位移
+                // 3. 還原所有修改的樣式
                 actionCell.style.display = 'flex';
+                iconsToHide.forEach(icon => icon.style.removeProperty('display'));
                 el.style.removeProperty('background-color');
+                el.style.removeProperty('border-left');
                 contentTds.forEach(td => {
                     td.style.removeProperty('position');
                     td.style.removeProperty('top');
                 });
+                if (customerTd) {
+                    customerTd.style.removeProperty('margin-top');
+                }
                 
-                // 4. 將畫布轉換為 Blob 以進行「真正的」靜默下載
+                // 4. 將畫布轉換為 Blob 以進行靜默下載
                 canvas.toBlob((blob) => {
                     const name = el.querySelector('[data-label="客戶"] span').innerText;
                     const url = URL.createObjectURL(blob);
@@ -981,11 +1020,9 @@
                     link.href = url;
                     link.download = `清洗紀錄_${name}_${id.substring(0,4)}.png`;
                     
-                    // 必須插入 DOM 才能在某些瀏覽器中穩定觸發 click
                     document.body.appendChild(link);
                     link.click();
                     
-                    // 下載後清理
                     setTimeout(() => {
                         document.body.removeChild(link);
                         URL.revokeObjectURL(url);
