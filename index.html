@@ -13,7 +13,7 @@
 
     <link rel="apple-touch-icon" href="./icon.png">
     
-    <link rel="manifest" href='data:application/manifest+json,{"name":"冷氣清洗紀錄","short_name":"冷氣紀錄","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#475569","icons":[{"src":"./icon.png","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"冷氣清洗紀錄","short_name":"冷紀錄","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#475569","icons":[{"src":"./icon.png","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -25,14 +25,460 @@
             font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif; 
             background-color: #ffffff !important;
         }
-        .hidden { display: none; }
-        /* 恢復已完成狀態的視覺對比度與左側灰藍色線條 */
+        /* 本次修正：加上 !important 確保能蓋過 ID 選擇器的 display 屬性 */
+        .hidden { display: none !important; }
+        
+        /* 已完成狀態：改成上方單一細線，不再使用左側直線 */
         .completed-row { 
-            background-color: #f1f5f9 !important; 
-            border-left: 5px solid #64748b !important; 
-            opacity: 0.95; 
+            background-color: #f6f8fb !important; 
+            border-left: none !important;
+            border-top: 4px solid #94a3b8 !important;
+            opacity: 0.98; 
+            position: relative;
+        }
+
+        /* 統計卡片統一改成上方單一細線風格 */
+        .stats-card {
+            border-radius: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-top-width: 4px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+        }
+        .stats-card-all {
+            background: linear-gradient(180deg, #3d4c63 0%, #344256 100%);
+            border-color: #405168;
+            border-top-color: #93a6bf;
+            color: #ffffff;
+        }
+        .stats-card-year {
+            background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+            border-color: #e5e7eb;
+            border-top-color: #a7b4c8;
+        }
+        .stats-card-month {
+            background: linear-gradient(180deg, #fbf9ff 0%, #f5f3ff 100%);
+            border-color: #ddd6fe;
+            border-top-color: #8b7bc8;
+        }
+        .stats-side-label {
+            color: inherit;
+            opacity: 0.82;
         }
         
+        /* PASS 來源統計：改成更清楚的資訊卡 */
+        .pass-summary-wrap {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            padding-bottom: 0.5rem;
+        }
+        .pass-summary-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.55rem;
+            gap: 0.5rem;
+        }
+        .pass-total-pill {
+            border-radius: 999px;
+            padding: 0.22rem 0.55rem;
+            font-size: 0.65rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .pass-card {
+            background: rgba(255,255,255,0.86);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.045);
+        }
+        .pass-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            padding-bottom: 0.55rem;
+            margin-bottom: 0.55rem;
+            border-bottom: 1px dashed rgba(148, 163, 184, 0.32);
+        }
+        .pass-name-block {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .pass-avatar {
+            width: 1.65rem;
+            height: 1.65rem;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 900;
+            flex: 0 0 auto;
+        }
+        .pass-name {
+            font-size: 0.92rem;
+            font-weight: 900;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .pass-qty {
+            border-radius: 999px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.65rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .pass-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.45rem;
+        }
+        .pass-metric {
+            border-radius: 0.75rem;
+            padding: 0.45rem 0.25rem;
+            text-align: center;
+        }
+        .pass-label {
+            display: block; /* 恢復預設堆疊 */
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.12rem;
+        }
+        .pass-value {
+            display: block; /* 恢復預設堆疊 */
+            font-size: 0.72rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .pass-year-theme .pass-avatar,
+        .pass-year-theme .pass-qty,
+        .pass-year-theme .pass-metric {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .pass-year-theme .pass-name { color: #334155; }
+        .pass-year-theme .pass-net .pass-value { color: #334155; }
+        .pass-year-theme .pass-total-pill { background: #f1f5f9; color: #475569; }
+        .pass-month-theme .pass-avatar,
+        .pass-month-theme .pass-qty,
+        .pass-month-theme .pass-metric {
+            background: #f5f3ff;
+            color: #6d5cae;
+        }
+        .pass-month-theme .pass-name { color: #6d5cae; }
+        .pass-month-theme .pass-net .pass-value { color: #7c3aed; }
+        .pass-month-theme .pass-total-pill { background: #ede9fe; color: #6d5cae; }
+
+        /* 統一收入 / 支出 / 淨利 顯示樣式 */
+        .metric-box-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.55rem;
+        }
+        .metric-box {
+            border-radius: 0.95rem;
+            border: 1px solid transparent;
+            padding: 0.55rem 0.45rem;
+            text-align: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+            white-space: nowrap;
+        }
+        .metric-box-label {
+            display: block; /* 恢復預設堆疊樣式 */
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.15rem;
+        }
+        .metric-box-value,
+        .metric-box button {
+            display: inline-block; /* 恢復預設堆疊樣式 */
+            font-size: 1rem;
+            line-height: 1.1;
+            font-weight: 900;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            text-decoration: none;
+        }
+        .metric-box button { cursor: pointer; }
+        .metric-box-rev { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+        .metric-box-exp { background: #fff1f2; border-color: #fecdd3; color: #e11d48; }
+        .metric-box-net { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+
+        .stats-card-all .metric-box-rev { background: rgba(191, 219, 254, 0.14); border-color: rgba(191, 219, 254, 0.2); color: #dbeafe; }
+        .stats-card-all .metric-box-exp { background: rgba(253, 164, 175, 0.14); border-color: rgba(253, 164, 175, 0.2); color: #fecdd3; }
+        .stats-card-all .metric-box-net { background: rgba(110, 231, 183, 0.15); border-color: rgba(110, 231, 183, 0.22); color: #bbf7d0; }
+
+        .stats-card-year .metric-box-rev { background: #f8fafc; border-color: #dbe4ef; color: #334155; }
+        .stats-card-year .metric-box-exp { background: #fff1f2; border-color: #fecdd3; color: #e11d48; }
+        .stats-card-year .metric-box-net { background: #eefcf5; border-color: #b7ebd1; color: #047857; }
+
+        .stats-card-month .metric-box-rev { background: #f5f3ff; border-color: #ddd6fe; color: #6d5cae; }
+        .stats-card-month .metric-box-exp { background: #fff1f2; border-color: #fecdd3; color: #e11d48; }
+        .stats-card-month .metric-box-net { background: #eef2ff; border-color: #c7d2fe; color: #4f46e5; }
+
+        .pass-metric.pass-net {
+            background: #ecfdf5 !important;
+            border: 1px solid #a7f3d0;
+            color: #047857 !important;
+        }
+        .pass-metric.pass-net .pass-label,
+        .pass-metric.pass-net .pass-value {
+            color: #047857 !important;
+        }
+
+        .record-metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.45rem;
+            margin-top: 0.2rem;
+        }
+        .record-metric-grid .metric-box {
+            padding: 0.5rem 0.35rem;
+            border-radius: 0.85rem;
+        }
+        .record-metric-grid .metric-box-value {
+            font-size: 0.92rem;
+        }
+
+        /* 本次修改：僅針對下方紀錄列表強制水平排列 */
+        .record-metric-grid .metric-box-label {
+            display: inline !important; 
+            margin-right: 4px;
+            margin-bottom: 0 !important;
+        }
+        .record-metric-grid .metric-box-value, 
+        .record-metric-grid button {
+            display: inline !important;
+        }
+
+        /* 手機版：避免全部年份統計金額超出框框 */
+        .stats-card-all > .flex-1,
+        .stats-card-all .metric-box,
+        .stats-card-all .metric-box-grid > div {
+            min-width: 0;
+        }
+        .metric-box-value,
+        .metric-box button,
+        .pass-value {
+            max-width: 100%;
+            overflow-wrap: anywhere;
+        }
+        .stats-card-month #monthTitle,
+        .stats-card-month .flex.justify-between.items-start > div,
+        .stats-card-month #mCounts,
+        #passSummarySection h3 {
+            color: #6d5cae !important;
+        }
+        #passSummarySection {
+            border-top-color: #ddd6fe !important;
+            background: rgba(255, 255, 255, 0.72) !important;
+        }
+
+        @media (max-width: 480px) {
+            .stats-card-all {
+                padding: 0.8rem !important;
+            }
+            .stats-card-all .stats-side-label {
+                margin-right: 0.55rem !important;
+                padding-right: 0.5rem !important;
+                font-size: 0.54rem !important;
+            }
+            .stats-card-all .metric-box-grid {
+                gap: 0.32rem;
+            }
+            .stats-card-all .metric-box {
+                padding: 0.45rem 0.18rem;
+                border-radius: 0.72rem;
+            }
+            .stats-card-all .metric-box-label {
+                font-size: 0.52rem;
+                letter-spacing: 0.02em;
+                margin-bottom: 0.14rem;
+            }
+            .stats-card-all .metric-box-value,
+            .stats-card-all .metric-box button {
+                font-size: clamp(0.82rem, 3.6vw, 1.05rem);
+                line-height: 1.08;
+                white-space: normal;
+                word-break: break-word;
+            }
+        }
+
+        /* 整體改成平面感，移除明顯立體陰影 */
+        [class*="shadow"],
+        .stats-card,
+        .pass-card,
+        .metric-box,
+        tr,
+        #assistantSummaryModal,
+        #authPage > div,
+        button {
+            box-shadow: none !important;
+        }
+        .stats-card-all {
+            background: #3f4f66 !important;
+        }
+        .stats-card-year {
+            background: #fbfcfe !important;
+        }
+        .stats-card-month {
+            background: #fbf9ff !important;
+        }
+        .pass-card {
+            background: #ffffff !important;
+        }
+        .metric-box {
+            box-shadow: none !important;
+        }
+
+        /* 淨利區塊統一使用淺綠色系 */
+        .metric-box-net,
+        .stats-card-all .metric-box-net,
+        .stats-card-year .metric-box-net,
+        .stats-card-month .metric-box-net,
+        .record-metric-grid .metric-box-net {
+            background: #ecfdf5 !important;
+            border-color: #a7f3d0 !important;
+            color: #047857 !important;
+        }
+        .metric-box-net .metric-box-label,
+        .metric-box-net .metric-box-value {
+            color: #047857 !important;
+        }
+        .pass-metric.pass-net,
+        .pass-year-theme .pass-metric.pass-net,
+        .pass-month-theme .pass-metric.pass-net {
+            background: #ecfdf5 !important;
+            border-color: #a7f3d0 !important;
+            color: #047857 !important;
+        }
+        .pass-metric.pass-net .pass-label,
+        .pass-metric.pass-net .pass-value {
+            color: #047857 !important;
+        }
+
+        /* 全部年份總累計：金額放大，但仍避免手機溢出 */
+        .stats-card-all .metric-box-value,
+        .stats-card-all .metric-box button {
+            font-size: 1.08rem;
+            line-height: 1.08;
+        }
+
+        /* PASS 來源統計：改成點擊展開 / 收合 */
+        .pass-summary-head {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            cursor: pointer;
+            text-align: left;
+        }
+        .pass-summary-title-area {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .pass-summary-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex: 0 0 auto;
+        }
+        .pass-toggle-pill {
+            border-radius: 999px;
+            padding: 0.22rem 0.52rem;
+            font-size: 0.62rem;
+            font-weight: 900;
+            white-space: nowrap;
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+        .pass-month-theme .pass-toggle-pill {
+            background: #f5f3ff;
+            color: #6d5cae;
+            border-color: #ddd6fe;
+        }
+        .pass-summary-wrap.pass-collapsed .pass-summary-list {
+            display: none !important;
+        }
+        .pass-summary-list {
+            margin-top: 0.55rem;
+        }
+
+        /* PASS 收合時減少下方空白，讓區塊貼齊卡片底部 */
+        .pass-summary-wrap.pass-collapsed {
+            padding-bottom: 0.18rem !important;
+            margin-bottom: -1.05rem !important;
+        }
+        .pass-summary-wrap.pass-collapsed .pass-summary-head {
+            margin-bottom: 0 !important;
+        }
+        #passSummarySection.pass-collapsed,
+        #passYearSummarySection.pass-collapsed {
+            min-height: 0 !important;
+        }
+
+        /* 下方每筆紀錄的收入 / 支出 / 淨利改成簡潔文字列 */
+        .record-metric-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 0 !important;
+            margin-top: 0 !important; 
+            padding: 0 !important; 
+            border-radius: 0 !important;
+            background: transparent !important;
+        }
+        .record-metric-grid .metric-box {
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            padding: 0 0.35rem 0.4rem !important; 
+            box-shadow: none !important;
+            text-align: left !important;
+        }
+        .record-metric-grid .metric-box:not(:last-child) {
+            border-right: 1px solid #e2e8f0 !important;
+        }
+        .record-metric-grid .metric-box-label {
+            font-size: 0.58rem !important;
+            letter-spacing: 0.03em !important;
+            color: #94a3b8 !important;
+        }
+        .record-metric-grid .metric-box-value {
+            font-size: 0.9rem !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+        }
+        .record-metric-grid .metric-box-rev .metric-box-value { color: #475569 !important; }
+        .record-metric-grid .metric-box-exp .metric-box-value { color: #e11d48 !important; }
+        .record-metric-grid .metric-box-net .metric-box-value { color: #047857 !important; }
+
+        @media (max-width: 420px) {
+            .record-metric-grid .metric-box {
+                padding-left: 0.25rem !important;
+                padding-right: 0.25rem !important;
+            }
+            .record-metric-grid .metric-box-value {
+                font-size: 0.82rem !important;
+                white-space: normal !important;
+                overflow-wrap: anywhere !important;
+            }
+        }
+
         .note-display { white-space: pre-wrap; word-break: break-all; display: block; line-height: 1.3; }
 
         @keyframes highlight-fade {
@@ -50,22 +496,19 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;
             transition: all 0.3s ease;
         }
-        /* 增加儲存格的上下空間，並加深基礎文字顏色 */
         td { 
             display: block; width: 100%; 
             padding: 0.15rem 0 !important; 
             border: none !important; text-align: left; color: #334155; 
         }
         
-        /* 客戶名稱加大加粗，增加對比 */
         td[data-label="客戶"] { 
             font-weight: 800; font-size: 1.2rem; color: #0f172a; 
             padding-bottom: 0.1rem !important; 
         }
-        /* 金額帳目增加明顯分隔線與粗體，並增加與上方文字的距離 */
         td[data-label="金額帳目"] { 
-            padding-top: 0.75rem !important; 
-            margin-top: 0.75rem; 
+            padding-top: 0.7rem !important; 
+            margin-top: 0.7rem; 
             border-top: 2px dashed #cbd5e1 !important; color: #1e293b; font-size: 0.9rem; font-weight: 700;
         }
         td.action-cell {
@@ -74,7 +517,6 @@
             padding-top: 0.5rem !important; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;
         }
 
-        /* 預約時間增加底線做為頭部資訊區隔 */
         .time-display { 
             font-size: 0.85rem; color: #475569; font-weight: 600; 
             border-bottom: 1px solid #f1f5f9; 
@@ -86,15 +528,70 @@
             .desktop-half-width { max-width: 50% !important; margin-left: auto; margin-right: auto; }
         }
 
-        /* 小幫手統計浮窗樣式 */
         #assistantSummaryModal {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             z-index: 100; width: 90%; max-width: 350px;
         }
 
-        /* Lucide 圖示統一微調 */
         .lucide { width: 14px; height: 14px; stroke-width: 2; display: inline-block; vertical-align: -2px; }
         .btn-icon { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+
+        /* 懸浮待收提醒組件樣式 */
+        #floatingUnpaidWrap {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .unpaid-badge {
+            background: #f59e0b;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4) !important;
+            transition: all 0.2s ease;
+        }
+        .unpaid-badge:active { transform: scale(0.9); }
+        .unpaid-count-dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e11d48;
+            color: white;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 2px solid white;
+        }
+        .floating-unpaid-list {
+            background: #fff;
+            border: 1px solid #fde68a;
+            border-radius: 1.25rem;
+            padding: 1rem;
+            width: 260px;
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15) !important;
+        }
+        .floating-unpaid-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #fef3c7;
+        }
+        .floating-unpaid-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body class="bg-[#faf9f6] min-h-screen text-slate-700">
@@ -116,7 +613,8 @@
     </section>
 
     <div id="mainApp" class="hidden">
-        <nav class="bg-slate-600 text-white py-2 px-4 shadow-md sticky top-0 z-50">
+        <!-- 本次修正：移除 sticky top-0 z-50 -->
+        <nav class="bg-slate-600 text-white py-2 px-4 shadow-md">
             <div class="container mx-auto flex justify-between items-center">
                 <h1 class="text-lg font-bold tracking-widest">冷氣清洗紀錄</h1>
                 <div class="flex space-x-2">
@@ -221,23 +719,29 @@
 
             <section id="listPage" class="desktop-half-width">
                 
-                <div class="bg-slate-700 p-4 rounded-2xl shadow-sm border-l-4 border-slate-400 text-white flex items-center mb-4 relative">
-                    <div class="flex flex-col text-[10px] font-bold uppercase tracking-widest text-slate-400 mr-4 border-r border-slate-600 pr-3 text-center leading-tight">
+                <div class="stats-card stats-card-all p-4 text-white flex items-center mb-4 relative">
+                    <div class="stats-side-label flex flex-col text-[10px] font-bold uppercase tracking-widest mr-4 border-r border-white/15 pr-3 text-center leading-tight">
                         <span>全</span><span>部</span><span>年</span><span>份</span><span>總</span><span>累</span><span>計</span>
                     </div>
                     <div class="flex-1">
-                        <div class="grid grid-cols-3 gap-2 text-center border-b border-slate-600 pb-2 mb-2">
-                            <div><p class="text-[10px] text-slate-400">冷氣</p><p class="text-xl font-bold" id="allAc">0</p></div>
-                            <div><p class="text-[10px] text-slate-400">洗衣機</p><p class="text-xl font-bold" id="allWm">0</p></div>
-                            <div><p class="text-[10px] text-slate-400">水塔</p><p class="text-xl font-bold" id="allWt">0</p></div>
+                        <div class="grid grid-cols-3 gap-2 text-center border-b border-white/10 pb-2 mb-2">
+                            <div><p class="text-[10px] text-white/65">冷氣</p><p class="text-xl font-bold" id="allAc">0</p></div>
+                            <div><p class="text-[10px] text-white/65">洗衣機</p><p class="text-xl font-bold" id="allWm">0</p></div>
+                            <div><p class="text-[10px] text-white/65">水塔</p><p class="text-xl font-bold" id="allWt">0</p></div>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 text-center items-end">
-                            <div><p class="text-[10px] text-slate-400 mb-1">總收入</p><p class="text-sm font-bold leading-tight" id="allRev">$0</p></div>
-                            <div class="relative group">
-                                <p class="text-[10px] text-slate-400 mb-1">小幫手</p>
-                                <button onclick="showAllAssistantDetails()" class="text-sm font-bold text-rose-300 underline decoration-rose-300/40 leading-tight p-0 inline-block bg-transparent border-none" id="allExp">$0</button>
+                        <div class="metric-box-grid">
+                            <div class="metric-box metric-box-rev">
+                                <span class="metric-box-label">總收入</span>
+                                <span class="metric-box-value" id="allRev">$0</span>
                             </div>
-                            <div><p class="text-[10px] text-emerald-300 mb-1">淨實收</p><p class="text-sm font-bold text-emerald-300 leading-tight" id="allNet">$0</p></div>
+                            <div class="metric-box metric-box-exp">
+                                <span class="metric-box-label">小幫手</span>
+                                <button onclick="showAllAssistantDetails()" id="allExp">$0</button>
+                            </div>
+                            <div class="metric-box metric-box-net">
+                                <span class="metric-box-label">淨實收</span>
+                                <span class="metric-box-value" id="allNet">$0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -257,62 +761,83 @@
                 </div>
 
                 <div class="space-y-3 mb-4">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-slate-400">
+                    <div class="stats-card stats-card-year p-5">
                         <div>
                             <div class="flex justify-between items-start">
-                                <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest" id="yearTitle">年度統計</h3>
+                                <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-widest" id="yearTitle">年度統計</h3>
                                 <div class="text-[10px] text-slate-400">年度數量: <span class="text-slate-700 font-bold" id="yCounts">冷0 / 洗0 / 水0</span></div>
                             </div>
-                            <div class="grid grid-cols-3 gap-2 mt-2 text-center">
-                                <div><p class="text-[10px] text-slate-400 mb-1">年度總營收</p><p class="text-lg font-bold text-slate-800" id="yRev">$0</p></div>
-                                <div><p class="text-[10px] text-slate-400 mb-1">年度支出</p><button onclick="showYearAssistantDetails()" class="text-lg font-bold text-rose-400 underline decoration-rose-400/40 leading-tight p-0 inline-block bg-transparent border-none" id="yExp">$0</button></div>
-                                <div><p class="text-[10px] text-emerald-300 font-bold mb-1">年度淨利</p><p class="text-lg font-bold text-emerald-700" id="yNet">$0</p></div>
+                            <div class="metric-box-grid mt-3">
+                                <div class="metric-box metric-box-rev">
+                                    <span class="metric-box-label">年度總營收</span>
+                                    <span class="metric-box-value" id="yRev">$0</span>
+                                </div>
+                                <div class="metric-box metric-box-exp">
+                                    <span class="metric-box-label">年度支出</span>
+                                    <button onclick="showYearAssistantDetails()" id="yExp">$0</button>
+                                </div>
+                                <div class="metric-box metric-box-net">
+                                    <span class="metric-box-label">年度淨利</span>
+                                    <span class="metric-box-value" id="yNet">$0</span>
+                                </div>
                             </div>
 
-                            <div id="passYearSummarySection" class="mt-3 pt-3 border-t border-indigo-100 bg-indigo-50/20 -mx-5 px-3 hidden">
-                                <div class="flex justify-between items-center mb-2">
-                                    <h3 class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                        <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (年度)
-                                    </h3>
-                                    <span class="text-[10px] text-indigo-400 font-bold" id="passYearTotal">總額 $0</span>
-                                </div>
-                                <div id="passYearSummaryList" class="grid grid-cols-1 gap-2 pb-2"></div>
+                            <div id="passYearSummarySection" class="pass-summary-wrap pass-year-theme pass-collapsed border-t border-slate-200 bg-slate-50/70 -mx-5 px-3 hidden">
+                                <button type="button" class="pass-summary-head" onclick="togglePassSummary('passYearSummarySection')">
+                                    <span class="pass-summary-title-area">
+                                        <h3 class="text-slate-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                            <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (年度)
+                                        </h3>
+                                    </span>
+                                    <span class="pass-summary-actions">
+                                        <span class="pass-total-pill" id="passYearTotal">總額 $0</span>
+                                        <span class="pass-toggle-pill"><span class="pass-toggle-text">展開</span></span>
+                                    </span>
+                                </button>
+                                <div id="passYearSummaryList" class="pass-summary-list grid grid-cols-1 gap-2"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-emerald-50/40 p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500">
+                    <div class="stats-card stats-card-month p-5">
                         <div>
                             <div class="flex justify-between items-start">
                                 <h3 class="text-emerald-600 text-[10px] font-bold uppercase tracking-widest" id="monthTitle">本月統計</h3>
-                                <div class="text-[10px] text-emerald-600/70">月度數量: <span class="text-emerald-800 font-bold" id="mCounts">冷0 / 洗0 / 水0</span></div>
+                                <div class="text-[10px] text-emerald-700/70">月度數量: <span class="text-emerald-800 font-bold" id="mCounts">冷0 / 洗0 / 水0</span></div>
                             </div>
-                            <div class="grid grid-cols-3 gap-2 mt-2 text-center">
-                                <div><p class="text-[10px] text-emerald-600/70 mb-1">本月總營收</p><p class="text-lg font-bold text-emerald-900" id="mRev">$0</p></div>
-                                <div><p class="text-[10px] text-emerald-600/70 mb-1">本月支出</p><button onclick="showMonthAssistantDetails()" class="text-lg font-bold text-rose-500 underline decoration-rose-500/40 leading-tight p-0 inline-block bg-transparent border-none" id="mExp">$0</button></div>
-                                <div><p class="text-[10px] text-emerald-600 font-bold mb-1">本月淨利</p><p class="text-lg font-bold text-emerald-700" id="mNet">$0</p></div>
+                            <div class="metric-box-grid mt-3">
+                                <div class="metric-box metric-box-rev">
+                                    <span class="metric-box-label">本月總營收</span>
+                                    <span class="metric-box-value" id="mRev">$0</span>
+                                </div>
+                                <div class="metric-box metric-box-exp">
+                                    <span class="metric-box-label">本月支出</span>
+                                    <button onclick="showMonthAssistantDetails()" id="mExp">$0</button>
+                                </div>
+                                <div class="metric-box metric-box-net">
+                                    <span class="metric-box-label">本月淨利</span>
+                                    <span class="metric-box-value" id="mNet">$0</span>
+                                </div>
                             </div>
                             
-                            <div id="passSummarySection" class="mt-3 pt-3 border-t border-emerald-100 bg-white/40 -mx-5 px-3 hidden">
-                                <div class="flex justify-between items-center mb-2">
-                                    <h3 class="text-emerald-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                        <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (月度)
-                                    </h3>
-                                    <span class="text-[10px] text-emerald-600 font-bold" id="passMonthTotal">總額 $0</span>
-                                </div>
-                                <div id="passSummaryList" class="grid grid-cols-1 gap-2 pb-2"></div>
+                            <div id="passSummarySection" class="pass-summary-wrap pass-month-theme pass-collapsed border-t border-emerald-100 bg-white/65 -mx-5 px-3 hidden">
+                                <button type="button" class="pass-summary-head" onclick="togglePassSummary('passSummarySection')">
+                                    <span class="pass-summary-title-area">
+                                        <h3 class="text-emerald-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                            <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (月度)
+                                        </h3>
+                                    </span>
+                                    <span class="pass-summary-actions">
+                                        <span class="pass-total-pill" id="passMonthTotal">總額 $0</span>
+                                        <span class="pass-toggle-pill"><span class="pass-toggle-text">展開</span></span>
+                                    </span>
+                                </button>
+                                <div id="passSummaryList" class="pass-summary-list grid grid-cols-1 gap-2"></div>
                             </div>
                         </div>
 
-                        <div id="unpaidSection" class="border-t border-amber-200 mt-4 pt-4 -mx-5 px-5 pb-2 hidden">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-amber-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                    <i data-lucide="alert-circle" class="w-3 h-3"></i> 本月待收款明細 (點擊姓名跳轉)
-                                </h3>
-                                <button onclick="quickFilterUnpaid()" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md hover:bg-amber-200 transition-colors font-bold">查看全部待收</button>
-                            </div>
-                            <div id="unpaidList" class="space-y-1.5 text-amber-900"></div>
-                        </div>
+                        <!-- 舊有待收區塊已隱藏 -->
+                        <div id="unpaidSection" class="hidden"></div>
                     </div>
                 </div>
 
@@ -331,15 +856,39 @@
                             <button onclick="clearMonthFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none" title="清除年月篩選"><i data-lucide="calendar-x" class="w-4 h-4"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <select id="typeFilter" onchange="filterRecords()" class="bg-slate-50 border-none rounded-xl p-2 text-[10px] outline-none"><option value="all">全部品項</option><option value="ac">冷氣</option><option value="wm">洗衣機</option><option value="wt">水塔</option></select>
-                        <select id="statusFilter" onchange="filterRecords()" class="bg-slate-50 border-none rounded-xl p-2 text-[10px] outline-none"><option value="all">施工進度</option><option value="completed">已完成</option><option value="pending">待處理</option></select>
-                        <select id="paymentFilter" onchange="filterRecords()" class="bg-slate-50 border-none rounded-xl p-2 text-[10px] outline-none"><option value="all">帳務狀態</option><option value="paid">已收款</option><option value="unpaid">待收款</option></select>
+                    <!-- 品項與進度篩選按鈕群組 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div id="typeFilterGroup" class="flex gap-1 bg-slate-50 rounded-xl p-1 h-[38px]">
+                            <button type="button" onclick="setTypeFilter('all', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all bg-slate-200 shadow-sm text-slate-700">全部品項</button>
+                            <button type="button" onclick="setTypeFilter('ac', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">冷氣</button>
+                            <button type="button" onclick="setTypeFilter('wm', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">洗衣機</button>
+                            <button type="button" onclick="setTypeFilter('wt', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">水塔</button>
+                        </div>
+                        <div id="statusFilterGroup" class="flex gap-1 bg-slate-50 rounded-xl p-1 h-[38px]">
+                            <button type="button" onclick="setStatusFilter('all', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all bg-slate-200 shadow-sm text-slate-700">全部進度</button>
+                            <button type="button" onclick="setStatusFilter('completed', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">已完成</button>
+                            <button type="button" onclick="setStatusFilter('pending', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">待處理</button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto"><table class="min-w-full text-sm"><tbody id="recordList" class="divide-y divide-slate-100"></tbody></table></div>
             </section>
+        </div>
+
+        <!-- 懸浮待收提醒 HTML 結構 -->
+        <div id="floatingUnpaidWrap" class="hidden">
+            <div id="floatingUnpaidList" class="floating-unpaid-list hidden">
+                <h5 class="text-[11px] font-bold text-amber-700 uppercase tracking-widest mb-2 pb-2 border-b border-amber-100 flex justify-between items-center">
+                    <span>待收款明細 (全系統)</span>
+                    <button onclick="toggleFloatingUnpaid()" class="text-amber-400 font-bold">&times;</button>
+                </h5>
+                <div id="floatingUnpaidItems" class="space-y-1.5"></div>
+            </div>
+            <button onclick="toggleFloatingUnpaid()" class="unpaid-badge relative">
+                <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                <span id="unpaidCountBadge" class="unpaid-count-dot">0</span>
+            </button>
         </div>
     </div>
 
@@ -369,19 +918,19 @@
         let knownPassNames = [];
         let snapshotUnsubscribe = null;
 
-        // 篩選快取，供支出浮窗使用
         let currentYearRecords = [];
         let currentMonthRecords = [];
+        
+        // 狀態與品項篩選變數
+        let currentStatusFilter = 'all';
+        let currentTypeFilter = 'all';
 
-        // 授權清單
         const allowedEmails = ['eroraror@gmail.com', 'graceyiyo@gmail.com'];
 
-        // 初始化圖示
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
         });
 
-        // 登入狀態監聽
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 if (allowedEmails.includes(user.email.toLowerCase())) {
@@ -628,6 +1177,14 @@
             updateQuickPassTags();
         }
 
+        window.togglePassSummary = (sectionId) => {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            section.classList.toggle('pass-collapsed');
+            const text = section.querySelector('.pass-toggle-text');
+            if (text) text.innerText = section.classList.contains('pass-collapsed') ? '展開' : '收合';
+        };
+
         window.toggleAssistantModal = (title = "小幫手薪資總計 (全期)", records = allRecords) => {
             const modal = document.getElementById('assistantSummaryModal');
             const overlay = document.getElementById('assistantSummaryOverlay');
@@ -645,7 +1202,6 @@
             lucide.createIcons();
         };
 
-        // 三個快速開啟浮窗的入口
         window.showAllAssistantDetails = () => {
             toggleAssistantModal("小幫手薪資總計 (全期)", allRecords);
         };
@@ -709,22 +1265,55 @@
             filterRecords();
         };
 
+        // 切換懸浮待收列表面板
+        window.toggleFloatingUnpaid = () => {
+            const list = document.getElementById('floatingUnpaidList');
+            if (list) list.classList.toggle('hidden');
+        };
+
+        // 本次修正：處理進度按鈕點選與配色
+        window.setStatusFilter = (val, btn) => {
+            currentStatusFilter = val;
+            const statusColors = { all: 'bg-slate-200', completed: 'bg-emerald-100', pending: 'bg-amber-100' };
+            document.querySelectorAll('.status-btn').forEach(b => {
+                b.classList.remove('bg-white', 'bg-slate-200', 'bg-emerald-100', 'bg-amber-100', 'shadow-sm', 'text-slate-700');
+                b.classList.add('text-slate-400');
+            });
+            btn.classList.add(statusColors[val], 'shadow-sm', 'text-slate-700');
+            btn.classList.remove('text-slate-400');
+            filterRecords();
+        };
+
+        // 本次修正：處理品項按鈕點選與配色
+        window.setTypeFilter = (val, btn) => {
+            currentTypeFilter = val;
+            const typeColors = { all: 'bg-slate-200', ac: 'bg-emerald-100', wm: 'bg-blue-100', wt: 'bg-purple-100' };
+            document.querySelectorAll('.type-btn').forEach(b => {
+                b.classList.remove('bg-white', 'bg-slate-200', 'bg-emerald-100', 'bg-blue-100', 'bg-purple-100', 'shadow-sm', 'text-slate-700');
+                b.classList.add('text-slate-400');
+            });
+            btn.classList.add(typeColors[val], 'shadow-sm', 'text-slate-700');
+            btn.classList.remove('text-slate-400');
+            filterRecords();
+        };
+
         window.filterRecords = () => {
             const kw = document.getElementById('searchKeyword').value.toLowerCase();
             const mon = document.getElementById('monthFilter').value;
-            const type = document.getElementById('typeFilter').value;
-            const status = document.getElementById('statusFilter').value;
-            const payment = document.getElementById('paymentFilter').value;
+            
+            // 從變數讀取點選後的篩選狀態
+            const type = currentTypeFilter;
+            const status = currentStatusFilter;
 
-            // 統計數據變數 (僅受時間過濾影響，不受關鍵字影響)
             let mRev = 0, mExp = 0, mAc = 0, mWm = 0, mWt = 0;
             let yRev = 0, yExp = 0, yAc = 0, yWm = 0, yWt = 0;
             let aAc = 0, aWm = 0, aWt = 0, aRev = 0, aExp = 0;
-            let mUnpaidDetails = []; 
+            
+            // 每次重新過濾前，重置全系統待收明細
+            let systemUnpaidDetails = []; 
             let mPassSummary = {}; 
             let yPassSummary = {}; 
             
-            // 重置篩選快取
             currentYearRecords = [];
             currentMonthRecords = [];
 
@@ -734,7 +1323,11 @@
             document.getElementById('monthTitle').innerText = mon ? `${filterMonthName} 月份統計` : "全期統計";
 
             allRecords.forEach(r => {
-                // 全部累積計算
+                // 1. 全系統掃描待收
+                if (r.payment === 'unpaid') {
+                    systemUnpaidDetails.push({ id: r.id, name: r.customerName, amount: r.totalAmount });
+                }
+
                 aAc += (r.acCount || 0); aWm += (r.wmCount || 0); aWt += (r.wtCount || 0);
                 aRev += (r.totalAmount || 0); aExp += (r.assistantPay || 0);
 
@@ -742,7 +1335,6 @@
                 const iM = r.bookingTime.substring(0, 7);
                 const iQty = (r.acCount || 0) + (r.wmCount || 0) + (r.wtCount || 0);
 
-                // 年度統計計算 (不受列表篩選影響)
                 if (iY === filterYear) { 
                     currentYearRecords.push(r);
                     yRev += r.totalAmount; yExp += r.assistantPay; yAc += (r.acCount || 0); yWm += (r.wmCount || 0); yWt += (r.wtCount || 0); 
@@ -754,11 +1346,9 @@
                     }
                 }
 
-                // 月度統計計算 (不受列表篩選影響)
                 if (!mon || iM === mon) { 
                     currentMonthRecords.push(r);
                     mRev += r.totalAmount; mExp += r.assistantPay; mAc += (r.acCount || 0); mWm += (r.wmCount || 0); mWt += (r.wtCount || 0);
-                    if (r.payment === 'unpaid') mUnpaidDetails.push({ id: r.id, name: r.customerName, amount: r.totalAmount });
                     if (r.passFrom) {
                         mPassSummary[r.passFrom] = (mPassSummary[r.passFrom] || { qty: 0, rev: 0, exp: 0 });
                         mPassSummary[r.passFrom].qty += iQty;
@@ -768,21 +1358,44 @@
                 }
             });
 
-            // 列表資料過濾 (受所有篩選器影響)
             const baseFiltered = allRecords.filter(i => {
                 const iM = i.bookingTime.substring(0, 7);
                 const searchStr = `${i.customerName} ${i.address} ${i.acBrand} ${i.assistantDetail || ''} ${i.passFrom || ''} ${i.note}`.toLowerCase();
                 
                 const matchSearch = searchStr.includes(kw);
                 const matchMonth = (!mon || iM === mon);
+                // 使用點選狀態進行篩選
                 const matchType = (type === 'all' || (type === 'ac' && i.acCount > 0) || (type === 'wm' && i.wmCount > 0) || (type === 'wt' && i.wtCount > 0));
                 const matchStatus = (status === 'all' || i.status === status);
-                const matchPayment = (payment === 'all' || i.payment === payment);
 
-                return matchSearch && matchMonth && matchType && matchStatus && matchPayment;
+                return matchSearch && matchMonth && matchType && matchStatus;
             });
 
-            // 渲染年度 PASS 統計
+            // 更新懸浮待收組件核心邏輯
+            const floatingWrap = document.getElementById('floatingUnpaidWrap');
+            const floatingBadgeCount = document.getElementById('unpaidCountBadge');
+            const floatingList = document.getElementById('floatingUnpaidList');
+            const floatingItemsContainer = document.getElementById('floatingUnpaidItems');
+
+            if (systemUnpaidDetails.length > 0) {
+                // 有待收款項時顯示按鈕
+                floatingWrap.classList.remove('hidden');
+                floatingBadgeCount.innerText = systemUnpaidDetails.length;
+                floatingItemsContainer.innerHTML = systemUnpaidDetails.map(item => `
+                    <div class="floating-unpaid-item">
+                        <button onclick="scrollToRecord('${item.id}'); toggleFloatingUnpaid();" class="text-left hover:underline text-[13px] font-bold text-amber-800 truncate flex-1">
+                            • ${item.name}
+                        </button>
+                        <span class="font-black text-amber-600 text-[13px] ml-2">$${item.amount.toLocaleString()}</span>
+                    </div>
+                `).join('');
+            } else {
+                // 當沒有待收款項時，絕對隱藏
+                floatingWrap.classList.add('hidden');
+                floatingList.classList.add('hidden');
+                floatingBadgeCount.innerText = "0";
+            }
+
             const passYearSortedKeys = Object.keys(yPassSummary).sort((a,b) => yPassSummary[b].rev - yPassSummary[a].rev);
             if (passYearSortedKeys.length > 0) {
                 document.getElementById('passYearSummarySection').classList.remove('hidden');
@@ -791,22 +1404,33 @@
                     passYearTotalAmt += yPassSummary[k].rev;
                     const net = yPassSummary[k].rev - yPassSummary[k].exp;
                     return `
-                    <div class="flex items-center justify-between bg-white py-3 px-2.5 rounded-xl border border-indigo-100 gap-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm text-indigo-600 font-bold whitespace-nowrap">${k}</span>
-                            <span class="text-[11px] bg-indigo-50 px-1.5 py-0.5 rounded text-indigo-400 font-bold whitespace-nowrap">${yPassSummary[k].qty}台</span>
+                    <div class="pass-card">
+                        <div class="pass-card-top">
+                            <div class="pass-name-block">
+                                <span class="pass-avatar">${k.substring(0, 1)}</span>
+                                <span class="pass-name">${k}</span>
+                            </div>
+                            <span class="pass-qty">${yPassSummary[k].qty} 台</span>
                         </div>
-                        <div class="text-[11px] flex items-center gap-3 text-slate-500 whitespace-nowrap">
-                            <span>收:$${yPassSummary[k].rev.toLocaleString()}</span>
-                            <span>支:$${yPassSummary[k].exp.toLocaleString()}</span>
-                            <span class="font-bold text-indigo-700 bg-indigo-50/50 px-2 py-0.5 rounded">淨:$${net.toLocaleString()}</span>
+                        <div class="pass-metrics">
+                            <div class="pass-metric">
+                                <span class="pass-label">收入</span>
+                                <span class="pass-value">$${yPassSummary[k].rev.toLocaleString()}</span>
+                            </div>
+                            <div class="pass-metric">
+                                <span class="pass-label">支出</span>
+                                <span class="pass-value">$${yPassSummary[k].exp.toLocaleString()}</span>
+                            </div>
+                            <div class="pass-metric pass-net">
+                                <span class="pass-label">淨利</span>
+                                <span class="pass-value">$${net.toLocaleString()}</span>
+                            </div>
                         </div>
                     </div>`;
                 }).join('');
                 document.getElementById('passYearTotal').innerText = `總額 $${passYearTotalAmt.toLocaleString()}`;
             } else { document.getElementById('passYearSummarySection').classList.add('hidden'); }
 
-            // 渲染月度 PASS 統計
             const passSortedKeys = Object.keys(mPassSummary).sort((a,b) => mPassSummary[b].rev - mPassSummary[a].rev);
             if (passSortedKeys.length > 0) {
                 document.getElementById('passSummarySection').classList.remove('hidden');
@@ -815,25 +1439,32 @@
                     passTotalAmt += mPassSummary[k].rev;
                     const net = mPassSummary[k].rev - mPassSummary[k].exp;
                     return `
-                    <div class="flex items-center justify-between bg-white py-3 px-2.5 rounded-xl border border-emerald-100 gap-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm text-emerald-700 font-bold whitespace-nowrap">${k}</span>
-                            <span class="text-[11px] bg-emerald-50 px-1.5 py-0.5 rounded text-emerald-500 font-bold whitespace-nowrap">${mPassSummary[k].qty}台</span>
+                    <div class="pass-card">
+                        <div class="pass-card-top">
+                            <div class="pass-name-block">
+                                <span class="pass-avatar">${k.substring(0, 1)}</span>
+                                <span class="pass-name">${k}</span>
+                            </div>
+                            <span class="pass-qty">${mPassSummary[k].qty} 台</span>
                         </div>
-                        <div class="text-[11px] flex items-center gap-3 text-emerald-800/70 whitespace-nowrap">
-                            <span>收:$${mPassSummary[k].rev.toLocaleString()}</span>
-                            <span>支:$${mPassSummary[k].exp.toLocaleString()}</span>
-                            <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">淨:$${net.toLocaleString()}</span>
+                        <div class="pass-metrics">
+                            <div class="pass-metric">
+                                <span class="pass-label">收入</span>
+                                <span class="pass-value">$${mPassSummary[k].rev.toLocaleString()}</span>
+                            </div>
+                            <div class="pass-metric">
+                                <span class="pass-label">支出</span>
+                                <span class="pass-value">$${mPassSummary[k].exp.toLocaleString()}</span>
+                            </div>
+                            <div class="pass-metric pass-net">
+                                <span class="pass-label">淨利</span>
+                                <span class="pass-value">$${net.toLocaleString()}</span>
+                            </div>
                         </div>
                     </div>`;
                 }).join('');
                 document.getElementById('passMonthTotal').innerText = `總額 $${passTotalAmt.toLocaleString()}`;
             } else { document.getElementById('passSummarySection').classList.add('hidden'); }
-
-            if (mUnpaidDetails.length > 0) {
-                document.getElementById('unpaidSection').classList.remove('hidden');
-                document.getElementById('unpaidList').innerHTML = mUnpaidDetails.map(item => `<div class="flex justify-between py-1.5 items-center"><button onclick="scrollToRecord('${item.id}')" class="text-left hover:underline decoration-amber-400 font-bold text-[14px]">• ${item.name}</button><span class="font-bold text-[15px]">$${item.amount.toLocaleString()}</span></div>`).join('');
-            } else { document.getElementById('unpaidSection').classList.add('hidden'); }
 
             document.getElementById('allAc').innerText = aAc; document.getElementById('allWm').innerText = aWm; document.getElementById('allWt').innerText = aWt;
             document.getElementById('allRev').innerText = `$${aRev.toLocaleString()}`; document.getElementById('allExp').innerText = `$${aExp.toLocaleString()}`; document.getElementById('allNet').innerText = `$${(aRev - aExp).toLocaleString()}`;
@@ -888,7 +1519,20 @@
                         ${asDisplay ? `<div class="text-[11px] text-rose-500 font-medium mt-0.5">${asDisplay}</div>` : ''}
                     </td>
                     <td data-label="金額帳目" class="px-6 py-4 text-slate-600 font-medium">
-                        收 ${i.totalAmount.toLocaleString()} - 支 ${i.assistantPay.toLocaleString()} = <span class="text-emerald-700 font-bold">淨 ${(i.totalAmount - i.assistantPay).toLocaleString()}</span>
+                        <div class="record-metric-grid">
+                            <div class="metric-box metric-box-rev">
+                                <span class="metric-box-label">收入</span>
+                                <span class="metric-box-value">$${i.totalAmount.toLocaleString()}</span>
+                            </div>
+                            <div class="metric-box metric-box-exp">
+                                <span class="metric-box-label">支出</span>
+                                <span class="metric-box-value">$${i.assistantPay.toLocaleString()}</span>
+                            </div>
+                            <div class="metric-box metric-box-net">
+                                <span class="metric-box-label">淨利</span>
+                                <span class="metric-box-value">$${(i.totalAmount - i.assistantPay).toLocaleString()}</span>
+                            </div>
+                        </div>
                     </td>
                     <td class="px-6 py-4 action-cell">
                         <button onclick="toggleDone('${i.id}', '${i.status}')" class="flex items-center gap-1 ${isComp ? 'text-slate-400 bg-slate-50 border-slate-200' : 'text-emerald-700 bg-emerald-50 border-emerald-100'} px-2 py-1.5 rounded-lg border text-[10px] font-bold">
@@ -962,58 +1606,137 @@
         };
 
         window.changeMonth = (o) => { const i = document.getElementById('monthFilter'); if (!i.value) i.value = new Date().toISOString().substring(0, 7); let [y, m] = i.value.split('-').map(Number); let d = new Date(y, m - 1); d.setMonth(d.getMonth() + o); i.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; filterRecords(); };
-        window.quickFilterUnpaid = () => { document.getElementById('paymentFilter').value = 'unpaid'; filterRecords(); };
+        window.quickFilterUnpaid = () => { /* 此功能現改為由懸浮驚嘆號控制 */ };
         window.deleteRec = async (id) => { if(confirm('確定要刪除嗎？')) await deleteDoc(doc(db, "cleaningRecords", id)); };
 
-        // 截圖自動下載優化功能
         window.downloadRec = (id) => {
             const el = document.getElementById(`rec-${id}`);
             const actionCell = el.querySelector('.action-cell');
             const contentTds = el.querySelectorAll('td:not(.action-cell)');
-            const customerTd = el.querySelector('td[data-label="客戶"]'); // 鎖定客戶名稱欄位
-            
-            // 使用渲染後的 SVG 類名 (.lucide-phone, .lucide-map-pin) 才能確實抓到圖示
+            const customerTd = el.querySelector('td[data-label="客戶"]');
+            const metricGrid = el.querySelector('.record-metric-grid');
+            const metricBoxesWithLines = el.querySelectorAll('.record-metric-grid .metric-box:not(:last-child)');
             const iconsToHide = el.querySelectorAll('.lucide-phone, .lucide-map-pin, button[onclick^="copyText"]');
             
-            // 1. 隱藏按鈕區、圖示，處理底色與邊框
             actionCell.style.display = 'none';
             iconsToHide.forEach(icon => icon.style.display = 'none');
-            el.style.setProperty('background-color', '#ffffff', 'important');
-            el.style.setProperty('border-left', 'none', 'important'); // 截圖時隱藏左側線條
             
-            // 將內容文字向上偏移改為 -10px
+            const originalWidth = el.style.width;
+            el.style.width = getComputedStyle(el).width;
+            
+            el.style.setProperty('background-color', '#ffffff', 'important');
+            el.style.setProperty('border-top', 'none', 'important'); 
+            
             contentTds.forEach(td => {
                 td.style.setProperty('position', 'relative', 'important');
-                td.style.setProperty('top', '-10px', 'important');
+                td.style.setProperty('top', '-8px', 'important');
             });
 
-            // 特別針對客戶名稱賦予向上拉近的負間距，這會自然將底下所有元素一併往上帶
+            if (metricGrid) {
+                metricGrid.style.setProperty('margin-top', '-13px', 'important');
+            }
+
             if (customerTd) {
                 customerTd.style.setProperty('margin-top', '-10px', 'important');
             }
             
-            // 2. 執行截圖
+            metricBoxesWithLines.forEach(box => {
+                box.style.setProperty('border-right', 'none', 'important');
+                box.style.setProperty('background-image', 'linear-gradient(to bottom, transparent 15px, #e2e8f0 15px)', 'important');
+                box.style.setProperty('background-size', '1px 100%', 'important');
+                box.style.setProperty('background-repeat', 'no-repeat', 'important');
+                box.style.setProperty('background-position', 'right', 'important');
+            });
+
             html2canvas(el, {
-                scale: 2, // 提高畫質
-                backgroundColor: "#ffffff", // 確保 canvas 外框也是白色
+                scale: 2, 
+                backgroundColor: "#ffffff", 
                 useCORS: true,
                 logging: false
             }).then(canvas => {
-                // 3. 還原所有修改的樣式
                 actionCell.style.display = 'flex';
                 iconsToHide.forEach(icon => icon.style.removeProperty('display'));
+                el.style.width = originalWidth;
                 el.style.removeProperty('background-color');
-                el.style.removeProperty('border-left');
+                el.style.removeProperty('border-top');
                 contentTds.forEach(td => {
                     td.style.removeProperty('position');
                     td.style.removeProperty('top');
                 });
+                if (metricGrid) {
+                    metricGrid.style.removeProperty('margin-top');
+                }
                 if (customerTd) {
                     customerTd.style.removeProperty('margin-top');
                 }
                 
-                // 4. 將畫布轉換為 Blob 以進行靜默下載
-                canvas.toBlob((blob) => {
+                metricBoxesWithLines.forEach(box => {
+                    box.style.removeProperty('border-right');
+                    box.style.removeProperty('background-image');
+                    box.style.removeProperty('background-size');
+                    box.style.removeProperty('background-repeat');
+                    box.style.removeProperty('background-position');
+                });
+
+                const framedCanvas = document.createElement('canvas');
+                const ctx = framedCanvas.getContext('2d');
+                const padding = 28;
+                const radius = 22;
+                framedCanvas.width = canvas.width + padding * 2;
+                framedCanvas.height = canvas.height + padding * 2;
+
+                const drawRoundedRect = (context, x, y, w, h, r) => {
+                    context.beginPath();
+                    context.moveTo(x + r, y);
+                    context.lineTo(x + w - r, y);
+                    context.quadraticCurveTo(x + w, y, x + w, y + r);
+                    context.lineTo(x + w, y + h - r);
+                    context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                    context.lineTo(x + r, y + h);
+                    context.quadraticCurveTo(x, y + h, x, y + h - r);
+                    context.lineTo(x, y + r);
+                    context.quadraticCurveTo(x, y, x + r, y);
+                    context.closePath();
+                };
+
+                ctx.clearRect(0, 0, framedCanvas.width, framedCanvas.height);
+                ctx.save();
+                drawRoundedRect(ctx, 6, 6, framedCanvas.width - 12, framedCanvas.height - 12, radius + 8);
+                ctx.fillStyle = '#f8fafc';
+                ctx.fill();
+                ctx.restore();
+
+                ctx.save();
+                ctx.shadowColor = 'rgba(15, 23, 42, 0.10)';
+                ctx.shadowBlur = 18;
+                ctx.shadowOffsetY = 6;
+                drawRoundedRect(ctx, padding, padding, canvas.width, canvas.height, radius);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                ctx.restore();
+
+                ctx.save();
+                ctx.shadowColor = 'transparent';
+                drawRoundedRect(ctx, padding, padding, canvas.width, canvas.height, radius);
+                ctx.clip();
+                ctx.drawImage(canvas, padding, padding);
+                ctx.restore();
+
+                ctx.save();
+                drawRoundedRect(ctx, padding + 1.5, padding + 1.5, canvas.width - 3, canvas.height - 3, radius - 1);
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.restore();
+
+                ctx.save();
+                drawRoundedRect(ctx, padding - 8, padding - 8, canvas.width + 16, canvas.height + 16, radius + 6);
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+
+                framedCanvas.toBlob((blob) => {
                     const name = el.querySelector('[data-label="客戶"] span').innerText;
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
