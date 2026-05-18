@@ -592,6 +592,127 @@
             border-bottom: 1px dashed #fef3c7;
         }
         .floating-unpaid-item:last-child { border-bottom: none; }
+
+
+        /* 手機版篩選統計與篩選列排版微調 */
+        .filter-summary-head {
+            gap: 0.5rem;
+        }
+        .filter-count-line {
+            white-space: nowrap;
+        }
+        .date-filter-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+            align-items: end;
+        }
+        .clear-filter-row {
+            display: flex;
+        }
+        @media (max-width: 640px) {
+            .filter-summary-head {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 0.28rem !important;
+            }
+            .filter-summary-head #monthTitle {
+                line-height: 1.35 !important;
+                word-break: break-word !important;
+            }
+            .filter-count-line {
+                width: 100% !important;
+                font-size: 0.68rem !important;
+                line-height: 1.35 !important;
+                white-space: normal !important;
+            }
+            .date-filter-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 0.5rem !important;
+            }
+            .date-filter-row input[type="date"] {
+                font-size: 0.72rem !important;
+                padding-left: 0.45rem !important;
+                padding-right: 0.35rem !important;
+            }
+            .clear-filter-row button {
+                width: 100% !important;
+            }
+        }
+
+        /* 篩選區塊改為點選展開，減少清單上方佔用空間 */
+        .filter-shell {
+            padding: 0.65rem !important;
+        }
+        .filter-toggle-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            border: 0;
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 0.75rem 0.85rem;
+            color: #475569;
+            text-align: left;
+        }
+        .filter-toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+        .filter-toggle-title {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: #334155;
+            white-space: nowrap;
+        }
+        .filter-toggle-status {
+            display: block;
+            margin-top: 0.1rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #94a3b8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+        .filter-toggle-right {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex: 0 0 auto;
+            font-size: 0.72rem;
+            font-weight: 900;
+            color: #64748b;
+        }
+        .filter-panel {
+            margin-top: 0.75rem;
+        }
+        .filter-shell.filter-collapsed .filter-panel {
+            display: none !important;
+        }
+        .filter-shell.filter-collapsed .filter-chevron {
+            transform: rotate(0deg);
+        }
+        .filter-shell:not(.filter-collapsed) .filter-chevron {
+            transform: rotate(180deg);
+        }
+        .filter-chevron {
+            transition: transform 0.2s ease;
+        }
+        @media (max-width: 640px) {
+            .filter-toggle-status {
+                max-width: 62vw;
+            }
+            .filter-shell {
+                margin-bottom: 0.75rem !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-[#faf9f6] min-h-screen text-slate-700">
@@ -801,21 +922,21 @@
 
                     <div class="stats-card stats-card-month p-5">
                         <div>
-                            <div class="flex justify-between items-start">
+                            <div class="filter-summary-head flex justify-between items-start">
                                 <h3 class="text-emerald-600 text-[10px] font-bold uppercase tracking-widest" id="monthTitle">本月統計</h3>
-                                <div class="text-[10px] text-emerald-700/70">月度數量: <span class="text-emerald-800 font-bold" id="mCounts">冷0 / 洗0 / 水0</span></div>
+                                <div class="filter-count-line text-[10px] text-emerald-700/70"><span id="mCountsLabel">月度數量</span>: <span class="text-emerald-800 font-bold" id="mCounts">冷0 / 洗0 / 水0</span></div>
                             </div>
                             <div class="metric-box-grid mt-3">
                                 <div class="metric-box metric-box-rev">
-                                    <span class="metric-box-label">本月總營收</span>
+                                    <span class="metric-box-label" id="mRevLabel">本月總營收</span>
                                     <span class="metric-box-value" id="mRev">$0</span>
                                 </div>
                                 <div class="metric-box metric-box-exp">
-                                    <span class="metric-box-label">本月支出</span>
+                                    <span class="metric-box-label" id="mExpLabel">本月支出</span>
                                     <button onclick="showMonthAssistantDetails()" id="mExp">$0</button>
                                 </div>
                                 <div class="metric-box metric-box-net">
-                                    <span class="metric-box-label">本月淨利</span>
+                                    <span class="metric-box-label" id="mNetLabel">本月淨利</span>
                                     <span class="metric-box-value" id="mNet">$0</span>
                                 </div>
                             </div>
@@ -824,7 +945,7 @@
                                 <button type="button" class="pass-summary-head" onclick="togglePassSummary('passSummarySection')">
                                     <span class="pass-summary-title-area">
                                         <h3 class="text-emerald-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                            <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (月度)
+                                            <i data-lucide="forward" class="w-3 h-3"></i> <span id="passFilteredTitle">PASS 來源統計 (月度)</span>
                                         </h3>
                                     </span>
                                     <span class="pass-summary-actions">
@@ -841,33 +962,56 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-3 md:p-5 rounded-2xl shadow-sm border border-slate-100 mb-6 space-y-4">
-                    <div class="flex flex-col md:flex-row gap-3">
-                        <div class="flex-[3] relative">
-                            <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
-                                <i data-lucide="search" class="w-4 h-4"></i>
+                <div id="filterShell" class="filter-shell filter-collapsed bg-white rounded-2xl shadow-sm border border-slate-100 mb-6">
+                    <button type="button" onclick="toggleFilterPanel()" class="filter-toggle-btn">
+                        <span class="filter-toggle-left">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-500 flex-none"></i>
+                            <span class="min-w-0">
+                                <span class="filter-toggle-title">篩選條件</span>
+                                <span id="filterStatusText" class="filter-toggle-status">目前：本月份</span>
+                            </span>
+                        </span>
+                        <span class="filter-toggle-right">
+                            <span class="filter-toggle-word">展開</span>
+                            <i data-lucide="chevron-down" class="filter-chevron w-4 h-4"></i>
+                        </span>
+                    </button>
+
+                    <div id="filterPanel" class="filter-panel space-y-4">
+                        <div class="flex flex-col gap-3">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </div>
+                                <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="關鍵字搜尋：姓名、電話、地址、機型、PASS、小幫手、備註..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
                             </div>
-                            <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="搜尋姓名、地址、機型、PASS..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
+                            <div class="date-filter-row">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">起始日期</label>
+                                    <input type="date" id="dateStartFilter" onchange="filterRecords()" class="w-full bg-slate-50 border-none rounded-xl p-2.5 text-sm outline-none font-medium h-[42px]">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">結束日期</label>
+                                    <input type="date" id="dateEndFilter" onchange="filterRecords()" class="w-full bg-slate-50 border-none rounded-xl p-2.5 text-sm outline-none font-medium h-[42px]">
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex-[3] flex items-center gap-1">
-                            <button onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                            <input type="month" id="monthFilter" onchange="filterRecords()" class="flex-1 bg-slate-50 border-none rounded-xl p-2 text-sm outline-none text-center font-medium h-[42px]">
-                            <button onclick="changeMonth(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                            <button onclick="clearMonthFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition-all leading-none" title="清除年月篩選"><i data-lucide="calendar-x" class="w-4 h-4"></i></button>
+                        <!-- 品項與進度篩選按鈕群組 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div id="typeFilterGroup" class="flex gap-1 bg-slate-50 rounded-xl p-1 h-[38px]">
+                                <button type="button" onclick="setTypeFilter('all', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all bg-slate-200 shadow-sm text-slate-700">全部品項</button>
+                                <button type="button" onclick="setTypeFilter('ac', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">冷氣</button>
+                                <button type="button" onclick="setTypeFilter('wm', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">洗衣機</button>
+                                <button type="button" onclick="setTypeFilter('wt', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">水塔</button>
+                            </div>
+                            <div id="statusFilterGroup" class="flex gap-1 bg-slate-50 rounded-xl p-1 h-[38px]">
+                                <button type="button" onclick="setStatusFilter('all', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all bg-slate-200 shadow-sm text-slate-700">全部進度</button>
+                                <button type="button" onclick="setStatusFilter('completed', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">已完成</button>
+                                <button type="button" onclick="setStatusFilter('pending', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">待處理</button>
+                            </div>
                         </div>
-                    </div>
-                    <!-- 品項與進度篩選按鈕群組 -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div id="typeFilterGroup" class="flex gap-1 bg-slate-50 rounded-xl p-1 h-[38px]">
-                            <button type="button" onclick="setTypeFilter('all', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all bg-slate-200 shadow-sm text-slate-700">全部品項</button>
-                            <button type="button" onclick="setTypeFilter('ac', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">冷氣</button>
-                            <button type="button" onclick="setTypeFilter('wm', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">洗衣機</button>
-                            <button type="button" onclick="setTypeFilter('wt', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">水塔</button>
-                        </div>
-                        <div id="statusFilterGroup" class="flex gap-1 bg-slate-50 rounded-xl p-1 h-[38px]">
-                            <button type="button" onclick="setStatusFilter('all', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all bg-slate-200 shadow-sm text-slate-700">全部進度</button>
-                            <button type="button" onclick="setStatusFilter('completed', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">已完成</button>
-                            <button type="button" onclick="setStatusFilter('pending', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">待處理</button>
+                        <div class="clear-filter-row">
+                            <button onclick="clearAllFilters()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2.5 rounded-xl transition-all leading-none h-[42px] text-[11px] font-bold flex items-center justify-center gap-1" title="清除全部篩選，並回到當月份"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>清除全部篩選</button>
                         </div>
                     </div>
                 </div>
@@ -981,7 +1125,17 @@
             });
         }
 
-        document.getElementById('monthFilter').value = new Date().toISOString().substring(0, 7);
+        const todayForFilter = new Date();
+        const formatLocalDate = (d) => {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        };
+        const firstDayForFilter = new Date(todayForFilter.getFullYear(), todayForFilter.getMonth(), 1);
+        const lastDayForFilter = new Date(todayForFilter.getFullYear(), todayForFilter.getMonth() + 1, 0);
+        document.getElementById('dateStartFilter').value = formatLocalDate(firstDayForFilter);
+        document.getElementById('dateEndFilter').value = formatLocalDate(lastDayForFilter);
 
         window.showPage = (id) => {
             document.getElementById('formPage').classList.toggle('hidden', id !== 'formPage');
@@ -1260,10 +1414,69 @@
             });
         };
 
-        window.clearMonthFilter = () => {
-            document.getElementById('monthFilter').value = "";
-            filterRecords();
+        function setDateFilterToCurrentMonth() {
+            const now = new Date();
+            const first = new Date(now.getFullYear(), now.getMonth(), 1);
+            const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            document.getElementById('dateStartFilter').value = formatLocalDate(first);
+            document.getElementById('dateEndFilter').value = formatLocalDate(last);
+        }
+
+        window.toggleFilterPanel = () => {
+            const shell = document.getElementById('filterShell');
+            if (!shell) return;
+            shell.classList.toggle('filter-collapsed');
+            const word = shell.querySelector('.filter-toggle-word');
+            if (word) word.innerText = shell.classList.contains('filter-collapsed') ? '展開' : '收合';
+            lucide.createIcons();
         };
+
+        function updateFilterStatusText(isPureCurrentMonth, startDate, endDate, kw, type, status) {
+            const el = document.getElementById('filterStatusText');
+            if (!el) return;
+            const parts = [];
+            if (isPureCurrentMonth) {
+                parts.push('本月份');
+            } else if (startDate && endDate) {
+                parts.push(`${startDate.replaceAll('-', '/')}～${endDate.replaceAll('-', '/')}`);
+            } else if (startDate) {
+                parts.push(`${startDate.replaceAll('-', '/')} 之後`);
+            } else if (endDate) {
+                parts.push(`${endDate.replaceAll('-', '/')} 之前`);
+            } else {
+                parts.push('全部日期');
+            }
+            if (kw) parts.push(`關鍵字「${kw}」`);
+            if (type !== 'all') parts.push({ ac: '冷氣', wm: '洗衣機', wt: '水塔' }[type] || type);
+            if (status !== 'all') parts.push({ completed: '已完成', pending: '待處理' }[status] || status);
+            el.innerText = `目前：${parts.join('｜')}`;
+        }
+
+        function resetFilterButtonStyles(groupSelector, activeValue) {
+            const colorMap = { all: 'bg-slate-200', completed: 'bg-emerald-100', pending: 'bg-amber-100', ac: 'bg-emerald-100', wm: 'bg-blue-100', wt: 'bg-purple-100' };
+            document.querySelectorAll(groupSelector).forEach(btn => {
+                btn.classList.remove('bg-white', 'bg-slate-200', 'bg-emerald-100', 'bg-amber-100', 'bg-blue-100', 'bg-purple-100', 'shadow-sm', 'text-slate-700');
+                btn.classList.add('text-slate-400');
+                const onclickText = btn.getAttribute('onclick') || '';
+                if (onclickText.includes(`'${activeValue}'`)) {
+                    btn.classList.add(colorMap[activeValue] || 'bg-slate-200', 'shadow-sm', 'text-slate-700');
+                    btn.classList.remove('text-slate-400');
+                }
+            });
+        }
+
+        window.clearAllFilters = () => {
+            document.getElementById('searchKeyword').value = "";
+            setDateFilterToCurrentMonth();
+            currentTypeFilter = 'all';
+            currentStatusFilter = 'all';
+            resetFilterButtonStyles('.type-btn', 'all');
+            resetFilterButtonStyles('.status-btn', 'all');
+            filterRecords();
+            lucide.createIcons();
+        };
+
+        window.clearDateFilter = window.clearAllFilters;
 
         // 切換懸浮待收列表面板
         window.toggleFloatingUnpaid = () => {
@@ -1298,87 +1511,104 @@
         };
 
         window.filterRecords = () => {
-            const kw = document.getElementById('searchKeyword').value.toLowerCase();
-            const mon = document.getElementById('monthFilter').value;
-            
-            // 從變數讀取點選後的篩選狀態
+            const kw = (document.getElementById('searchKeyword').value || '').trim().toLowerCase();
+            const startDate = document.getElementById('dateStartFilter').value;
+            const endDate = document.getElementById('dateEndFilter').value;
             const type = currentTypeFilter;
             const status = currentStatusFilter;
 
-            let mRev = 0, mExp = 0, mAc = 0, mWm = 0, mWt = 0;
-            let yRev = 0, yExp = 0, yAc = 0, yWm = 0, yWt = 0;
             let aAc = 0, aWm = 0, aWt = 0, aRev = 0, aExp = 0;
-            
-            // 每次重新過濾前，重置全系統待收明細
-            let systemUnpaidDetails = []; 
-            let mPassSummary = {}; 
-            let yPassSummary = {}; 
-            
+            let yRev = 0, yExp = 0, yAc = 0, yWm = 0, yWt = 0;
+            let fRev = 0, fExp = 0, fAc = 0, fWm = 0, fWt = 0;
+            let systemUnpaidDetails = [];
+            let yPassSummary = {};
+            let fPassSummary = {};
+
             currentYearRecords = [];
             currentMonthRecords = [];
 
-            const filterYear = mon ? mon.split('-')[0] : new Date().getFullYear().toString();
-            const filterMonthName = mon ? mon.split('-')[1] : "全部";
+            const now = new Date();
+            const filterYear = startDate ? startDate.split('-')[0] : now.getFullYear().toString();
+            const currentMonthFirst = formatLocalDate(new Date(now.getFullYear(), now.getMonth(), 1));
+            const currentMonthLast = formatLocalDate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+            const isPureCurrentMonth = startDate === currentMonthFirst && endDate === currentMonthLast && !kw && type === 'all' && status === 'all';
+            updateFilterStatusText(isPureCurrentMonth, startDate, endDate, kw, type, status);
+            const periodTitle = (() => {
+                if (isPureCurrentMonth) return `${String(now.getMonth() + 1).padStart(2, '0')} 月份統計`;
+                if (startDate && endDate) return `${startDate.replaceAll('-', '/')}～${endDate.replaceAll('-', '/')} 篩選統計`;
+                if (startDate) return `${startDate.replaceAll('-', '/')} 之後篩選統計`;
+                if (endDate) return `${endDate.replaceAll('-', '/')} 之前篩選統計`;
+                return '全部資料篩選統計';
+            })();
+
             document.getElementById('yearTitle').innerText = `${filterYear} 年度統計`;
-            document.getElementById('monthTitle').innerText = mon ? `${filterMonthName} 月份統計` : "全期統計";
+            document.getElementById('monthTitle').innerText = periodTitle;
+            document.getElementById('mCountsLabel').innerText = isPureCurrentMonth ? '月度數量' : '篩選數量';
+            document.getElementById('mRevLabel').innerText = isPureCurrentMonth ? '本月總營收' : '篩選總營收';
+            document.getElementById('mExpLabel').innerText = isPureCurrentMonth ? '本月支出' : '篩選支出';
+            document.getElementById('mNetLabel').innerText = isPureCurrentMonth ? '本月淨利' : '篩選淨利';
+            const passFilteredTitle = document.getElementById('passFilteredTitle');
+            if (passFilteredTitle) passFilteredTitle.innerText = isPureCurrentMonth ? 'PASS 來源統計 (月度)' : 'PASS 來源統計 (篩選)';
 
-            allRecords.forEach(r => {
-                // 1. 全系統掃描待收
-                if (r.payment === 'unpaid') {
-                    systemUnpaidDetails.push({ id: r.id, name: r.customerName, amount: r.totalAmount });
-                }
-
-                aAc += (r.acCount || 0); aWm += (r.wmCount || 0); aWt += (r.wtCount || 0);
-                aRev += (r.totalAmount || 0); aExp += (r.assistantPay || 0);
-
-                const iY = r.bookingTime.split('-')[0];
-                const iM = r.bookingTime.substring(0, 7);
-                const iQty = (r.acCount || 0) + (r.wmCount || 0) + (r.wtCount || 0);
-
-                if (iY === filterYear) { 
-                    currentYearRecords.push(r);
-                    yRev += r.totalAmount; yExp += r.assistantPay; yAc += (r.acCount || 0); yWm += (r.wmCount || 0); yWt += (r.wtCount || 0); 
-                    if (r.passFrom) {
-                        yPassSummary[r.passFrom] = (yPassSummary[r.passFrom] || { qty: 0, rev: 0, exp: 0 });
-                        yPassSummary[r.passFrom].qty += iQty;
-                        yPassSummary[r.passFrom].rev += r.totalAmount;
-                        yPassSummary[r.passFrom].exp += r.assistantPay;
-                    }
-                }
-
-                if (!mon || iM === mon) { 
-                    currentMonthRecords.push(r);
-                    mRev += r.totalAmount; mExp += r.assistantPay; mAc += (r.acCount || 0); mWm += (r.wmCount || 0); mWt += (r.wtCount || 0);
-                    if (r.passFrom) {
-                        mPassSummary[r.passFrom] = (mPassSummary[r.passFrom] || { qty: 0, rev: 0, exp: 0 });
-                        mPassSummary[r.passFrom].qty += iQty;
-                        mPassSummary[r.passFrom].rev += r.totalAmount;
-                        mPassSummary[r.passFrom].exp += r.assistantPay;
-                    }
-                }
-            });
+            const getDateOnly = (record) => (record.bookingTime || '').substring(0, 10);
+            const getSearchText = (record) => `${record.customerName || ''} ${record.phone || ''} ${record.address || ''} ${record.acBrand || ''} ${record.assistantDetail || ''} ${record.passFrom || ''} ${record.note || ''}`.toLowerCase();
+            const getQty = (record) => (parseInt(record.acCount) || 0) + (parseInt(record.wmCount) || 0) + (parseInt(record.wtCount) || 0);
+            const addPassSummary = (target, record) => {
+                if (!record.passFrom) return;
+                target[record.passFrom] = (target[record.passFrom] || { qty: 0, rev: 0, exp: 0 });
+                target[record.passFrom].qty += getQty(record);
+                target[record.passFrom].rev += (parseInt(record.totalAmount) || 0);
+                target[record.passFrom].exp += (parseInt(record.assistantPay) || 0);
+            };
 
             const baseFiltered = allRecords.filter(i => {
-                const iM = i.bookingTime.substring(0, 7);
-                const searchStr = `${i.customerName} ${i.address} ${i.acBrand} ${i.assistantDetail || ''} ${i.passFrom || ''} ${i.note}`.toLowerCase();
-                
-                const matchSearch = searchStr.includes(kw);
-                const matchMonth = (!mon || iM === mon);
-                // 使用點選狀態進行篩選
-                const matchType = (type === 'all' || (type === 'ac' && i.acCount > 0) || (type === 'wm' && i.wmCount > 0) || (type === 'wt' && i.wtCount > 0));
+                const recordDate = getDateOnly(i);
+                const matchSearch = !kw || getSearchText(i).includes(kw);
+                const matchStart = !startDate || (recordDate && recordDate >= startDate);
+                const matchEnd = !endDate || (recordDate && recordDate <= endDate);
+                const matchType = (type === 'all' || (type === 'ac' && (parseInt(i.acCount) || 0) > 0) || (type === 'wm' && (parseInt(i.wmCount) || 0) > 0) || (type === 'wt' && (parseInt(i.wtCount) || 0) > 0));
                 const matchStatus = (status === 'all' || i.status === status);
-
-                return matchSearch && matchMonth && matchType && matchStatus;
+                return matchSearch && matchStart && matchEnd && matchType && matchStatus;
             });
 
-            // 更新懸浮待收組件核心邏輯
+            allRecords.forEach(r => {
+                const rev = parseInt(r.totalAmount) || 0;
+                const exp = parseInt(r.assistantPay) || 0;
+                const ac = parseInt(r.acCount) || 0;
+                const wm = parseInt(r.wmCount) || 0;
+                const wt = parseInt(r.wtCount) || 0;
+
+                if (r.payment === 'unpaid') {
+                    systemUnpaidDetails.push({ id: r.id, name: r.customerName || '未填姓名', amount: rev });
+                }
+
+                aAc += ac; aWm += wm; aWt += wt; aRev += rev; aExp += exp;
+
+                const iY = (r.bookingTime || '').split('-')[0];
+                if (iY === filterYear) {
+                    currentYearRecords.push(r);
+                    yRev += rev; yExp += exp; yAc += ac; yWm += wm; yWt += wt;
+                    addPassSummary(yPassSummary, r);
+                }
+            });
+
+            baseFiltered.forEach(r => {
+                const rev = parseInt(r.totalAmount) || 0;
+                const exp = parseInt(r.assistantPay) || 0;
+                const ac = parseInt(r.acCount) || 0;
+                const wm = parseInt(r.wmCount) || 0;
+                const wt = parseInt(r.wtCount) || 0;
+                currentMonthRecords.push(r);
+                fRev += rev; fExp += exp; fAc += ac; fWm += wm; fWt += wt;
+                addPassSummary(fPassSummary, r);
+            });
+
             const floatingWrap = document.getElementById('floatingUnpaidWrap');
             const floatingBadgeCount = document.getElementById('unpaidCountBadge');
             const floatingList = document.getElementById('floatingUnpaidList');
             const floatingItemsContainer = document.getElementById('floatingUnpaidItems');
 
             if (systemUnpaidDetails.length > 0) {
-                // 有待收款項時顯示按鈕
                 floatingWrap.classList.remove('hidden');
                 floatingBadgeCount.innerText = systemUnpaidDetails.length;
                 floatingItemsContainer.innerHTML = systemUnpaidDetails.map(item => `
@@ -1390,54 +1620,23 @@
                     </div>
                 `).join('');
             } else {
-                // 當沒有待收款項時，絕對隱藏
                 floatingWrap.classList.add('hidden');
                 floatingList.classList.add('hidden');
                 floatingBadgeCount.innerText = "0";
             }
 
-            const passYearSortedKeys = Object.keys(yPassSummary).sort((a,b) => yPassSummary[b].rev - yPassSummary[a].rev);
-            if (passYearSortedKeys.length > 0) {
-                document.getElementById('passYearSummarySection').classList.remove('hidden');
-                let passYearTotalAmt = 0;
-                document.getElementById('passYearSummaryList').innerHTML = passYearSortedKeys.map(k => {
-                    passYearTotalAmt += yPassSummary[k].rev;
-                    const net = yPassSummary[k].rev - yPassSummary[k].exp;
-                    return `
-                    <div class="pass-card">
-                        <div class="pass-card-top">
-                            <div class="pass-name-block">
-                                <span class="pass-avatar">${k.substring(0, 1)}</span>
-                                <span class="pass-name">${k}</span>
-                            </div>
-                            <span class="pass-qty">${yPassSummary[k].qty} 台</span>
-                        </div>
-                        <div class="pass-metrics">
-                            <div class="pass-metric">
-                                <span class="pass-label">收入</span>
-                                <span class="pass-value">$${yPassSummary[k].rev.toLocaleString()}</span>
-                            </div>
-                            <div class="pass-metric">
-                                <span class="pass-label">支出</span>
-                                <span class="pass-value">$${yPassSummary[k].exp.toLocaleString()}</span>
-                            </div>
-                            <div class="pass-metric pass-net">
-                                <span class="pass-label">淨利</span>
-                                <span class="pass-value">$${net.toLocaleString()}</span>
-                            </div>
-                        </div>
-                    </div>`;
-                }).join('');
-                document.getElementById('passYearTotal').innerText = `總額 $${passYearTotalAmt.toLocaleString()}`;
-            } else { document.getElementById('passYearSummarySection').classList.add('hidden'); }
-
-            const passSortedKeys = Object.keys(mPassSummary).sort((a,b) => mPassSummary[b].rev - mPassSummary[a].rev);
-            if (passSortedKeys.length > 0) {
-                document.getElementById('passSummarySection').classList.remove('hidden');
+            const renderPassSummaryCards = (summary, sectionId, listId, totalId) => {
+                const sortedKeys = Object.keys(summary).sort((a, b) => summary[b].rev - summary[a].rev);
+                const section = document.getElementById(sectionId);
+                if (sortedKeys.length === 0) {
+                    section.classList.add('hidden');
+                    return;
+                }
+                section.classList.remove('hidden');
                 let passTotalAmt = 0;
-                document.getElementById('passSummaryList').innerHTML = passSortedKeys.map(k => {
-                    passTotalAmt += mPassSummary[k].rev;
-                    const net = mPassSummary[k].rev - mPassSummary[k].exp;
+                document.getElementById(listId).innerHTML = sortedKeys.map(k => {
+                    passTotalAmt += summary[k].rev;
+                    const net = summary[k].rev - summary[k].exp;
                     return `
                     <div class="pass-card">
                         <div class="pass-card-top">
@@ -1445,16 +1644,16 @@
                                 <span class="pass-avatar">${k.substring(0, 1)}</span>
                                 <span class="pass-name">${k}</span>
                             </div>
-                            <span class="pass-qty">${mPassSummary[k].qty} 台</span>
+                            <span class="pass-qty">${summary[k].qty} 台</span>
                         </div>
                         <div class="pass-metrics">
                             <div class="pass-metric">
                                 <span class="pass-label">收入</span>
-                                <span class="pass-value">$${mPassSummary[k].rev.toLocaleString()}</span>
+                                <span class="pass-value">$${summary[k].rev.toLocaleString()}</span>
                             </div>
                             <div class="pass-metric">
                                 <span class="pass-label">支出</span>
-                                <span class="pass-value">$${mPassSummary[k].exp.toLocaleString()}</span>
+                                <span class="pass-value">$${summary[k].exp.toLocaleString()}</span>
                             </div>
                             <div class="pass-metric pass-net">
                                 <span class="pass-label">淨利</span>
@@ -1463,17 +1662,30 @@
                         </div>
                     </div>`;
                 }).join('');
-                document.getElementById('passMonthTotal').innerText = `總額 $${passTotalAmt.toLocaleString()}`;
-            } else { document.getElementById('passSummarySection').classList.add('hidden'); }
+                document.getElementById(totalId).innerText = `總額 $${passTotalAmt.toLocaleString()}`;
+            };
 
-            document.getElementById('allAc').innerText = aAc; document.getElementById('allWm').innerText = aWm; document.getElementById('allWt').innerText = aWt;
-            document.getElementById('allRev').innerText = `$${aRev.toLocaleString()}`; document.getElementById('allExp').innerText = `$${aExp.toLocaleString()}`; document.getElementById('allNet').innerText = `$${(aRev - aExp).toLocaleString()}`;
-            document.getElementById('mRev').innerText = `$${mRev.toLocaleString()}`; document.getElementById('mExp').innerText = `$${mExp.toLocaleString()}`; document.getElementById('mNet').innerText = `$${(mRev - mExp).toLocaleString()}`;
-            document.getElementById('mCounts').innerText = `冷${mAc} / 洗${mWm} / 水${mWt}`;
-            document.getElementById('yRev').innerText = `$${yRev.toLocaleString()}`; document.getElementById('yExp').innerText = `$${yExp.toLocaleString()}`; document.getElementById('yNet').innerText = `$${(yRev - yExp).toLocaleString()}`;
+            renderPassSummaryCards(yPassSummary, 'passYearSummarySection', 'passYearSummaryList', 'passYearTotal');
+            renderPassSummaryCards(fPassSummary, 'passSummarySection', 'passSummaryList', 'passMonthTotal');
+
+            document.getElementById('allAc').innerText = aAc;
+            document.getElementById('allWm').innerText = aWm;
+            document.getElementById('allWt').innerText = aWt;
+            document.getElementById('allRev').innerText = `$${aRev.toLocaleString()}`;
+            document.getElementById('allExp').innerText = `$${aExp.toLocaleString()}`;
+            document.getElementById('allNet').innerText = `$${(aRev - aExp).toLocaleString()}`;
+
+            document.getElementById('yRev').innerText = `$${yRev.toLocaleString()}`;
+            document.getElementById('yExp').innerText = `$${yExp.toLocaleString()}`;
+            document.getElementById('yNet').innerText = `$${(yRev - yExp).toLocaleString()}`;
             document.getElementById('yCounts').innerText = `冷${yAc} / 洗${yWm} / 水${yWt}`;
 
-            renderRecords(baseFiltered.sort((a, b) => b.bookingTime.localeCompare(a.bookingTime)));
+            document.getElementById('mRev').innerText = `$${fRev.toLocaleString()}`;
+            document.getElementById('mExp').innerText = `$${fExp.toLocaleString()}`;
+            document.getElementById('mNet').innerText = `$${(fRev - fExp).toLocaleString()}`;
+            document.getElementById('mCounts').innerText = `冷${fAc} / 洗${fWm} / 水${fWt}｜${baseFiltered.length} 筆`;
+
+            renderRecords(baseFiltered.sort((a, b) => (b.bookingTime || '').localeCompare(a.bookingTime || '')));
             lucide.createIcons();
         };
 
@@ -1605,7 +1817,17 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        window.changeMonth = (o) => { const i = document.getElementById('monthFilter'); if (!i.value) i.value = new Date().toISOString().substring(0, 7); let [y, m] = i.value.split('-').map(Number); let d = new Date(y, m - 1); d.setMonth(d.getMonth() + o); i.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; filterRecords(); };
+        window.changeMonth = (o) => {
+            const startInput = document.getElementById('dateStartFilter');
+            const endInput = document.getElementById('dateEndFilter');
+            const base = startInput.value ? new Date(startInput.value + 'T00:00:00') : new Date();
+            base.setMonth(base.getMonth() + o);
+            const first = new Date(base.getFullYear(), base.getMonth(), 1);
+            const last = new Date(base.getFullYear(), base.getMonth() + 1, 0);
+            startInput.value = formatLocalDate(first);
+            endInput.value = formatLocalDate(last);
+            filterRecords();
+        };
         window.quickFilterUnpaid = () => { /* 此功能現改為由懸浮驚嘆號控制 */ };
         window.deleteRec = async (id) => { if(confirm('確定要刪除嗎？')) await deleteDoc(doc(db, "cleaningRecords", id)); };
 
