@@ -983,7 +983,7 @@
                                 <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
                                     <i data-lucide="search" class="w-4 h-4"></i>
                                 </div>
-                                <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="關鍵字搜尋：姓名、電話、地址、機型、PASS、小幫手、備註..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
+                                <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="可輸入多個關鍵字：姓名、電話、地址、機型、PASS、小幫手、備註..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
                             </div>
                             <div class="date-filter-row">
                                 <div>
@@ -1512,6 +1512,7 @@
 
         window.filterRecords = () => {
             const kw = (document.getElementById('searchKeyword').value || '').trim().toLowerCase();
+            const keywordTerms = kw.split(/\s+/).filter(Boolean);
             const startDate = document.getElementById('dateStartFilter').value;
             const endDate = document.getElementById('dateEndFilter').value;
             const type = currentTypeFilter;
@@ -1551,7 +1552,19 @@
             if (passFilteredTitle) passFilteredTitle.innerText = isPureCurrentMonth ? 'PASS 來源統計 (月度)' : 'PASS 來源統計 (篩選)';
 
             const getDateOnly = (record) => (record.bookingTime || '').substring(0, 10);
-            const getSearchText = (record) => `${record.customerName || ''} ${record.phone || ''} ${record.address || ''} ${record.acBrand || ''} ${record.assistantDetail || ''} ${record.passFrom || ''} ${record.note || ''}`.toLowerCase();
+            const normalizeSearchText = (text) => String(text || '').toLowerCase().replace(/[\s\-－–—_()（）\[\]【】,，.。:：;；/\\]+/g, '');
+            const getSearchText = (record) => {
+                const raw = `${record.customerName || ''} ${record.phone || ''} ${record.address || ''} ${record.acBrand || ''} ${record.assistantDetail || ''} ${record.passFrom || ''} ${record.note || ''}`.toLowerCase();
+                return { raw, compact: normalizeSearchText(raw) };
+            };
+            const matchesKeywords = (record) => {
+                if (keywordTerms.length === 0) return true;
+                const searchText = getSearchText(record);
+                return keywordTerms.every(term => {
+                    const normalizedTerm = normalizeSearchText(term);
+                    return searchText.raw.includes(term) || (normalizedTerm && searchText.compact.includes(normalizedTerm));
+                });
+            };
             const getQty = (record) => (parseInt(record.acCount) || 0) + (parseInt(record.wmCount) || 0) + (parseInt(record.wtCount) || 0);
             const addPassSummary = (target, record) => {
                 if (!record.passFrom) return;
@@ -1563,7 +1576,7 @@
 
             const baseFiltered = allRecords.filter(i => {
                 const recordDate = getDateOnly(i);
-                const matchSearch = !kw || getSearchText(i).includes(kw);
+                const matchSearch = matchesKeywords(i);
                 const matchStart = !startDate || (recordDate && recordDate >= startDate);
                 const matchEnd = !endDate || (recordDate && recordDate <= endDate);
                 const matchType = (type === 'all' || (type === 'ac' && (parseInt(i.acCount) || 0) > 0) || (type === 'wm' && (parseInt(i.wmCount) || 0) > 0) || (type === 'wt' && (parseInt(i.wtCount) || 0) > 0));
