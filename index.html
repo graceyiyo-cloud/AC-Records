@@ -11,9 +11,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#475569">
 
-    <link rel="apple-touch-icon" href="./icon.png">
+    <link rel="apple-touch-icon" href="/icon.png">
     
-    <link rel="manifest" href='data:application/manifest+json,{"name":"冷氣清洗紀錄","short_name":"冷紀錄","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#475569","icons":[{"src":"./icon.png","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="manifest" href="./manifest.json">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -1171,7 +1171,7 @@
                         <button onclick="toggleSettingsMenu(event)" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
                             <i data-lucide="settings" class="btn-icon"></i>設定
                         </button>
-                        <div id="settingsMenu" class="hidden absolute bottom-full right-0 mb-2 w-32 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden text-slate-700 text-[0.8rem] z-[90]">
+                        <div id="settingsMenu" class="hidden fixed bottom-[4.5rem] right-4 md:right-auto w-32 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden text-slate-700 text-[0.8rem] z-[90]">
                             <button onclick="downloadBackup(this); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
                                 <i data-lucide="file-down" class="w-4 h-4 mr-2 text-slate-500"></i>備份
                             </button>
