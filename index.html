@@ -544,133 +544,6 @@
 
         .lucide { width: 14px; height: 14px; stroke-width: 2; display: inline-block; vertical-align: -2px; }
         .btn-icon { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
-
-        /* 懸浮待收提醒組件樣式 */
-        #floatingUnpaidWrap {
-            position: fixed;
-            bottom: 84px; /* 本次調整：由原本 24px 上調為 84px 避開底部導覽列 */
-            right: 24px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        .unpaid-badge {
-            background: #f59e0b;
-            color: white;
-            width: 48px;
-            height: 48px;
-            border-radius: 999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 3px solid white;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4) !important;
-            transition: all 0.2s ease;
-        }
-        .unpaid-badge:active { transform: scale(0.9); }
-        .unpaid-count-dot {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #e11d48;
-            color: white;
-            font-size: 10px;
-            font-weight: 900;
-            padding: 2px 6px;
-            border-radius: 999px;
-            border: 2px solid white;
-        }
-        .floating-unpaid-list {
-            background: #fff;
-            border: 1px solid #fde68a;
-            border-radius: 1.25rem;
-            padding: 1rem;
-            width: 260px;
-            max-height: 50vh;
-            overflow-y: auto;
-            margin-bottom: 12px;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15) !important;
-        }
-        .floating-unpaid-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px dashed #fef3c7;
-        }
-        .floating-unpaid-item:last-child { border-bottom: none; }
-
-        /* 懸浮提醒：未完成與待收款放在同一組 */
-        .floating-reminder-badges {
-            display: flex;
-            flex-direction: column;
-            gap: 0.45rem;
-            align-items: flex-end;
-        }
-        .floating-reminder-btn {
-            min-width: 72px;
-            height: 42px;
-            border-radius: 999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.3rem;
-            cursor: pointer;
-            border: 3px solid white;
-            transition: all 0.2s ease;
-            font-size: 0.72rem;
-            font-weight: 900;
-            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.16) !important;
-        }
-        .floating-reminder-btn:active { transform: scale(0.94); }
-        .floating-pending-btn {
-            background: #10b981;
-            color: white;
-        }
-        .floating-unpaid-btn {
-            background: #f59e0b;
-            color: white;
-        }
-        .floating-reminder-count {
-            background: rgba(255,255,255,0.95);
-            color: #334155;
-            min-width: 1.25rem;
-            height: 1.25rem;
-            border-radius: 999px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 0.32rem;
-            font-size: 0.65rem;
-            font-weight: 900;
-        }
-        .floating-reminder-section {
-            padding-top: 0.35rem;
-        }
-        .floating-reminder-section + .floating-reminder-section {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px dashed #e2e8f0;
-        }
-        .floating-reminder-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.45rem;
-            font-size: 0.68rem;
-            font-weight: 900;
-            letter-spacing: 0.08em;
-        }
-        .floating-pending-title { color: #047857; }
-        .floating-unpaid-title { color: #b45309; }
-        .floating-reminder-empty {
-            color: #94a3b8;
-            font-size: 0.75rem;
-            padding: 0.4rem 0;
-        }
-
         /* 手機版篩選統計與篩選列排版微調 */
         .filter-summary-head {
             gap: 0.5rem;
@@ -828,9 +701,39 @@
 
     <div id="mainApp" class="hidden">
         <!-- 頂部標題列 (自然隨畫面滾動隱藏) -->
-        <header class="bg-slate-600 text-white py-3 px-3 md:px-4 shadow-md">
-            <div class="container mx-auto flex justify-center items-center">
+        <header class="bg-slate-600 text-white py-3 px-3 md:px-4 shadow-md relative z-[100]">
+            <div class="container mx-auto flex justify-center items-center relative">
                 <h1 class="text-base md:text-lg font-bold tracking-widest whitespace-nowrap shrink-0">冷氣清洗紀錄</h1>
+                <!-- 將原本在最下方的未完成提醒移至此處 -->
+                <div id="floatingUnpaidWrap" class="hidden absolute right-0">
+                    <button onclick="toggleFloatingUnpaid(event)" class="text-amber-400 hover:text-amber-300 transition-colors relative flex items-center justify-center p-1" title="未完成 / 待收款提醒">
+                        <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                        <span id="unpaidCountBadge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none border-2 border-slate-600">0</span>
+                    </button>
+                    <!-- 提醒明細選單 -->
+                    <div id="floatingUnpaidList" class="hidden absolute top-full right-0 mt-3 w-[260px] bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden z-[100] max-h-[70vh] flex flex-col text-slate-800 text-left">
+                        <div class="bg-slate-50 px-4 py-2 border-b border-slate-100 flex justify-between items-center shrink-0">
+                            <span class="text-[11px] font-bold text-slate-700 uppercase tracking-widest">提醒明細 (全系統)</span>
+                            <button onclick="toggleFloatingUnpaid(event)" class="text-slate-400 hover:text-slate-600 font-bold text-lg leading-none">&times;</button>
+                        </div>
+                        <div class="overflow-y-auto p-3 space-y-4">
+                            <div class="floating-reminder-section">
+                                <div class="flex justify-between items-center mb-2 pb-1 border-b border-slate-100">
+                                    <span class="text-xs font-bold text-amber-600">未完成</span>
+                                    <span id="pendingSectionCount" class="text-[10px] font-bold text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded">0 筆</span>
+                                </div>
+                                <div id="floatingPendingItems" class="space-y-1.5"></div>
+                            </div>
+                            <div class="floating-reminder-section">
+                                <div class="flex justify-between items-center mb-2 pb-1 border-b border-slate-100">
+                                    <span class="text-xs font-bold text-rose-500">待收款</span>
+                                    <span id="unpaidSectionCount" class="text-[10px] font-bold text-rose-400 bg-rose-50 px-1.5 py-0.5 rounded">0 筆</span>
+                                </div>
+                                <div id="floatingUnpaidItems" class="space-y-1.5"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -1124,33 +1027,7 @@
             </section>
         </div>
 
-        <!-- 懸浮待收提醒 HTML 結構 -->
-        <div id="floatingUnpaidWrap" class="hidden">
-            <div id="floatingUnpaidList" class="floating-unpaid-list hidden">
-                <h5 class="text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-2 pb-2 border-b border-slate-100 flex justify-between items-center">
-                    <span>提醒明細 (全系統)</span>
-                    <button onclick="toggleFloatingUnpaid()" class="text-slate-400 font-bold">&times;</button>
-                </h5>
-                <div class="floating-reminder-section">
-                    <div class="floating-reminder-title floating-pending-title">
-                        <span>未完成</span>
-                        <span id="pendingSectionCount">0 筆</span>
-                    </div>
-                    <div id="floatingPendingItems" class="space-y-1.5"></div>
-                </div>
-                <div class="floating-reminder-section">
-                    <div class="floating-reminder-title floating-unpaid-title">
-                        <span>待收款</span>
-                        <span id="unpaidSectionCount">0 筆</span>
-                    </div>
-                    <div id="floatingUnpaidItems" class="space-y-1.5"></div>
-                </div>
-            </div>
-            <button onclick="toggleFloatingUnpaid()" class="unpaid-badge relative" title="未完成 / 待收款提醒">
-                <i data-lucide="alert-circle" class="w-6 h-6"></i>
-                <span id="unpaidCountBadge" class="unpaid-count-dot">0</span>
-            </button>
-        </div>
+
 
         <!-- 底部導覽列 (固定在最下方) -->
         <input type="file" id="backupFileInput" accept="application/json,.json" class="hidden" onchange="restoreBackupFromFile(this)">
@@ -1420,9 +1297,15 @@
         };
 
         document.addEventListener('click', (e) => {
-            const menu = document.getElementById('settingsMenu');
-            if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target)) {
-                menu.classList.add('hidden');
+            const settingsMenu = document.getElementById('settingsMenu');
+            const floatingList = document.getElementById('floatingUnpaidList');
+            const floatingWrap = document.getElementById('floatingUnpaidWrap');
+            
+            if (settingsMenu && !settingsMenu.classList.contains('hidden') && !settingsMenu.contains(e.target)) {
+                settingsMenu.classList.add('hidden');
+            }
+            if (floatingList && !floatingList.classList.contains('hidden') && !floatingWrap.contains(e.target)) {
+                floatingList.classList.add('hidden');
             }
         });
 
@@ -1966,7 +1849,8 @@
         window.clearDateFilter = window.clearAllFilters;
 
         // 切換懸浮待收列表面板
-        window.toggleFloatingUnpaid = () => {
+        window.toggleFloatingUnpaid = (e) => {
+            if (e) e.stopPropagation();
             const list = document.getElementById('floatingUnpaidList');
             if (list) list.classList.toggle('hidden');
         };
@@ -2122,22 +2006,22 @@
                 if (unpaidSectionCount) unpaidSectionCount.innerText = `${systemUnpaidDetails.length} 筆`;
 
                 floatingPendingItemsContainer.innerHTML = systemPendingDetails.length > 0 ? systemPendingDetails.map(item => `
-                    <div class="floating-unpaid-item">
-                        <button onclick="scrollToRecord('${item.id}'); toggleFloatingUnpaid();" class="text-left hover:underline text-[13px] font-bold text-emerald-800 truncate flex-1">
+                    <div class="flex justify-between items-center py-2 border-b border-dashed border-slate-200 last:border-none">
+                        <button onclick="scrollToRecord('${item.id}'); toggleFloatingUnpaid();" class="text-left hover:underline text-[13px] font-bold text-amber-600 truncate flex-1">
                             • ${item.name}
                         </button>
-                        <span class="font-black text-emerald-600 text-[11px] ml-2 whitespace-nowrap">${item.time}</span>
+                        <span class="font-black text-amber-500 text-[11px] ml-2 whitespace-nowrap">${item.time}</span>
                     </div>
-                `).join('') : '<div class="floating-reminder-empty">目前沒有未完成資料</div>';
+                `).join('') : '<div class="text-slate-400 text-xs font-medium py-1">目前沒有未完成資料</div>';
 
                 floatingUnpaidItemsContainer.innerHTML = systemUnpaidDetails.length > 0 ? systemUnpaidDetails.map(item => `
-                    <div class="floating-unpaid-item">
-                        <button onclick="scrollToRecord('${item.id}'); toggleFloatingUnpaid();" class="text-left hover:underline text-[13px] font-bold text-amber-800 truncate flex-1">
+                    <div class="flex justify-between items-center py-2 border-b border-dashed border-slate-200 last:border-none">
+                        <button onclick="scrollToRecord('${item.id}'); toggleFloatingUnpaid();" class="text-left hover:underline text-[13px] font-bold text-rose-600 truncate flex-1">
                             • ${item.name}
                         </button>
-                        <span class="font-black text-amber-600 text-[13px] ml-2">$${item.amount.toLocaleString()}</span>
+                        <span class="font-black text-rose-500 text-[13px] ml-2">$${item.amount.toLocaleString()}</span>
                     </div>
-                `).join('') : '<div class="floating-reminder-empty">目前沒有待收款資料</div>';
+                `).join('') : '<div class="text-slate-400 text-xs font-medium py-1">目前沒有待收款資料</div>';
             } else {
                 floatingWrap.classList.add('hidden');
                 floatingList.classList.add('hidden');
