@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>冷氣清洗紀錄</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="冷氣紀錄">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#475569">
+
+    <link rel="apple-touch-icon" href="./icon.png">
+    
+    <link rel="manifest" href='data:application/manifest+json,{"name":"冷氣清洗紀錄","short_name":"冷紀錄","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#475569","icons":[{"src":"./icon.png","sizes":"512x512","type":"image/png"}]}'>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        /* 整體字體加大約 10% */
+        html { font-size: 110%; }
+        body { 
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif; 
+            background-color: #ffffff !important;
+        }
+        /* 本次修正：加上 !important 確保能蓋過 ID 選擇器的 display 屬性 */
+        .hidden { display: none !important; }
+        
+        /* 本次修正：隱藏導覽列溢出的滾動條 */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 已完成狀態：改成上方單一細線，不再使用左側直線 */
+        .completed-row { 
+            background-color: #f6f8fb !important; 
+            border-left: none !important;
+            border-top: 4px solid #94a3b8 !important;
+            opacity: 0.98; 
+            position: relative;
+        }
+
+        /* 統計卡片統一改成上方單一細線風格 */
+        .stats-card {
+            border-radius: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-top-width: 4px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+        }
+        
+        .stats-card-all {
+            background: linear-gradient(180deg, #3d4c63 0%, #344256 100%);
+            border-color: #405168;
+            border-top-color: #93a6bf;
+            color: #ffffff;
+        }
+        .stats-card-year {
+            background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+            border-color: #e5e7eb;
+            border-top-color: #a7b4c8;
+        }
+        .stats-card-month {
+            background: linear-gradient(180deg, #fbf9ff 0%, #f5f3ff 100%);
+            border-color: #ddd6fe;
+            border-top-color: #8b7bc8;
+        }
+        .stats-side-label {
+            color: inherit;
+            opacity: 0.82;
+        }
+        
+        /* PASS 來源統計：改成更清楚的資訊卡 */
+        .pass-summary-wrap {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            padding-bottom: 0.5rem;
+        }
+        .pass-summary-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.55rem;
+            gap: 0.5rem;
+        }
+        .pass-total-pill {
+            border-radius: 999px;
+            padding: 0.22rem 0.55rem;
+            font-size: 0.65rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .pass-card {
+            background: rgba(255,255,255,0.86);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.045);
+        }
+        .pass-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            padding-bottom: 0.55rem;
+            margin-bottom: 0.55rem;
+            border-bottom: 1px dashed rgba(148, 163, 184, 0.32);
+        }
+        
+        .pass-name-block {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .pass-avatar {
+            width: 1.65rem;
+            height: 1.65rem;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 900;
+            flex: 0 0 auto;
+        }
+        .pass-name {
+            font-size: 0.92rem;
+            font-weight: 900;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .pass-qty {
+            border-radius: 999px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.65rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .pass-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.45rem;
+        }
+        .pass-metric {
+            border-radius: 0.75rem;
+            padding: 0.45rem 0.25rem;
+            text-align: center;
+        }
+        .pass-label {
+            display: block; /* 恢復預設堆疊 */
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.12rem;
+        }
+        .pass-value {
+            display: block; /* 恢復預設堆疊 */
+            font-size: 0.72rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        
+        .pass-year-theme .pass-avatar,
+        .pass-year-theme .pass-qty,
+        .pass-year-theme .pass-metric {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .pass-year-theme .pass-name { color: #334155; }
+        .pass-year-theme .pass-net .pass-value { color: #334155; }
+        .pass-year-theme .pass-total-pill { background: #f1f5f9; color: #475569; }
+        .pass-month-theme .pass-avatar,
+        .pass-month-theme .pass-qty,
+        .pass-month-theme .pass-metric {
+            background: #f5f3ff;
+            color: #6d5cae;
+        }
+        .pass-month-theme .pass-name { color: #6d5cae; }
+        .pass-month-theme .pass-net .pass-value { color: #7c3aed; }
+        .pass-month-theme .pass-total-pill { background: #ede9fe; color: #6d5cae; }
+
+        /* 統一收入 / 支出 / 淨利 顯示樣式 */
+        .metric-box-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.55rem;
+        }
+        .metric-box {
+            border-radius: 0.95rem;
+            border: 1px solid transparent;
+            padding: 0.55rem 0.45rem;
+            text-align: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+            white-space: nowrap;
+        }
+        .metric-box-label {
+            display: block; /* 恢復預設堆疊樣式 */
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.15rem;
+        }
+        .metric-box-value,
+        .metric-box button {
+            display: inline-block; /* 恢復預設堆疊樣式 */
+            font-size: 1rem;
+            line-height: 1.1;
+            font-weight: 900;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            text-decoration: none;
+        }
+        .metric-box button { cursor: pointer; }
+        
+        .metric-box-rev { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+        .metric-box-exp { background: #fff1f2; border-color: #fecdd3; color: #e11d48; }
+        .metric-box-net { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+
+        .stats-card-all .metric-box-rev { background: rgba(191, 219, 254, 0.14); border-color: rgba(191, 219, 254, 0.2); color: #dbeafe; }
+        .stats-card-all .metric-box-exp { background: rgba(253, 164, 175, 0.14); border-color: rgba(253, 164, 175, 0.2); color: #fecdd3; }
+        .stats-card-all .metric-box-net { background: rgba(110, 231, 183, 0.15); border-color: rgba(110, 231, 183, 0.22); color: #bbf7d0; }
+
+        .stats-card-year .metric-box-rev { background: #f8fafc; border-color: #dbe4ef; color: #334155; }
+        .stats-card-year .metric-box-exp { background: #fff1f2; border-color: #fecdd3; color: #e11d48; }
+        .stats-card-year .metric-box-net { background: #eefcf5; border-color: #b7ebd1; color: #047857; }
+
+        .stats-card-month .metric-box-rev { background: #f5f3ff; border-color: #ddd6fe; color: #6d5cae; }
+        .stats-card-month .metric-box-exp { background: #fff1f2; border-color: #fecdd3; color: #e11d48; }
+        .stats-card-month .metric-box-net { background: #eef2ff; border-color: #c7d2fe; color: #4f46e5; }
+
+        .pass-metric.pass-net {
+            background: #ecfdf5 !important;
+            border: 1px solid #a7f3d0;
+            color: #047857 !important;
+        }
+        .pass-metric.pass-net .pass-label,
+        .pass-metric.pass-net .pass-value {
+            color: #047857 !important;
+        }
+
+        .record-metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.45rem;
+            margin-top: 0.2rem;
+        }
+        .record-metric-grid .metric-box {
+            padding: 0.5rem 0.35rem;
+            border-radius: 0.85rem;
+        }
+        .record-metric-grid .metric-box-value {
+            font-size: 0.92rem;
+        }
+
+        .record-metric-grid .metric-box-label {
+            display: inline !important; 
+            margin-right: 4px;
+            margin-bottom: 0 !important;
+        }
+        .record-metric-grid .metric-box-value, 
+        .record-metric-grid button {
+            display: inline !important;
+        }
+
+        /* 手機版：避免全部年份統計金額超出框框 */
+        .stats-card-all > .flex-1,
+        .stats-card-all .metric-box,
+        .stats-card-all .metric-box-grid > div {
+            min-width: 0;
+        }
+        .metric-box-value,
+        .metric-box button,
+        .pass-value {
+            max-width: 100%;
+            overflow-wrap: anywhere;
+        }
+        .stats-card-month #monthTitle,
+        .stats-card-month .flex.justify-between.items-start > div,
+        .stats-card-month #mCounts,
+        #passSummarySection h3 {
+            color: #6d5cae !important;
+        }
+        #passSummarySection {
+            border-top-color: #ddd6fe !important;
+            background: rgba(255, 255, 255, 0.72) !important;
+        }
+
+        @media (max-width: 480px) {
+            .stats-card-all {
+                padding: 0.8rem !important;
+            }
+            .stats-card-all .stats-side-label {
+                margin-right: 0.55rem !important;
+                padding-right: 0.5rem !important;
+                font-size: 0.54rem !important;
+            }
+            .stats-card-all .metric-box-grid {
+                gap: 0.32rem;
+            }
+            .stats-card-all .metric-box {
+                padding: 0.45rem 0.18rem;
+                border-radius: 0.72rem;
+            }
+            .stats-card-all .metric-box-label {
+                font-size: 0.52rem;
+                letter-spacing: 0.02em;
+                margin-bottom: 0.14rem;
+            }
+            .stats-card-all .metric-box-value,
+            .stats-card-all .metric-box button {
+                font-size: clamp(0.82rem, 3.6vw, 1.05rem);
+                line-height: 1.08;
+                white-space: normal;
+                word-break: break-word;
+            }
+        }
+
+        /* 整體改成平面感，移除明顯立體陰影 */
+        [class*="shadow"],
+        .stats-card,
+        .pass-card,
+        .metric-box,
+        tr,
+        #assistantSummaryModal,
+        #authPage > div,
+        button {
+            box-shadow: none !important;
+        }
+        .stats-card-all {
+            background: #3f4f66 !important;
+        }
+        .stats-card-year {
+            background: #fbfcfe !important;
+        }
+        .stats-card-month {
+            background: #fbf9ff !important;
+        }
+        .pass-card {
+            background: #ffffff !important;
+        }
+        .metric-box {
+            box-shadow: none !important;
+        }
+
+        /* 淨利區塊統一使用淺綠色系 */
+        .metric-box-net,
+        .stats-card-all .metric-box-net,
+        .stats-card-year .metric-box-net,
+        .stats-card-month .metric-box-net,
+        .record-metric-grid .metric-box-net {
+            background: #ecfdf5 !important;
+            border-color: #a7f3d0 !important;
+            color: #047857 !important;
+        }
+        .metric-box-net .metric-box-label,
+        .metric-box-net .metric-box-value {
+            color: #047857 !important;
+        }
+        .pass-metric.pass-net,
+        .pass-year-theme .pass-metric.pass-net,
+        .pass-month-theme .pass-metric.pass-net {
+            background: #ecfdf5 !important;
+            border-color: #a7f3d0 !important;
+            color: #047857 !important;
+        }
+        .pass-metric.pass-net .pass-label,
+        .pass-metric.pass-net .pass-value {
+            color: #047857 !important;
+        }
+
+        /* 全部年份總累計：金額放大，但仍避免手機溢出 */
+        .stats-card-all .metric-box-value,
+        .stats-card-all .metric-box button {
+            font-size: 1.08rem;
+            line-height: 1.08;
+        }
+
+        /* PASS 來源統計：改成點擊展開 / 收合 */
+        .pass-summary-head {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            cursor: pointer;
+            text-align: left;
+        }
+        .pass-summary-title-area {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .pass-summary-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex: 0 0 auto;
+        }
+        .pass-toggle-pill {
+            border-radius: 999px;
+            padding: 0.22rem 0.52rem;
+            font-size: 0.62rem;
+            font-weight: 900;
+            white-space: nowrap;
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+        .pass-month-theme .pass-toggle-pill {
+            background: #f5f3ff;
+            color: #6d5cae;
+            border-color: #ddd6fe;
+        }
+        .pass-summary-wrap.pass-collapsed .pass-summary-list {
+            display: none !important;
+        }
+        .pass-summary-list {
+            margin-top: 0.55rem;
+        }
+
+        /* PASS 收合時減少下方空白，讓區塊貼齊卡片底部 */
+        .pass-summary-wrap.pass-collapsed {
+            padding-bottom: 0.18rem !important;
+            margin-bottom: -1.05rem !important;
+        }
+        .pass-summary-wrap.pass-collapsed .pass-summary-head {
+            margin-bottom: 0 !important;
+        }
+        #passSummarySection.pass-collapsed,
+        #passYearSummarySection.pass-collapsed {
+            min-height: 0 !important;
+        }
+
+        /* 下方每筆紀錄的收入 / 支出 / 淨利改成簡潔文字列 */
+        .record-metric-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 0 !important;
+            margin-top: 0 !important; 
+            padding: 0 !important; 
+            border-radius: 0 !important;
+            background: transparent !important;
+        }
+        .record-metric-grid .metric-box {
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            padding: 0 0.35rem 0.4rem !important; 
+            box-shadow: none !important;
+            text-align: left !important;
+        }
+        .record-metric-grid .metric-box:not(:last-child) {
+            border-right: 1px solid #e2e8f0 !important;
+        }
+        .record-metric-grid .metric-box-label {
+            font-size: 0.58rem !important;
+            letter-spacing: 0.03em !important;
+            color: #94a3b8 !important;
+        }
+        .record-metric-grid .metric-box-value {
+            font-size: 0.9rem !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+        }
+        .record-metric-grid .metric-box-rev .metric-box-value { color: #475569 !important; }
+        .record-metric-grid .metric-box-exp .metric-box-value { color: #e11d48 !important; }
+        .record-metric-grid .metric-box-net .metric-box-value { color: #047857 !important; }
+
+        @media (max-width: 420px) {
+            .record-metric-grid .metric-box {
+                padding-left: 0.25rem !important;
+                padding-right: 0.25rem !important;
+            }
+            .record-metric-grid .metric-box-value {
+                font-size: 0.82rem !important;
+                white-space: normal !important;
+                overflow-wrap: anywhere !important;
+            }
+        }
+
+        .note-display { white-space: pre-wrap; word-break: break-all; display: block; line-height: 1.3; }
+
+        @keyframes highlight-fade {
+            0% { background-color: #fef08a; transform: scale(1.02); }
+            100% { background-color: white; transform: scale(1); }
+        }
+        .highlight-target { animation: highlight-fade 2s ease-out; z-index: 10; }
+
+        /* 全裝置統一使用卡片式佈局 - 針對手機版面進行清晰度優化 */
+        thead { display: none; }
+        tr { 
+            display: block; margin-bottom: 0.5rem; 
+            border-radius: 12px; background: white;
+            padding: 1rem; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        td { 
+            display: block; width: 100%; 
+            padding: 0.15rem 0 !important; 
+            border: none !important; text-align: left; color: #334155; 
+        }
+        
+        td[data-label="客戶"] { 
+            font-weight: 800; font-size: 1.2rem; color: #0f172a; 
+            padding-bottom: 0.1rem !important; 
+        }
+        /* 本次修正：縮小金額帳目與上方的距離 */
+        td[data-label="金額帳目"] { 
+            padding-top: 0.2rem !important; 
+            margin-top: 0.2rem; 
+            color: #1e293b; font-size: 0.9rem; font-weight: 700;
+        }
+        td.action-cell {
+            border-top: 1px solid #e2e8f0 !important; 
+            margin-top: 0.5rem; 
+            padding-top: 0.5rem !important; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;
+        }
+
+        .time-display { 
+            font-size: 0.85rem; color: #475569; font-weight: 600; 
+            border-bottom: 1px solid #f1f5f9; 
+            padding-bottom: 0.25rem !important; 
+            margin-bottom: 0.1rem; 
+        }
+
+        @media (min-width: 1024px) {
+            .desktop-half-width { max-width: 50% !important; margin-left: auto; margin-right: auto; }
+        }
+
+        #assistantSummaryModal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 100; width: 90%; max-width: 350px;
+        }
+
+        .lucide { width: 14px; height: 14px; stroke-width: 2; display: inline-block; vertical-align: -2px; }
+        .btn-icon { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+
+        /* 懸浮待收提醒組件樣式 */
+        #floatingUnpaidWrap {
+            position: fixed;
+            bottom: 84px; /* 本次調整：由原本 24px 上調為 84px 避開底部導覽列 */
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .unpaid-badge {
+            background: #f59e0b;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4) !important;
+            transition: all 0.2s ease;
+        }
+        .unpaid-badge:active { transform: scale(0.9); }
+        .unpaid-count-dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e11d48;
+            color: white;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 2px solid white;
+        }
+        .floating-unpaid-list {
+            background: #fff;
+            border: 1px solid #fde68a;
+            border-radius: 1.25rem;
+            padding: 1rem;
+            width: 260px;
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15) !important;
+        }
+        .floating-unpaid-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #fef3c7;
+        }
+        .floating-unpaid-item:last-child { border-bottom: none; }
+
+        /* 懸浮提醒：未完成與待收款放在同一組 */
+        .floating-reminder-badges {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            align-items: flex-end;
+        }
+        .floating-reminder-btn {
+            min-width: 72px;
+            height: 42px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            border: 3px solid white;
+            transition: all 0.2s ease;
+            font-size: 0.72rem;
+            font-weight: 900;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.16) !important;
+        }
+        .floating-reminder-btn:active { transform: scale(0.94); }
+        .floating-pending-btn {
+            background: #10b981;
+            color: white;
+        }
+        .floating-unpaid-btn {
+            background: #f59e0b;
+            color: white;
+        }
+        .floating-reminder-count {
+            background: rgba(255,255,255,0.95);
+            color: #334155;
+            min-width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0.32rem;
+            font-size: 0.65rem;
+            font-weight: 900;
+        }
+        .floating-reminder-section {
+            padding-top: 0.35rem;
+        }
+        .floating-reminder-section + .floating-reminder-section {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #e2e8f0;
+        }
+        .floating-reminder-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.45rem;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+        }
+        .floating-pending-title { color: #047857; }
+        .floating-unpaid-title { color: #b45309; }
+        .floating-reminder-empty {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            padding: 0.4rem 0;
+        }
+
+        /* 手機版篩選統計與篩選列排版微調 */
+        .filter-summary-head {
+            gap: 0.5rem;
+        }
+        .filter-count-line {
+            white-space: nowrap;
+        }
+        .date-filter-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+            align-items: end;
+        }
+        .clear-filter-row {
+            display: flex;
+        }
+        @media (max-width: 640px) {
+            .filter-summary-head {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 0.28rem !important;
+            }
+            .filter-summary-head #monthTitle {
+                line-height: 1.35 !important;
+                word-break: break-word !important;
+            }
+            .filter-count-line {
+                width: 100% !important;
+                font-size: 0.68rem !important;
+                line-height: 1.35 !important;
+                white-space: normal !important;
+            }
+            .date-filter-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 0.5rem !important;
+            }
+            .date-filter-row input[type="date"] {
+                font-size: 0.72rem !important;
+                padding-left: 0.45rem !important;
+                padding-right: 0.35rem !important;
+            }
+            .clear-filter-row button {
+                width: 100% !important;
+            }
+        }
+
+        /* 篩選區塊改為點選展開，減少清單上方佔用空間 */
+        .filter-shell {
+            padding: 0.65rem !important;
+        }
+        .filter-toggle-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            border: 0;
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 0.75rem 0.85rem;
+            color: #475569;
+            text-align: left;
+        }
+        .filter-toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+        .filter-toggle-title {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: #334155;
+            white-space: nowrap;
+        }
+        .filter-toggle-status {
+            display: block;
+            margin-top: 0.1rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #94a3b8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+        .filter-toggle-right {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex: 0 0 auto;
+            font-size: 0.72rem;
+            font-weight: 900;
+            color: #64748b;
+        }
+        .filter-panel {
+            margin-top: 0.75rem;
+        }
+        .filter-shell.filter-collapsed .filter-panel {
+            display: none !important;
+        }
+        .filter-shell.filter-collapsed .filter-chevron {
+            transform: rotate(0deg);
+        }
+        .filter-shell:not(.filter-collapsed) .filter-chevron {
+            transform: rotate(180deg);
+        }
+        .filter-chevron {
+            transition: transform 0.2s ease;
+        }
+        @media (max-width: 640px) {
+            .filter-toggle-status {
+                max-width: 62vw;
+            }
+            .filter-shell {
+                margin-bottom: 0.75rem !important;
+            }
+        }
+
+        /* 匯出圖片專用 CSS，解決 html2canvas 文字偏下的問題，統一將文字往上偏移 2px */
+        .export-capture span,
+        .export-capture h2,
+        .export-capture div.leading-tight,
+        .export-capture div.leading-snug,
+        .export-capture div.note-display,
+        .export-capture div.as-display-text,
+        .export-capture i.lucide {
+            position: relative !important;
+            top: -2px !important;
+        }
+        /* 防止 span 內的 icon 被雙重偏移 (例如 PASS 標籤內的 icon) */
+        .export-capture span i.lucide {
+            top: 0 !important;
+        }
+    </style>
+</head>
+<body class="bg-[#faf9f6] min-h-screen text-slate-700">
+
+    <section id="authPage" class="fixed inset-0 z-[100] bg-slate-100 flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 w-full max-w-sm text-center">
+            <div class="w-16 h-16 bg-slate-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i data-lucide="lock" class="text-white w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">系統登入</h2>
+            <p class="text-slate-400 text-sm mb-8">請使用授權的 Google 帳號進行登入</p>
+            
+            <button onclick="handleLogin()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-4 rounded-xl border border-slate-200 shadow-sm transition-all active:scale-95 mb-4">
+                <img src="https://www.gstatic.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" class="w-5 h-5">
+                Google 帳號登入
+            </button>
+            <p id="authError" class="text-rose-500 text-xs font-bold hidden whitespace-pre-wrap"></p>
+        </div>
+    </section>
+
+    <div id="mainApp" class="hidden">
+        <!-- 頂部標題列 (自然隨畫面滾動隱藏) -->
+        <header class="bg-slate-600 text-white py-3 px-3 md:px-4 shadow-md">
+            <div class="container mx-auto flex justify-center items-center">
+                <h1 class="text-base md:text-lg font-bold tracking-widest whitespace-nowrap shrink-0">冷氣清洗紀錄</h1>
+            </div>
+        </header>
+
+        <!-- 主要內容區 (增加 pb-24 確保底部內容不被新加入的固定導覽列遮擋) -->
+        <div class="container mx-auto px-1.5 md:px-4 pt-6 pb-24">
+            
+            <section id="formPage" class="hidden max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
+                <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">
+                    <i data-lucide="clipboard-list" class="w-6 h-6"></i> 新增紀錄
+                </h2>
+                <form id="recordForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">預約日期時間</label>
+                            <input type="datetime-local" id="bookingTime" required class="block w-full border-slate-200 rounded-xl p-3 border text-sm outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">客戶姓名</label>
+                            <input type="text" id="customerName" required class="block w-full border-slate-200 rounded-xl p-3 border text-sm outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">連絡電話</label>
+                            <input type="tel" id="phone" class="block w-full border-slate-200 rounded-xl p-3 border text-sm outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">施工地址</label>
+                            <input type="text" id="address" class="block w-full border-slate-200 rounded-xl p-3 border text-sm outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">冷氣台數</label>
+                            <input type="number" id="acCount" value="0" min="0" onfocus="this.select()" oninput="handleAcCountChange()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">洗衣機</label>
+                            <input type="number" id="wmCount" value="0" min="0" onfocus="this.select()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">水塔</label>
+                            <input type="number" id="wtCount" value="0" min="0" onfocus="this.select()" class="w-full rounded-lg p-2 border border-slate-200 text-sm font-bold">
+                        </div>
+                    </div>
+
+                    <div id="acBrandSection" class="hidden space-y-2 bg-emerald-50/30 p-4 rounded-xl border border-emerald-100">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-bold text-emerald-600 uppercase tracking-wider"><i data-lucide="snowflake" class="lucide mr-1"></i> 冷氣明細</label>
+                            <button type="button" onclick="addAcDetailRow()" class="text-[10px] bg-emerald-600 text-white px-2 py-1 rounded shadow-sm">+ 增加明細</button>
+                        </div>
+                        <div id="acDetailsContainer" class="space-y-2"></div>
+                    </div>
+
+                    <div class="space-y-2 bg-rose-50/30 p-4 rounded-xl border border-rose-100">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-bold text-rose-600 uppercase tracking-wider"><i data-lucide="users" class="lucide mr-1"></i> 小幫手明細</label>
+                            <button type="button" onclick="addAssistantRow()" class="text-[10px] bg-rose-500 text-white px-2 py-1 rounded shadow-sm">+ 增加小幫手</button>
+                        </div>
+                        <div id="assistantDetailsContainer" class="space-y-2"></div>
+                        <div id="quickAssistantTags" class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-rose-100/50"></div>
+                    </div>
+
+                    <div class="space-y-2 bg-indigo-50/30 p-4 rounded-xl border border-indigo-100">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-bold text-indigo-600 uppercase tracking-wider"><i data-lucide="forward" class="lucide mr-1"></i> PASS 案件設定</label>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="passFrom" list="passNamesList" placeholder="輸入 PASS 來源對象名稱" class="flex-1 rounded-lg p-2 border border-indigo-100 text-sm" oninput="updateQuickPassTags()">
+                        </div>
+                        <div id="quickPassTags" class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-indigo-100/50"></div>
+                    </div>
+
+                    <datalist id="assistantNamesList"></datalist>
+                    <datalist id="passNamesList"></datalist>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+                        <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">總收費</label><input type="number" id="totalAmount" required onfocus="this.select()" oninput="calcFormNet()" class="w-full border-slate-200 rounded-xl p-3 border font-bold"></div>
+                        <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">小幫手總支出</label><input type="number" id="assistantPay" value="0" readonly class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border font-bold text-rose-500"></div>
+                        <div><label class="block text-xs font-bold text-emerald-600 uppercase mb-1">預估淨利</label><input type="text" id="formNetProfit" value="$0" readonly class="w-full bg-emerald-50 border-emerald-100 rounded-xl p-3 border font-bold text-emerald-700"></div>
+                    </div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">其他備註</label><textarea id="note" rows="3" class="w-full border-slate-200 rounded-xl p-3 border text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"></textarea></div>
+                    
+                    <div class="flex gap-3">
+                        <button type="button" onclick="showPage('listPage')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-4 rounded-xl transition-all active:scale-[0.98] border border-slate-200/50">返回清單</button>
+                        <button type="submit" class="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-md transition-all active:scale-[0.98]">確認儲存紀錄</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- 幸福家專屬清單頁面 -->
+            <section id="xingfuPage" class="hidden desktop-half-width">
+                <div class="flex justify-end gap-2 mb-4">
+                    <button onclick="copyXingfuText(this)" class="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-xl text-[0.8rem] font-bold transition-all border border-slate-200 shadow-sm active:scale-95">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i> 複製文字
+                    </button>
+                    <button onclick="downloadXingfuImage(this)" class="flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-4 py-2 rounded-xl text-[0.8rem] font-bold transition-all border border-emerald-200 shadow-sm active:scale-95">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> 下載圖片
+                    </button>
+                </div>
+                
+                <div id="xingfuExportArea" class="bg-white px-2 py-4 md:p-6 rounded-3xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-2 mb-4 md:mb-6 pb-3 md:pb-4 border-b border-slate-100 px-2 md:px-0">
+                        <i data-lucide="building-2" class="w-6 h-6 text-emerald-600"></i>
+                        <h2 class="text-xl font-bold text-slate-800 tracking-wider">幸福家最新清洗紀錄</h2>
+                    </div>
+                    <div id="xingfuList" class="space-y-0 px-1 md:px-0">
+                        <!-- JS 動態寫入內容 -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="listPage" class="desktop-half-width">
+                
+                <div class="stats-card stats-card-all p-4 text-white flex items-center mb-4 relative">
+                    <div class="stats-side-label flex flex-col text-[10px] font-bold uppercase tracking-widest mr-4 border-r border-white/15 pr-3 text-center leading-tight">
+                        <span>全</span><span>部</span><span>年</span><span>份</span><span>總</span><span>累</span><span>計</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="grid grid-cols-3 gap-2 text-center border-b border-white/10 pb-2 mb-2">
+                            <div><p class="text-[10px] text-white/65">冷氣</p><p class="text-xl font-bold" id="allAc">0</p></div>
+                            <div><p class="text-[10px] text-white/65">洗衣機</p><p class="text-xl font-bold" id="allWm">0</p></div>
+                            <div><p class="text-[10px] text-white/65">水塔</p><p class="text-xl font-bold" id="allWt">0</p></div>
+                        </div>
+                        <div class="metric-box-grid">
+                            <div class="metric-box metric-box-rev">
+                                <span class="metric-box-label">總收入</span>
+                                <span class="metric-box-value" id="allRev">$0</span>
+                            </div>
+                            <div class="metric-box metric-box-exp">
+                                <span class="metric-box-label">小幫手</span>
+                                <button onclick="showAllAssistantDetails()" id="allExp">$0</button>
+                            </div>
+                            <div class="metric-box metric-box-net">
+                                <span class="metric-box-label">淨實收</span>
+                                <span class="metric-box-value" id="allNet">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="assistantSummaryOverlay" onclick="toggleAssistantModal()" class="hidden fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[90]"></div>
+                <div id="assistantSummaryModal" class="hidden bg-white rounded-2xl shadow-2xl p-5 border border-slate-200">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i data-lucide="handshake" class="w-4 h-4"></i> <span id="assistantModalTitle">小幫手薪資總計 (全期)</span>
+                        </h4>
+                        <button onclick="toggleAssistantModal()" class="text-slate-400 text-xl hover:text-slate-600">&times;</button>
+                    </div>
+                    <div id="assistantSummaryList" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1"></div>
+                    <div class="mt-4 pt-3 border-t text-[10px] text-slate-400 text-center">
+                        點擊背景或叉叉可關閉
+                    </div>
+                </div>
+
+                <div class="space-y-3 mb-4">
+                    <div class="stats-card stats-card-year p-5">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-widest" id="yearTitle">年度統計</h3>
+                                <div class="text-[10px] text-slate-400">年度數量: <span class="text-slate-700 font-bold" id="yCounts">冷0 / 洗0 / 水0</span></div>
+                            </div>
+                            <div class="metric-box-grid mt-3">
+                                <div class="metric-box metric-box-rev">
+                                    <span class="metric-box-label">年度總營收</span>
+                                    <span class="metric-box-value" id="yRev">$0</span>
+                                </div>
+                                <div class="metric-box metric-box-exp">
+                                    <span class="metric-box-label">年度支出</span>
+                                    <button onclick="showYearAssistantDetails()" id="yExp">$0</button>
+                                </div>
+                                <div class="metric-box metric-box-net">
+                                    <span class="metric-box-label">年度淨利</span>
+                                    <span class="metric-box-value" id="yNet">$0</span>
+                                </div>
+                            </div>
+
+                            <div id="passYearSummarySection" class="pass-summary-wrap pass-year-theme pass-collapsed border-t border-slate-200 bg-slate-50/70 -mx-5 px-3 hidden">
+                                <button type="button" class="pass-summary-head" onclick="togglePassSummary('passYearSummarySection')">
+                                    <span class="pass-summary-title-area">
+                                        <h3 class="text-slate-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                            <i data-lucide="forward" class="w-3 h-3"></i> PASS 來源統計 (年度)
+                                        </h3>
+                                    </span>
+                                    <span class="pass-summary-actions">
+                                        <span class="pass-total-pill" id="passYearTotal">總額 $0</span>
+                                        <span class="pass-toggle-pill"><span class="pass-toggle-text">展開</span></span>
+                                    </span>
+                                </button>
+                                <div id="passYearSummaryList" class="pass-summary-list grid grid-cols-1 gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-card stats-card-month p-5">
+                        <div>
+                            <div class="filter-summary-head flex justify-between items-start">
+                                <h3 class="text-emerald-600 text-[10px] font-bold uppercase tracking-widest" id="monthTitle">本月統計</h3>
+                                <div class="filter-count-line text-[10px] text-emerald-700/70"><span id="mCountsLabel">月度數量</span>: <span class="text-emerald-800 font-bold" id="mCounts">冷0 / 洗0 / 水0</span></div>
+                            </div>
+                            <div class="metric-box-grid mt-3">
+                                <div class="metric-box metric-box-rev">
+                                    <span class="metric-box-label" id="mRevLabel">本月總營收</span>
+                                    <span class="metric-box-value" id="mRev">$0</span>
+                                </div>
+                                <div class="metric-box metric-box-exp">
+                                    <span class="metric-box-label" id="mExpLabel">本月支出</span>
+                                    <button onclick="showMonthAssistantDetails()" id="mExp">$0</button>
+                                </div>
+                                <div class="metric-box metric-box-net">
+                                    <span class="metric-box-label" id="mNetLabel">本月淨利</span>
+                                    <span class="metric-box-value" id="mNet">$0</span>
+                                </div>
+                            </div>
+                            
+                            <div id="passSummarySection" class="pass-summary-wrap pass-month-theme pass-collapsed border-t border-emerald-100 bg-white/65 -mx-5 px-3 hidden">
+                                <button type="button" class="pass-summary-head" onclick="togglePassSummary('passSummarySection')">
+                                    <span class="pass-summary-title-area">
+                                        <h3 class="text-emerald-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                            <i data-lucide="forward" class="w-3 h-3"></i> <span id="passFilteredTitle">PASS 來源統計 (月度)</span>
+                                        </h3>
+                                    </span>
+                                    <span class="pass-summary-actions">
+                                        <span class="pass-total-pill" id="passMonthTotal">總額 $0</span>
+                                        <span class="pass-toggle-pill"><span class="pass-toggle-text">展開</span></span>
+                                    </span>
+                                </button>
+                                <div id="passSummaryList" class="pass-summary-list grid grid-cols-1 gap-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- 舊有待收區塊已隱藏 -->
+                        <div id="unpaidSection" class="hidden"></div>
+                    </div>
+                </div>
+
+                <div id="filterShell" class="filter-shell filter-collapsed bg-white rounded-2xl shadow-sm border border-slate-100 mb-6">
+                    <button type="button" onclick="toggleFilterPanel()" class="filter-toggle-btn">
+                        <span class="filter-toggle-left">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-500 flex-none"></i>
+                            <span class="min-w-0">
+                                <span class="filter-toggle-title">篩選條件</span>
+                                <span id="filterStatusText" class="filter-toggle-status">目前：本月份</span>
+                            </span>
+                        </span>
+                        <span class="filter-toggle-right">
+                            <span class="filter-toggle-word">展開</span>
+                            <i data-lucide="chevron-down" class="filter-chevron w-4 h-4"></i>
+                        </span>
+                    </button>
+
+                    <div id="filterPanel" class="filter-panel space-y-4">
+                        <div class="flex flex-col gap-3">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+                                    <i data-lucide="search" class="w-4 h-4"></i>
+                                </div>
+                                <input type="text" id="searchKeyword" oninput="filterRecords()" placeholder="可輸入多個關鍵字：姓名、電話、地址、機型、PASS、小幫手、備註..." class="w-full bg-slate-50 border-none rounded-xl p-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-slate-100">
+                            </div>
+                            <div class="date-filter-row">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">起始日期</label>
+                                    <input type="date" id="dateStartFilter" onchange="filterRecords()" class="w-full bg-slate-50 border-none rounded-xl p-2.5 text-sm outline-none font-medium h-[42px]">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">結束日期</label>
+                                    <input type="date" id="dateEndFilter" onchange="filterRecords()" class="w-full bg-slate-50 border-none rounded-xl p-2.5 text-sm outline-none font-medium h-[42px]">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 品項與進度篩選按鈕群組 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div id="typeFilterGroup" class="flex gap-1 bg-slate-50 rounded-xl p-1 h-[38px]">
+                                <button type="button" onclick="setTypeFilter('all', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all bg-slate-200 shadow-sm text-slate-700">全部品項</button>
+                                <button type="button" onclick="setTypeFilter('ac', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">冷氣</button>
+                                <button type="button" onclick="setTypeFilter('wm', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">洗衣機</button>
+                                <button type="button" onclick="setTypeFilter('wt', this)" class="type-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">水塔</button>
+                            </div>
+                            <div id="statusFilterGroup" class="flex gap-1 bg-slate-50 rounded-xl p-1 h-[38px]">
+                                <button type="button" onclick="setStatusFilter('all', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all bg-slate-200 shadow-sm text-slate-700">全部進度</button>
+                                <button type="button" onclick="setStatusFilter('completed', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">已完成</button>
+                                <button type="button" onclick="setStatusFilter('pending', this)" class="status-btn flex-1 rounded-lg text-[10px] font-bold transition-all text-slate-400">待處理</button>
+                            </div>
+                        </div>
+                        <div class="clear-filter-row">
+                            <button onclick="clearAllFilters()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2.5 rounded-xl transition-all leading-none h-[42px] text-[11px] font-bold flex items-center justify-center gap-1" title="清除全部篩選，並回到當月份"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>清除全部篩選</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto"><table class="min-w-full text-sm"><tbody id="recordList"></tbody></table></div>
+            </section>
+        </div>
+
+        <!-- 懸浮待收提醒 HTML 結構 -->
+        <div id="floatingUnpaidWrap" class="hidden">
+            <div id="floatingUnpaidList" class="floating-unpaid-list hidden">
+                <h5 class="text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-2 pb-2 border-b border-slate-100 flex justify-between items-center">
+                    <span>提醒明細 (全系統)</span>
+                    <button onclick="toggleFloatingUnpaid()" class="text-slate-400 font-bold">&times;</button>
+                </h5>
+                <div class="floating-reminder-section">
+                    <div class="floating-reminder-title floating-pending-title">
+                        <span>未完成</span>
+                        <span id="pendingSectionCount">0 筆</span>
+                    </div>
+                    <div id="floatingPendingItems" class="space-y-1.5"></div>
+                </div>
+                <div class="floating-reminder-section">
+                    <div class="floating-reminder-title floating-unpaid-title">
+                        <span>待收款</span>
+                        <span id="unpaidSectionCount">0 筆</span>
+                    </div>
+                    <div id="floatingUnpaidItems" class="space-y-1.5"></div>
+                </div>
+            </div>
+            <button onclick="toggleFloatingUnpaid()" class="unpaid-badge relative" title="未完成 / 待收款提醒">
+                <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                <span id="unpaidCountBadge" class="unpaid-count-dot">0</span>
+            </button>
+        </div>
+
+        <!-- 底部導覽列 (固定在最下方) -->
+        <input type="file" id="backupFileInput" accept="application/json,.json" class="hidden" onchange="restoreBackupFromFile(this)">
+
+        <nav class="fixed bottom-0 left-0 right-0 bg-slate-600 text-white pt-2 px-3 md:px-4 shadow-[0_-4px_12px_rgba(0,0,0,0.15)] z-[80]" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
+            <div class="container mx-auto flex justify-center items-center">
+                <div class="flex items-center justify-center gap-1.5 md:gap-3 overflow-x-auto hide-scrollbar w-full">
+                    <button onclick="showXingfuPage()" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
+                        <i data-lucide="building-2" class="btn-icon"></i>幸福家
+                    </button>
+                    <button onclick="showPage('listPage')" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
+                        <i data-lucide="list" class="btn-icon"></i>清單
+                    </button>
+                    <button onclick="prepareNewForm()" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
+                        <i data-lucide="pen-line" class="btn-icon"></i>填寫
+                    </button>
+                                        <button onclick="downloadBackup(this)" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0" title="下載備份 JSON">
+                        <i data-lucide="file-down" class="btn-icon"></i>備份
+                    </button>
+                    <button onclick="openBackupRestore()" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0" title="還原備份 JSON">
+                        <i data-lucide="file-up" class="btn-icon"></i>還原
+                    </button>
+                    <button onclick="handleLogout()" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-700 hover:bg-rose-600 border border-slate-500 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
+                        <i data-lucide="log-out" class="btn-icon"></i>登出
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTyt_nIV1h_MFRhQoT9PHFMXhus1jQVL4",
+            projectId: "ac-records-b8c40",
+            authDomain: "ac-records-b8c40.firebaseapp.com",
+            storageBucket: "ac-records-b8c40.firebasestorage.app",
+            messagingSenderId: "471993362594",
+            appId: "1:471993362594:web:1be7e72af1021760c64ffb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        
+        const recordsCol = collection(db, "cleaningRecords");
+        let allRecords = [];
+        let editingId = null;
+        let knownAssistantNames = []; 
+        let knownPassNames = [];
+        let snapshotUnsubscribe = null;
+
+        let currentYearRecords = [];
+        let currentMonthRecords = [];
+        
+        // 狀態與品項篩選變數
+        let currentStatusFilter = 'all';
+        let currentTypeFilter = 'all';
+
+        const allowedEmails = ['eroraror@gmail.com', 'graceyiyo@gmail.com'];
+
+        // 暫存幸福家文字供複製使用
+        let xingfuTextContent = "";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (allowedEmails.includes(user.email.toLowerCase())) {
+                    document.getElementById('authPage').classList.add('hidden');
+                    document.getElementById('mainApp').classList.remove('hidden');
+                    document.getElementById('authError').classList.add('hidden');
+                    startDataSubscription();
+                } else {
+                    document.getElementById('authError').innerText = "⚠️ 您沒有存取權限，請換個帳號試試。";
+                    document.getElementById('authError').classList.remove('hidden');
+                    signOut(auth);
+                }
+            } else {
+                document.getElementById('authPage').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('hidden');
+                if (snapshotUnsubscribe) {
+                    snapshotUnsubscribe();
+                    snapshotUnsubscribe = null;
+                }
+            }
+            lucide.createIcons();
+        });
+
+        window.handleLogin = async () => {
+            const errorEl = document.getElementById('authError');
+            errorEl.classList.add('hidden');
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Login failed", error);
+                errorEl.innerText = `⚠️ 登入失敗！\n錯誤代碼: ${error.code}\n請檢查 Firebase Console 是否啟動 Google 登入並加入授權網域。`;
+                errorEl.classList.remove('hidden');
+            }
+        };
+
+        window.handleLogout = () => {
+            if (confirm('確定要登出嗎？')) {
+                signOut(auth);
+            }
+        };
+        const cleanRecordForBackup = (record) => {
+            const copy = { ...record };
+            Object.keys(copy).forEach((key) => {
+                if (copy[key] === undefined) delete copy[key];
+            });
+            return copy;
+        };
+
+        window.downloadBackup = (btn) => {
+            if (!allRecords.length) {
+                alert('目前沒有可備份的紀錄。');
+                return;
+            }
+
+            const originalHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i data-lucide="loader" class="btn-icon animate-spin"></i>處理中';
+                lucide.createIcons();
+            }
+
+            try {
+                const exportedAt = new Date();
+                const payload = {
+                    app: 'cleaningRecords',
+                    version: 1,
+                    exportedAt: exportedAt.toISOString(),
+                    count: allRecords.length,
+                    records: allRecords.map(cleanRecordForBackup)
+                };
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const datePart = exportedAt.toISOString().slice(0, 10).replaceAll('-', '');
+                link.href = url;
+                link.download = `清洗紀錄備份_${datePart}.json`;
+                document.body.appendChild(link);
+                link.click();
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            } catch (error) {
+                console.error('Backup failed', error);
+                alert(`備份失敗：${error.message || error}`);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    lucide.createIcons();
+                }
+            }
+        };
+
+        window.openBackupRestore = () => {
+            const input = document.getElementById('backupFileInput');
+            if (!input) return;
+            input.value = '';
+            input.click();
+        };
+        window.restoreBackupFromFile = async (input) => {
+            const file = input.files && input.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const payload = JSON.parse(text);
+                const records = Array.isArray(payload) ? payload : payload.records;
+
+                if (!Array.isArray(records) || records.length === 0) {
+                    alert('這個備份檔沒有可還原的紀錄。');
+                    return;
+                }
+
+                const ok = confirm(`即將還原 ${records.length} 筆紀錄。\n\n同一筆備份再次還原會覆蓋相同 ID 的資料；若備份檔沒有 ID，會新增成新紀錄。\n\n確定要繼續嗎？`);
+                if (!ok) return;
+
+                let batch = writeBatch(db);
+                let batchCount = 0;
+                let restoredCount = 0;
+
+                for (const item of records) {
+                    if (!item || typeof item !== 'object') continue;
+                    const { id, ...data } = item;
+                    Object.keys(data).forEach((key) => {
+                        if (data[key] === undefined) delete data[key];
+                    });
+
+                    const targetRef = id ? doc(db, 'cleaningRecords', String(id)) : doc(recordsCol);
+                    batch.set(targetRef, data);
+                    batchCount += 1;
+                    restoredCount += 1;
+
+                    if (batchCount >= 450) {
+                        await batch.commit();
+                        batch = writeBatch(db);
+                        batchCount = 0;
+                    }
+                }
+
+                if (batchCount > 0) await batch.commit();
+                alert(`還原完成，共處理 ${restoredCount} 筆紀錄。`);
+            } catch (error) {
+                console.error('Restore failed', error);
+                alert(`還原失敗：${error.message || error}`);
+            } finally {
+                input.value = '';
+            }
+        };
+
+        function startDataSubscription() {
+            if (snapshotUnsubscribe) return;
+            snapshotUnsubscribe = onSnapshot(recordsCol, (snap) => {
+                allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                updateDatalists();
+                filterRecords();
+                
+                // 若正停留在幸福家頁面，自動更新資料
+                const xingfuPage = document.getElementById('xingfuPage');
+                if (xingfuPage && !xingfuPage.classList.contains('hidden')) {
+                    renderXingfuRecords();
+                }
+            });
+        }
+
+        const todayForFilter = new Date();
+        const formatLocalDate = (d) => {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        };
+        const firstDayForFilter = new Date(todayForFilter.getFullYear(), todayForFilter.getMonth(), 1);
+        const lastDayForFilter = new Date(todayForFilter.getFullYear(), todayForFilter.getMonth() + 1, 0);
+        document.getElementById('dateStartFilter').value = formatLocalDate(firstDayForFilter);
+        document.getElementById('dateEndFilter').value = formatLocalDate(lastDayForFilter);
+
+        window.showPage = (id) => {
+            document.getElementById('formPage').classList.toggle('hidden', id !== 'formPage');
+            document.getElementById('listPage').classList.toggle('hidden', id !== 'listPage');
+            document.getElementById('xingfuPage').classList.toggle('hidden', id !== 'xingfuPage');
+            lucide.createIcons(); 
+        };
+
+        // 顯示幸福家頁面並載入資料
+        window.showXingfuPage = () => {
+            showPage('xingfuPage');
+            renderXingfuRecords();
+        };
+
+        // 渲染幸福家專屬清單
+        function renderXingfuRecords() {
+            // 過濾包含 "幸福家" 的紀錄
+            const xRecords = allRecords.filter(r => (r.customerName || '').includes('幸福家'));
+
+            // 依據分店名稱分組，只保留最新的一筆
+            const storeMap = new Map();
+            xRecords.forEach(r => {
+                const name = (r.customerName || '').trim();
+                const current = storeMap.get(name);
+                if (!current || (r.bookingTime || '') > (current.bookingTime || '')) {
+                    storeMap.set(name, r);
+                }
+            });
+
+            // 轉為陣列並由新到舊排序
+            const latestRecords = Array.from(storeMap.values()).sort((a, b) => (b.bookingTime || '').localeCompare(a.bookingTime || ''));
+
+            const listContainer = document.getElementById('xingfuList');
+            const lines = [];
+            listContainer.innerHTML = '';
+
+            if (latestRecords.length === 0) {
+                listContainer.innerHTML = '<div class="text-slate-400 text-sm text-center py-4">尚無幸福家紀錄</div>';
+                xingfuTextContent = "尚無幸福家紀錄";
+                return;
+            }
+
+            let html = '';
+            latestRecords.forEach(i => {
+                const dateOnly = (i.bookingTime || '').substring(0, 10);
+                
+                // 移除「幸福家-」或「幸福家」開頭字樣
+                const name = (i.customerName || '').replace(/幸福家-?/g, '').trim();
+                
+                // 剔除冷氣明細中的單價金額 (*1500元)
+                let cleanedAcBrand = '';
+                if (i.acBrand) {
+                    cleanedAcBrand = i.acBrand.split('+').map(part => part.split('*')[0]).join('、');
+                }
+                
+                let services = [];
+                const acTitle = `冷氣${i.acCount}台`;
+                if(i.acCount > 0) services.push(cleanedAcBrand ? `${acTitle}：${cleanedAcBrand}` : acTitle);
+                if(i.wmCount > 0) services.push(`洗衣機${i.wmCount}台`);
+                if(i.wtCount > 0) services.push(`水塔${i.wtCount}口`);
+                const servicesStr = services.join('、');
+
+                // 組合嚴格的文字格式
+                const lineStr = `${dateOnly}｜${name}｜${servicesStr}`;
+                lines.push(lineStr);
+
+                // 改為舒適的行高 (leading-relaxed) 與間距 (pb-2 mb-2)
+                html += `
+                <div class="text-[0.8rem] border-b border-slate-100 last:border-0 pb-2 mb-2 last:mb-0 last:pb-0 text-slate-700 leading-relaxed flex items-start">
+                    <span class="font-mono text-emerald-600">${dateOnly}</span>
+                    <span class="text-slate-300 mx-0.5">｜</span>
+                    <span class="font-bold text-slate-800 whitespace-nowrap">${name}</span>
+                    <span class="text-slate-300 mx-0.5">｜</span>
+                    <span class="break-words flex-1">${servicesStr}</span>
+                </div>`;
+            });
+
+            listContainer.innerHTML = html;
+            xingfuTextContent = lines.join('\n');
+            lucide.createIcons();
+        }
+
+        // 一鍵複製純文字功能
+        window.copyXingfuText = (btn) => {
+            if (!xingfuTextContent) return;
+            navigator.clipboard.writeText(xingfuTextContent).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> 已複製';
+                btn.classList.add('bg-emerald-50', 'border-emerald-200');
+                lucide.createIcons();
+                setTimeout(() => { 
+                    btn.innerHTML = originalHTML; 
+                    btn.classList.remove('bg-emerald-50', 'border-emerald-200');
+                    lucide.createIcons(); 
+                }, 1500);
+            });
+        };
+
+        // 一鍵下載成圖片功能
+        window.downloadXingfuImage = async (btn) => {
+            const el = document.getElementById('xingfuExportArea');
+            if (!el) return;
+
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> 處理中';
+            lucide.createIcons();
+
+            // 匯出時暫時移除外框與陰影，由後續繪製圓角框處理
+            const originalBorder = el.style.border;
+            const originalShadow = el.style.boxShadow;
+            el.style.border = 'none';
+            el.style.boxShadow = 'none';
+            
+            // 匯出專用 class，讓內部文字與圖示往上移 2px
+            el.classList.add('export-capture');
+
+            try {
+                const canvas = await html2canvas(el, {
+                    scale: 2,
+                    backgroundColor: "#ffffff",
+                    logging: false
+                });
+
+                const framedCanvas = document.createElement('canvas');
+                const ctx = framedCanvas.getContext('2d');
+                const padding = 28;
+                const radius = 22;
+                framedCanvas.width = canvas.width + padding * 2;
+                framedCanvas.height = canvas.height + padding * 2;
+
+                const drawRoundedRect = (context, x, y, w, h, r) => {
+                    context.beginPath();
+                    context.moveTo(x + r, y);
+                    context.lineTo(x + w - r, y);
+                    context.quadraticCurveTo(x + w, y, x + w, y + r);
+                    context.lineTo(x + w, y + h - r);
+                    context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                    context.lineTo(x + r, y + h);
+                    context.quadraticCurveTo(x, y + h, x, y + h - r);
+                    context.lineTo(x, y + r);
+                    context.quadraticCurveTo(x, y, x + r, y);
+                    context.closePath();
+                };
+
+                // 底底色
+                ctx.clearRect(0, 0, framedCanvas.width, framedCanvas.height);
+                ctx.save();
+                drawRoundedRect(ctx, 6, 6, framedCanvas.width - 12, framedCanvas.height - 12, radius + 8);
+                ctx.fillStyle = '#f8fafc';
+                ctx.fill();
+                ctx.restore();
+
+                // 卡片主體與陰影
+                ctx.save();
+                ctx.shadowColor = 'rgba(15, 23, 42, 0.10)';
+                ctx.shadowBlur = 18;
+                ctx.shadowOffsetY = 6;
+                drawRoundedRect(ctx, padding, padding, canvas.width, canvas.height, radius);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                ctx.restore();
+
+                // 畫布貼上
+                ctx.save();
+                ctx.shadowColor = 'transparent';
+                drawRoundedRect(ctx, padding, padding, canvas.width, canvas.height, radius);
+                ctx.clip();
+                ctx.drawImage(canvas, padding, padding);
+                ctx.restore();
+
+                // 內框線
+                ctx.save();
+                drawRoundedRect(ctx, padding + 1.5, padding + 1.5, canvas.width - 3, canvas.height - 3, radius - 1);
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.restore();
+
+                // 外框線
+                ctx.save();
+                drawRoundedRect(ctx, padding - 8, padding - 8, canvas.width + 16, canvas.height + 16, radius + 6);
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+
+                framedCanvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    const dateStr = new Date().toISOString().split('T')[0];
+                    link.download = `幸福家最新紀錄_${dateStr}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                }, 'image/png');
+
+            } finally {
+                // 恢復樣式與按鈕狀態
+                el.style.border = originalBorder;
+                el.style.boxShadow = originalShadow;
+                // 移除匯出專用 class
+                el.classList.remove('export-capture');
+                
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        };
+
+        window.prepareNewForm = () => {
+            editingId = null;
+            document.getElementById('recordForm').reset();
+            document.getElementById('acDetailsContainer').innerHTML = '';
+            document.getElementById('assistantDetailsContainer').innerHTML = '';
+            document.getElementById('passFrom').value = '';
+            document.getElementById('formNetProfit').value = '$0';
+            toggleAcBrand();
+            updateQuickAssistantTags();
+            updateQuickPassTags();
+            showPage('formPage');
+        };
+
+        window.handleAcCountChange = () => {
+            const count = parseInt(document.getElementById('acCount').value) || 0;
+            toggleAcBrand();
+            const container = document.getElementById('acDetailsContainer');
+            if (count > 0 && container.children.length === 0) addAcDetailRow(count);
+        };
+
+        window.toggleAcBrand = () => {
+            document.getElementById('acBrandSection').classList.toggle('hidden', document.getElementById('acCount').value <= 0);
+            lucide.createIcons();
+        };
+
+        window.addAcDetailRow = (val = "") => {
+            const container = document.getElementById('acDetailsContainer');
+            const totalTarget = parseInt(document.getElementById('acCount').value) || 0;
+            if (val === "" && totalTarget > 0) {
+                let currentFilled = 0;
+                document.querySelectorAll('.ac-qty-input').forEach(input => currentFilled += (parseInt(input.value) || 0));
+                val = Math.max(0, totalTarget - currentFilled);
+            }
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-12 gap-2 items-center ac-detail-row mb-2";
+            div.innerHTML = `
+                <div class="col-span-5"><input type="text" placeholder="廠牌" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div>
+                <div class="col-span-3"><input type="number" value="${val}" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div>
+                <div class="col-span-3"><input type="number" placeholder="單價" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div>
+                <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcTotalFromDetails();" class="text-rose-400 font-bold text-lg">&times;</button></div>
+            `;
+            container.appendChild(div);
+        };
+
+        window.calcTotalFromDetails = () => {
+            let total = 0;
+            document.querySelectorAll('.ac-detail-row').forEach(row => {
+                const qty = parseInt(row.querySelector('.ac-qty-input').value) || 0;
+                const price = parseInt(row.querySelector('.ac-price-input').value) || 0;
+                total += (qty * price);
+            });
+            if (total > 0) {
+                document.getElementById('totalAmount').value = total;
+                calcFormNet();
+            }
+        };
+
+        window.addAssistantRow = (name = "", amount = "") => {
+            const container = document.getElementById('assistantDetailsContainer');
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-12 gap-2 items-center assistant-detail-row mb-2";
+            div.innerHTML = `
+                <div class="col-span-6"><input type="text" value="${name}" list="assistantNamesList" placeholder="名字" class="as-name-input w-full rounded-lg p-2 border border-rose-100 text-sm" oninput="updateQuickAssistantTags()"></div>
+                <div class="col-span-5"><input type="number" value="${amount}" onfocus="this.select()" oninput="calcAssistantTotal()" class="as-amount-input w-full rounded-lg p-2 border border-rose-100 text-sm font-bold text-rose-600"></div>
+                <div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcAssistantTotal(); updateQuickAssistantTags();" class="text-rose-400 font-bold text-lg">&times;</button></div>
+            `;
+            container.appendChild(div);
+            updateQuickAssistantTags();
+            calcAssistantTotal();
+        };
+
+        window.calcAssistantTotal = () => {
+            let total = 0;
+            document.querySelectorAll('.as-amount-input').forEach(input => total += (parseInt(input.value) || 0));
+            document.getElementById('assistantPay').value = total;
+            calcFormNet();
+        };
+
+        window.calcFormNet = () => {
+            const rev = parseInt(document.getElementById('totalAmount').value) || 0;
+            const exp = parseInt(document.getElementById('assistantPay').value) || 0;
+            document.getElementById('formNetProfit').value = `$${(rev - exp).toLocaleString()}`;
+        };
+
+        window.updateQuickAssistantTags = () => {
+            const container = document.getElementById('quickAssistantTags');
+            const currentNamesInForm = Array.from(document.querySelectorAll('.as-name-input')).map(input => input.value.trim());
+            const availableNames = knownAssistantNames.filter(name => !currentNamesInForm.includes(name));
+            if (availableNames.length === 0) {
+                container.innerHTML = '<span class="text-[10px] text-rose-300">無更多常用名字</span>';
+                return;
+            }
+            container.innerHTML = availableNames.map(name => `
+                <button type="button" onclick="addAssistantRow('${name}')" class="px-2 py-1 bg-white border border-rose-200 text-rose-600 rounded text-[10px] hover:bg-rose-50 transition-colors font-medium">+ ${name}</button>
+            `).join('');
+        };
+
+        window.updateQuickPassTags = () => {
+            const container = document.getElementById('quickPassTags');
+            const currentName = document.getElementById('passFrom').value.trim();
+            const availableNames = knownPassNames.filter(name => name !== currentName);
+            if (availableNames.length === 0) {
+                container.innerHTML = '<span class="text-[10px] text-indigo-300">尚無常用對象</span>';
+                return;
+            }
+            container.innerHTML = availableNames.map(name => `
+                <button type="button" onclick="document.getElementById('passFrom').value='${name}'; updateQuickPassTags();" class="px-2 py-1 bg-white border border-indigo-200 text-indigo-600 rounded text-[10px] hover:bg-indigo-50 transition-colors font-medium">${name}</button>
+            `).join('');
+        };
+
+        window.toggleDone = async (id, currentStatus) => {
+            await updateDoc(doc(db, "cleaningRecords", id), { status: currentStatus === 'completed' ? 'pending' : 'completed' });
+        };
+
+        window.togglePayment = async (id, currentPayment) => {
+            await updateDoc(doc(db, "cleaningRecords", id), { payment: currentPayment === 'paid' ? 'unpaid' : 'paid' });
+        };
+
+        document.getElementById('recordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const totalAc = parseInt(document.getElementById('acCount').value) || 0;
+            let acDetailTotal = 0; let acDetailsArray = [];
+            document.querySelectorAll('.ac-detail-row').forEach(row => {
+                const brand = row.querySelector('.ac-brand-input').value.trim();
+                const qty = parseInt(row.querySelector('.ac-qty-input').value) || 0;
+                const price = row.querySelector('.ac-price-input').value;
+                acDetailTotal += qty;
+                if (brand || qty > 0) acDetailsArray.push(`${brand || '機型未填'}-${qty}台${price ? `*${price}元` : ''}`);
+            });
+            if (totalAc > 0 && acDetailTotal !== totalAc) { alert(`⚠️ 明細台數不符！`); return; }
+
+            let assistantArray = [];
+            document.querySelectorAll('.assistant-detail-row').forEach(row => {
+                const n = row.querySelector('.as-name-input').value.trim();
+                const a = row.querySelector('.as-amount-input').value;
+                if (n && a) assistantArray.push(`${n}:${a}`);
+            });
+
+            const record = {
+                bookingTime: document.getElementById('bookingTime').value,
+                customerName: document.getElementById('customerName').value,
+                phone: document.getElementById('phone').value || "",
+                address: document.getElementById('address').value || "",
+                acCount: totalAc, acBrand: acDetailsArray.join('+'),
+                assistantDetail: assistantArray.join(','),
+                passFrom: document.getElementById('passFrom').value.trim(),
+                wmCount: parseInt(document.getElementById('wmCount').value) || 0,
+                wtCount: parseInt(document.getElementById('wtCount').value) || 0,
+                totalAmount: parseInt(document.getElementById('totalAmount').value) || 0,
+                assistantPay: parseInt(document.getElementById('assistantPay').value) || 0,
+                note: document.getElementById('note').value || ''
+            };
+
+            try {
+                if (editingId) {
+                    const original = allRecords.find(r => r.id === editingId);
+                    record.status = original.status; record.payment = original.payment;
+                    await updateDoc(doc(db, "cleaningRecords", editingId), record);
+                    editingId = null;
+                } else {
+                    record.status = 'pending'; record.payment = 'unpaid';
+                    await addDoc(recordsCol, record);
+                }
+                prepareNewForm();
+                showPage('listPage');
+            } catch (err) { alert('儲存失敗'); }
+        });
+
+        function updateDatalists() {
+            const asNames = new Set();
+            const psNames = new Set();
+            allRecords.forEach(r => { 
+                if (r.assistantDetail) {
+                    r.assistantDetail.split(',').forEach(s => {
+                        const name = s.split(':')[0];
+                        if (name) asNames.add(name);
+                    });
+                } 
+                if (r.passFrom) psNames.add(r.passFrom);
+            });
+            knownAssistantNames = Array.from(asNames).sort();
+            knownPassNames = Array.from(psNames).sort();
+            document.getElementById('assistantNamesList').innerHTML = knownAssistantNames.map(n => `<option value="${n}">`).join('');
+            document.getElementById('passNamesList').innerHTML = knownPassNames.map(n => `<option value="${n}">`).join('');
+            updateQuickAssistantTags();
+            updateQuickPassTags();
+        }
+
+        window.togglePassSummary = (sectionId) => {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            section.classList.toggle('pass-collapsed');
+            const text = section.querySelector('.pass-toggle-text');
+            if (text) text.innerText = section.classList.contains('pass-collapsed') ? '展開' : '收合';
+        };
+
+        window.toggleAssistantModal = (title = "小幫手薪資總計 (全期)", records = allRecords) => {
+            const modal = document.getElementById('assistantSummaryModal');
+            const overlay = document.getElementById('assistantSummaryOverlay');
+            const titleEl = document.getElementById('assistantModalTitle');
+            const isHidden = modal.classList.contains('hidden');
+            if (isHidden) {
+                titleEl.innerText = title;
+                renderAssistantSummary(records);
+                modal.classList.remove('hidden');
+                overlay.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+                overlay.classList.add('hidden');
+            }
+            lucide.createIcons();
+        };
+
+        window.showAllAssistantDetails = () => {
+            toggleAssistantModal("小幫手薪資總計 (全期)", allRecords);
+        };
+        window.showYearAssistantDetails = () => {
+            const title = document.getElementById('yearTitle').innerText;
+            toggleAssistantModal(`${title} 小幫手薪資`, currentYearRecords);
+        };
+        window.showMonthAssistantDetails = () => {
+            const title = document.getElementById('monthTitle').innerText;
+            toggleAssistantModal(`${title} 小幫手薪資`, currentMonthRecords);
+        };
+
+        function renderAssistantSummary(records) {
+            const summary = {};
+            let unclassified = 0;
+            records.forEach(r => {
+                const totalPay = parseInt(r.assistantPay) || 0;
+                if (totalPay <= 0) return;
+                if (r.assistantDetail) {
+                    const details = r.assistantDetail.split(',');
+                    details.forEach(detail => {
+                        const [name, amount] = detail.split(':');
+                        const amt = parseInt(amount) || 0;
+                        if (name) { summary[name] = (summary[name] || 0) + amt; } 
+                        else { unclassified += amt; }
+                    });
+                } else { unclassified += totalPay; }
+            });
+            const container = document.getElementById('assistantSummaryList');
+            let html = "";
+            const sortedNames = Object.keys(summary).sort((a, b) => summary[b] - summary[a]);
+            sortedNames.forEach(name => {
+                html += `
+                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <span class="font-bold text-slate-700 flex items-center gap-2"><i data-lucide="user" class="w-4 h-4 text-slate-400"></i>${name}</span>
+                    <span class="font-black text-rose-500">$${summary[name].toLocaleString()}</span>
+                </div>`;
+            });
+            if (unclassified > 0) {
+                html += `
+                <div class="flex justify-between items-center bg-amber-50 p-3 rounded-xl border border-amber-100">
+                    <span class="font-bold text-amber-700 flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4 text-amber-400"></i>未分類 / 舊紀錄</span>
+                    <span class="font-black text-amber-600">$${unclassified.toLocaleString()}</span>
+                </div>`;
+            }
+            if (html === "") html = "<p class='text-center text-slate-400 py-4'>該期間尚無小幫手支出紀錄</p>";
+            container.innerHTML = html;
+        }
+
+        window.copyText = (text, btn) => {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="text-emerald-500 w-[10px] h-[10px]"></i>';
+                lucide.createIcons();
+                setTimeout(() => { btn.innerHTML = originalHTML; lucide.createIcons(); }, 1500);
+            });
+        };
+
+        function setDateFilterToCurrentMonth() {
+            const now = new Date();
+            const first = new Date(now.getFullYear(), now.getMonth(), 1);
+            const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            document.getElementById('dateStartFilter').value = formatLocalDate(first);
+            document.getElementById('dateEndFilter').value = formatLocalDate(last);
+        }
+
+        window.toggleFilterPanel = () => {
+            const shell = document.getElementById('filterShell');
+            if (!shell) return;
+            shell.classList.toggle('filter-collapsed');
+            const word = shell.querySelector('.filter-toggle-word');
+            if (word) word.innerText = shell.classList.contains('filter-collapsed') ? '展開' : '收合';
+            lucide.createIcons();
+        };
+
+        function updateFilterStatusText(isPureCurrentMonth, startDate, endDate, kw, type, status) {
+            const el = document.getElementById('filterStatusText');
+            if (!el) return;
+            const parts = [];
+            if (isPureCurrentMonth) {
+                parts.push('本月份');
+            } else if (startDate && endDate) {
+                parts.push(`${startDate.replaceAll('-', '/')}～${endDate.replaceAll('-', '/')}`);
+            } else if (startDate) {
+                parts.push(`${startDate.replaceAll('-', '/')} 之後`);
+            } else if (endDate) {
+                parts.push(`${endDate.replaceAll('-', '/')} 之前`);
+            } else {
+                parts.push('全部日期');
+            }
+            if (kw) parts.push(`關鍵字「${kw}」`);
+            if (type !== 'all') parts.push({ ac: '冷氣', wm: '洗衣機', wt: '水塔' }[type] || type);
+            if (status !== 'all') parts.push({ completed: '已完成', pending: '待處理' }[status] || status);
+            el.innerText = `目前：${parts.join('｜')}`;
+        }
+
+        function resetFilterButtonStyles(groupSelector, activeValue) {
+            const colorMap = { all: 'bg-slate-200', completed: 'bg-emerald-100', pending: 'bg-amber-100', ac: 'bg-emerald-100', wm: 'bg-blue-100', wt: 'bg-purple-100' };
+            document.querySelectorAll(groupSelector).forEach(btn => {
+                btn.classList.remove('bg-white', 'bg-slate-200', 'bg-emerald-100', 'bg-amber-100', 'bg-blue-100', 'bg-purple-100', 'shadow-sm', 'text-slate-700');
+                btn.classList.add('text-slate-400');
+                const onclickText = btn.getAttribute('onclick') || '';
+                if (onclickText.includes(`'${activeValue}'`)) {
+                    btn.classList.add(colorMap[activeValue] || 'bg-slate-200', 'shadow-sm', 'text-slate-700');
+                    btn.classList.remove('text-slate-400');
+                }
+            });
+        }
+
+        window.clearAllFilters = () => {
+            document.getElementById('searchKeyword').value = "";
+            setDateFilterToCurrentMonth();
+            currentTypeFilter = 'all';
+            currentStatusFilter = 'all';
+            resetFilterButtonStyles('.type-btn', 'all');
+            resetFilterButtonStyles('.status-btn', 'all');
+            filterRecords();
+            lucide.createIcons();
+        };
+
+        window.clearDateFilter = window.clearAllFilters;
+
+        // 切換懸浮待收列表面板
+        window.toggleFloatingUnpaid = () => {
+            const list = document.getElementById('floatingUnpaidList');
+            if (list) list.classList.toggle('hidden');
+        };
+
+        // 處理進度按鈕點選與配色
+        window.setStatusFilter = (val, btn) => {
+            currentStatusFilter = val;
+            const statusColors = { all: 'bg-slate-200', completed: 'bg-emerald-100', pending: 'bg-amber-100' };
+            document.querySelectorAll('.status-btn').forEach(b => {
+                b.classList.remove('bg-white', 'bg-slate-200', 'bg-emerald-100', 'bg-amber-100', 'shadow-sm', 'text-slate-700');
+                b.classList.add('text-slate-400');
+            });
+            btn.classList.add(statusColors[val], 'shadow-sm', 'text-slate-700');
+            btn.classList.remove('text-slate-400');
+            filterRecords();
+        };
+
+        // 處理品項按鈕點選與配色
+        window.setTypeFilter = (val, btn) => {
+            currentTypeFilter = val;
+            const typeColors = { all: 'bg-slate-200', ac: 'bg-emerald-100', wm: 'bg-blue-100', wt: 'bg-purple-100' };
+            document.querySelectorAll('.type-btn').forEach(b => {
+                b.classList.remove('bg-white', 'bg-slate-200', 'bg-emerald-100', 'bg-blue-100', 'bg-purple-100', 'shadow-sm', 'text-slate-700');
+                b.classList.add('text-slate-400');
+            });
+            btn.classList.add(typeColors[val], 'shadow-sm', 'text-slate-700');
+            btn.classList.remove('text-slate-400');
+            filterRecords();
+        };
+
+        window.filterRecords = () => {
+            const kw = (document.getElementById('searchKeyword').value || '').trim().toLowerCase();
+            const keywordTerms = kw.split(/\s+/).filter(Boolean);
+            const startDate = document.getElementById('dateStartFilter').value;
+            const endDate = document.getElementById('dateEndFilter').value;
+            const type = currentTypeFilter;
+            const status = currentStatusFilter;
+
+            let aAc = 0, aWm = 0, aWt = 0, aRev = 0, aExp = 0;
+            let yRev = 0, yExp = 0, yAc = 0, yWm = 0, yWt = 0;
+            let fRev = 0, fExp = 0, fAc = 0, fWm = 0, fWt = 0;
+            let systemUnpaidDetails = [];
+            let systemPendingDetails = [];
+            let yPassSummary = {};
+            let fPassSummary = {};
+
+            currentYearRecords = [];
+            currentMonthRecords = [];
+
+            const now = new Date();
+            const filterYear = startDate ? startDate.split('-')[0] : now.getFullYear().toString();
+            const currentMonthFirst = formatLocalDate(new Date(now.getFullYear(), now.getMonth(), 1));
+            const currentMonthLast = formatLocalDate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+            const isPureCurrentMonth = startDate === currentMonthFirst && endDate === currentMonthLast && !kw && type === 'all' && status === 'all';
+            updateFilterStatusText(isPureCurrentMonth, startDate, endDate, kw, type, status);
+            const periodTitle = (() => {
+                if (isPureCurrentMonth) return `${String(now.getMonth() + 1).padStart(2, '0')} 月份統計`;
+                if (startDate && endDate) return `${startDate.replaceAll('-', '/')}～${endDate.replaceAll('-', '/')} 篩選統計`;
+                if (startDate) return `${startDate.replaceAll('-', '/')} 之後篩選統計`;
+                if (endDate) return `${endDate.replaceAll('-', '/')} 之前篩選統計`;
+                return '全部資料篩選統計';
+            })();
+
+            document.getElementById('yearTitle').innerText = `${filterYear} 年度統計`;
+            document.getElementById('monthTitle').innerText = periodTitle;
+            document.getElementById('mCountsLabel').innerText = isPureCurrentMonth ? '月度數量' : '篩選數量';
+            document.getElementById('mRevLabel').innerText = isPureCurrentMonth ? '本月總營收' : '篩選總營收';
+            document.getElementById('mExpLabel').innerText = isPureCurrentMonth ? '本月支出' : '篩選支出';
+            document.getElementById('mNetLabel').innerText = isPureCurrentMonth ? '本月淨利' : '篩選淨利';
+            const passFilteredTitle = document.getElementById('passFilteredTitle');
+            if (passFilteredTitle) passFilteredTitle.innerText = isPureCurrentMonth ? 'PASS 來源統計 (月度)' : 'PASS 來源統計 (篩選)';
+
+            const getDateOnly = (record) => (record.bookingTime || '').substring(0, 10);
+            const normalizeSearchText = (text) => String(text || '').toLowerCase().replace(/[\s\-－–—_()（）\[\]【】,，.。:：;；/\\]+/g, '');
+            const getSearchText = (record) => {
+                const raw = `${record.customerName || ''} ${record.phone || ''} ${record.address || ''} ${record.acBrand || ''} ${record.assistantDetail || ''} ${record.passFrom || ''} ${record.note || ''}`.toLowerCase();
+                return { raw, compact: normalizeSearchText(raw) };
+            };
+            const matchesKeywords = (record) => {
+                if (keywordTerms.length === 0) return true;
+                const searchText = getSearchText(record);
+                return keywordTerms.every(term => {
+                    const normalizedTerm = normalizeSearchText(term);
+                    return searchText.raw.includes(term) || (normalizedTerm && searchText.compact.includes(normalizedTerm));
+                });
+            };
+            const getQty = (record) => (parseInt(record.acCount) || 0) + (parseInt(record.wmCount) || 0) + (parseInt(record.wtCount) || 0);
+            const addPassSummary = (target, record) => {
+                if (!record.passFrom) return;
+                target[record.passFrom] = (target[record.passFrom] || { qty: 0, rev: 0, exp: 0 });
+                target[record.passFrom].qty += getQty(record);
+                target[record.passFrom].rev += (parseInt(record.totalAmount) || 0);
+                target[record.passFrom].exp += (parseInt(record.assistantPay) || 0);
+            };
+
+            const baseFiltered = allRecords.filter(i => {
+                const recordDate = getDateOnly(i);
+                const matchSearch = matchesKeywords(i);
+                const matchStart = !startDate || (recordDate && recordDate >= startDate);
+                const matchEnd = !endDate || (recordDate && recordDate <= endDate);
+                const matchType = (type === 'all' || (type === 'ac' && (parseInt(i.acCount) || 0) > 0) || (type === 'wm' && (parseInt(i.wmCount) || 0) > 0) || (type === 'wt' && (parseInt(i.wtCount) || 0) > 0));
+                const matchStatus = (status === 'all' || i.status === status);
+                return matchSearch && matchStart && matchEnd && matchType && matchStatus;
+            });
+
+            allRecords.forEach(r => {
+                const rev = parseInt(r.totalAmount) || 0;
+                const exp = parseInt(r.assistantPay) || 0;
+                const ac = parseInt(r.acCount) || 0;
+                const wm = parseInt(r.wmCount) || 0;
+                const wt = parseInt(r.wtCount) || 0;
+
+                if (r.payment === 'unpaid') {
+                    systemUnpaidDetails.push({ id: r.id, name: r.customerName || '未填姓名', amount: rev });
+                }
+                if (r.status !== 'completed') {
+                    systemPendingDetails.push({ id: r.id, name: r.customerName || '未填姓名', time: (r.bookingTime || '').replace('T', ' ') });
+                }
+
+                aAc += ac; aWm += wm; aWt += wt; aRev += rev; aExp += exp;
+
+                const iY = (r.bookingTime || '').split('-')[0];
+                if (iY === filterYear) {
+                    currentYearRecords.push(r);
+                    yRev += rev; yExp += exp; yAc += ac; yWm += wm; yWt += wt;
+                    addPassSummary(yPassSummary, r);
+                }
+            });
+
+            baseFiltered.forEach(r => {
+                const rev = parseInt(r.totalAmount) || 0;
+                const exp = parseInt(r.assistantPay) || 0;
+                const ac = parseInt(r.acCount) || 0;
+                const wm = parseInt(r.wmCount) || 0;
+                const wt = parseInt(r.wtCount) || 0;
+                currentMonthRecords.push(r);
+                fRev += rev; fExp += exp; fAc += ac; fWm += wm; fWt += wt;
+                addPassSummary(fPassSummary, r);
+            });
+
+            const floatingWrap = document.getElementById('floatingUnpaidWrap');
+            const floatingUnpaidBadgeCount = document.getElementById('unpaidCountBadge');
+            const floatingList = document.getElementById('floatingUnpaidList');
+            const floatingUnpaidItemsContainer = document.getElementById('floatingUnpaidItems');
+            const floatingPendingItemsContainer = document.getElementById('floatingPendingItems');
+            const pendingSectionCount = document.getElementById('pendingSectionCount');
+            const unpaidSectionCount = document.getElementById('unpaidSectionCount');
+
+            if (systemUnpaidDetails.length > 0 || systemPendingDetails.length > 0) {
+                floatingWrap.classList.remove('hidden');
+                floatingUnpaidBadgeCount.innerText = systemUnpaidDetails.length + systemPendingDetails.length;
+                if (pendingSectionCount) pendingSectionCount.innerText = `${systemPendingDetails.length} 筆`;
+                if (unpaidSectionCount) unpaidSectionCount.innerText = `${systemUnpaidDetails.length} 筆`;
+
+                floatingPendingItemsContainer.innerHTML = systemPendingDetails.length > 0 ? systemPendingDetails.map(item => `
+                    <div class="floating-unpaid-item">
+                        <button onclick="scrollToRecord('${item.id}'); toggleFloatingUnpaid();" class="text-left hover:underline text-[13px] font-bold text-emerald-800 truncate flex-1">
+                            • ${item.name}
+                        </button>
+                        <span class="font-black text-emerald-600 text-[11px] ml-2 whitespace-nowrap">${item.time}</span>
+                    </div>
+                `).join('') : '<div class="floating-reminder-empty">目前沒有未完成資料</div>';
+
+                floatingUnpaidItemsContainer.innerHTML = systemUnpaidDetails.length > 0 ? systemUnpaidDetails.map(item => `
+                    <div class="floating-unpaid-item">
+                        <button onclick="scrollToRecord('${item.id}'); toggleFloatingUnpaid();" class="text-left hover:underline text-[13px] font-bold text-amber-800 truncate flex-1">
+                            • ${item.name}
+                        </button>
+                        <span class="font-black text-amber-600 text-[13px] ml-2">$${item.amount.toLocaleString()}</span>
+                    </div>
+                `).join('') : '<div class="floating-reminder-empty">目前沒有待收款資料</div>';
+            } else {
+                floatingWrap.classList.add('hidden');
+                floatingList.classList.add('hidden');
+                floatingUnpaidBadgeCount.innerText = "0";
+                if (pendingSectionCount) pendingSectionCount.innerText = "0 筆";
+                if (unpaidSectionCount) unpaidSectionCount.innerText = "0 筆";
+                floatingPendingItemsContainer.innerHTML = '';
+                floatingUnpaidItemsContainer.innerHTML = '';
+            }
+
+            const renderPassSummaryCards = (summary, sectionId, listId, totalId) => {
+                const sortedKeys = Object.keys(summary).sort((a, b) => summary[b].rev - summary[a].rev);
+                const section = document.getElementById(sectionId);
+                if (sortedKeys.length === 0) {
+                    section.classList.add('hidden');
+                    return;
+                }
+                section.classList.remove('hidden');
+                let passTotalAmt = 0;
+                document.getElementById(listId).innerHTML = sortedKeys.map(k => {
+                    passTotalAmt += summary[k].rev;
+                    const net = summary[k].rev - summary[k].exp;
+                    return `
+                    <div class="pass-card">
+                        <div class="pass-card-top">
+                            <div class="pass-name-block">
+                                <span class="pass-avatar">${k.substring(0, 1)}</span>
+                                <span class="pass-name">${k}</span>
+                            </div>
+                            <span class="pass-qty">${summary[k].qty} 台</span>
+                        </div>
+                        <div class="pass-metrics">
+                            <div class="pass-metric">
+                                <span class="pass-label">收入</span>
+                                <span class="pass-value">$${summary[k].rev.toLocaleString()}</span>
+                            </div>
+                            <div class="pass-metric">
+                                <span class="pass-label">支出</span>
+                                <span class="pass-value">$${summary[k].exp.toLocaleString()}</span>
+                            </div>
+                            <div class="pass-metric pass-net">
+                                <span class="pass-label">淨利</span>
+                                <span class="pass-value">$${net.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+                document.getElementById(totalId).innerText = `總額 $${passTotalAmt.toLocaleString()}`;
+            };
+
+            renderPassSummaryCards(yPassSummary, 'passYearSummarySection', 'passYearSummaryList', 'passYearTotal');
+            renderPassSummaryCards(fPassSummary, 'passSummarySection', 'passSummaryList', 'passMonthTotal');
+
+            document.getElementById('allAc').innerText = aAc;
+            document.getElementById('allWm').innerText = aWm;
+            document.getElementById('allWt').innerText = aWt;
+            document.getElementById('allRev').innerText = `$${aRev.toLocaleString()}`;
+            document.getElementById('allExp').innerText = `$${aExp.toLocaleString()}`;
+            document.getElementById('allNet').innerText = `$${(aRev - aExp).toLocaleString()}`;
+
+            document.getElementById('yRev').innerText = `$${yRev.toLocaleString()}`;
+            document.getElementById('yExp').innerText = `$${yExp.toLocaleString()}`;
+            document.getElementById('yNet').innerText = `$${(yRev - yExp).toLocaleString()}`;
+            document.getElementById('yCounts').innerText = `冷${yAc} / 洗${yWm} / 水${yWt}`;
+
+            document.getElementById('mRev').innerText = `$${fRev.toLocaleString()}`;
+            document.getElementById('mExp').innerText = `$${fExp.toLocaleString()}`;
+            document.getElementById('mNet').innerText = `$${(fRev - fExp).toLocaleString()}`;
+            document.getElementById('mCounts').innerText = `冷${fAc} / 洗${fWm} / 水${fWt}｜${baseFiltered.length} 筆`;
+
+            renderRecords(baseFiltered.sort((a, b) => (b.bookingTime || '').localeCompare(a.bookingTime || '')));
+            lucide.createIcons();
+        };
+
+        // 本次修正：捨棄 table，全數改為 Flexbox 確保一列一列左邊項目右邊金額，並消除底部帳目的方塊色塊
+        function renderRecords(data) {
+            const list = document.getElementById('recordList');
+            list.innerHTML = data.map(i => {
+                
+                // 使用 div.flex 取代 table，完全避開全域 css 的衝突
+                let detailsHtml = '';
+                
+                if (i.acCount > 0) {
+                    detailsHtml += `<div class="font-bold text-emerald-700 text-[16px] mb-1">冷氣${i.acCount}台</div>`;
+                    let hasAcDetails = false;
+                    
+                    if (i.acBrand) {
+                        i.acBrand.split('+').forEach(item => {
+                            const match = item.match(/(.*)-(\d+)台(?:\*(\d+)元)?/);
+                            if (match) {
+                                const brand = match[1];
+                                const qty = parseInt(match[2]);
+                                const price = match[3] ? parseInt(match[3]) : null;
+                                const subtotal = price !== null ? (qty * price) : null;
+                                
+                                let labelStr = `<span>${brand}</span>`;
+                                if (price !== null) {
+                                    labelStr += ` <span class="text-slate-400 text-[13.5px]">($${price.toLocaleString()} &times; ${qty})</span>`;
+                                } else {
+                                    labelStr += ` <span>- ${qty}台</span>`;
+                                }
+                                
+                                detailsHtml += `<div class="flex justify-between items-start py-0.5 text-[15.5px] text-slate-600 leading-tight">
+                                    <div class="flex-1 pr-2 truncate">${labelStr}</div>
+                                    <div class="font-bold text-right shrink-0"><span>${subtotal !== null ? '$' + subtotal.toLocaleString() : ''}</span></div>
+                                </div>`;
+                                hasAcDetails = true;
+                            }
+                        });
+                    }
+                    if (!hasAcDetails) {
+                         detailsHtml += `<div class="flex justify-between items-start py-0.5 text-[15.5px] text-slate-600 leading-tight">
+                            <div class="flex-1 pr-2 truncate"><span>機型未填 - ${i.acCount}台</span></div>
+                            <div class="font-bold text-right shrink-0"></div>
+                        </div>`;
+                    }
+                }
+                
+                if (i.wmCount > 0) {
+                    detailsHtml += `<div class="font-bold text-blue-600 text-[16px] ${i.acCount > 0 ? 'mt-2' : ''} mb-1">洗衣機${i.wmCount}台</div>`;
+                }
+                
+                if (i.wtCount > 0) {
+                    detailsHtml += `<div class="font-bold text-purple-600 text-[16px] ${(i.acCount > 0 || i.wmCount > 0) ? 'mt-2' : ''} mb-1">水塔${i.wtCount}口</div>`;
+                }
+                
+                if (i.assistantDetail) {
+                    detailsHtml += `<div class="mt-2 pt-1.5 border-t border-slate-100 border-dashed">`;
+                    i.assistantDetail.split(',').forEach(s => {
+                        const [n, a] = s.split(':');
+                        const amt = parseInt(a) || 0;
+                        detailsHtml += `<div class="flex justify-between items-start py-0.5 text-[15.5px] text-rose-500 leading-tight font-medium">
+                            <div class="flex-1 pr-2 truncate"><span>小幫手：${n}</span></div>
+                            <div class="font-bold text-right shrink-0"><span>-$${amt.toLocaleString()}</span></div>
+                        </div>`;
+                    });
+                    detailsHtml += `</div>`;
+                }
+
+                let isComp = i.status === 'completed';
+                let isPaid = i.payment === 'paid';
+
+                return `
+                <tr id="rec-${i.id}" class="${isComp ? 'completed-row' : ''}">
+                    <td data-label="預約時間" class="px-6 py-4 time-display flex justify-between items-center">
+                        <span>${i.bookingTime.replace('T',' ')}</span>
+                        ${i.passFrom ? `<span class="text-indigo-500 font-bold flex items-center gap-1"><i data-lucide="forward" class="w-3 h-3"></i>PASS: ${i.passFrom}</span>` : '<span></span>'}
+                    </td>
+                    <td data-label="客戶" class="px-6 py-4 flex items-center gap-2">
+                        <span class="font-bold text-slate-900">${i.customerName}</span>
+                        ${i.phone ? `<span class="text-[12px] text-slate-400 font-normal flex items-center gap-0.5"><i data-lucide="phone" class="w-3 h-3"></i>${i.phone}</span>` : ''}
+                    </td>
+                    <td class="px-6 py-1 text-slate-500 text-xs flex items-center gap-1.5">
+                        ${i.address ? `
+                            <span class="flex items-center gap-0.5"><i data-lucide="map-pin" class="w-3 h-3"></i>${i.address}</span>
+                            <button onclick="copyText('${i.address}', this)" class="bg-slate-100 p-1 rounded-md hover:bg-slate-200 transition-colors">
+                                <i data-lucide="copy" class="w-2.5 h-2.5"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                    <td data-label="服務明細" class="px-6 py-2 text-slate-600">
+                        ${detailsHtml}
+                        ${i.note ? `<div class="text-[15px] text-slate-400 note-display border-t border-slate-100/60 mt-1 pt-1.5">備註: ${i.note}</div>` : ''}
+                    </td>
+                    <td data-label="金額帳目" class="px-6 py-4">
+                        <div class="border-t border-slate-200 border-dashed pt-2 mt-0">
+                            <div class="flex justify-between items-center text-[0.85rem] leading-none">
+                                <div class="flex-1 text-center border-r border-slate-200/80">
+                                    <span class="text-slate-400 text-[10px] mr-1">收入</span>
+                                    <span class="font-bold text-slate-600"><span>$${i.totalAmount.toLocaleString()}</span></span>
+                                </div>
+                                <div class="flex-1 text-center border-r border-slate-200/80">
+                                    <span class="text-slate-400 text-[10px] mr-1">支出</span>
+                                    <span class="font-bold text-rose-500"><span>$${i.assistantPay.toLocaleString()}</span></span>
+                                </div>
+                                <div class="flex-1 text-center">
+                                    <span class="text-slate-400 text-[10px] mr-1">淨利</span>
+                                    <span class="font-bold text-emerald-600"><span>$${(i.totalAmount - i.assistantPay).toLocaleString()}</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 action-cell">
+                        <button onclick="toggleDone('${i.id}', '${i.status}')" class="flex items-center gap-1 ${isComp ? 'text-slate-400 bg-slate-50 border-slate-200' : 'text-emerald-700 bg-emerald-50 border-emerald-100'} px-2 py-1.5 rounded-lg border text-[10px] font-bold">
+                            <i data-lucide="${isComp ? 'check-circle' : 'circle'}" class="w-3 h-3"></i>
+                            <span>${isComp ? '已完成' : '未完成'}</span>
+                        </button>
+                        <button onclick="togglePayment('${i.id}', '${i.payment}')" class="flex items-center gap-1 ${isPaid ? 'text-slate-400 bg-slate-50 border-slate-200' : 'text-amber-700 bg-amber-50 border-amber-100'} px-2 py-1.5 rounded-lg border text-[10px] font-bold">
+                            <i data-lucide="${isPaid ? 'banknote' : 'clock'}" class="w-3 h-3"></i>
+                            <span>${isPaid ? '已收款' : '待收款'}</span>
+                        </button>
+                        <button onclick="downloadRec('${i.id}')" class="flex items-center gap-1 text-indigo-600 bg-indigo-50 px-2 py-1.5 rounded-lg border border-indigo-100 text-[10px] font-bold" title="截圖">
+                            <i data-lucide="image" class="w-3 h-3"></i>
+                        </button>
+                        <button onclick="editRec('${i.id}')" class="flex items-center gap-1 text-slate-600 bg-slate-100 px-2 py-1.5 rounded-lg border text-[10px] font-bold" title="修改">
+                            <i data-lucide="edit-2" class="w-3 h-3"></i>
+                        </button>
+                        <button onclick="deleteRec('${i.id}')" class="flex items-center gap-1 text-rose-400 bg-rose-50 px-2 py-1.5 rounded-lg border text-[10px] font-bold" title="刪除">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        window.scrollToRecord = (id) => {
+            const e = document.getElementById(`rec-${id}`);
+            if (e) { e.scrollIntoView({ behavior: 'smooth', block: 'center' }); e.classList.add('highlight-target'); setTimeout(() => e.classList.remove('highlight-target'), 2000); }
+        };
+
+        window.editRec = (id) => {
+            const r = allRecords.find(x => x.id === id);
+            if(!r) return;
+            editingId = id;
+            document.getElementById('bookingTime').value = r.bookingTime;
+            document.getElementById('customerName').value = r.customerName;
+            document.getElementById('phone').value = r.phone || "";
+            document.getElementById('address').value = r.address || "";
+            document.getElementById('acCount').value = r.acCount;
+            document.getElementById('wmCount').value = r.wmCount;
+            document.getElementById('wtCount').value = r.wtCount;
+            document.getElementById('totalAmount').value = r.totalAmount;
+            document.getElementById('assistantPay').value = r.assistantPay;
+            document.getElementById('note').value = r.note;
+            document.getElementById('passFrom').value = r.passFrom || "";
+            
+            const acContainer = document.getElementById('acDetailsContainer');
+            acContainer.innerHTML = '';
+            if (r.acBrand) {
+                r.acBrand.split('+').forEach(part => {
+                    const m = part.match(/(.*)-(.*)台(?:\*(.*)元)?/);
+                    if (m) {
+                        const div = document.createElement('div');
+                        div.className = "grid grid-cols-12 gap-2 items-center ac-detail-row mb-2";
+                        div.innerHTML = `<div class="col-span-5"><input type="text" value="${m[1]}" class="ac-brand-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-3"><input type="number" value="${m[2]}" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-qty-input w-full rounded-lg p-2 border border-emerald-100 text-sm font-bold"></div><div class="col-span-3"><input type="number" value="${m[3]||''}" onfocus="this.select()" oninput="calcTotalFromDetails()" class="ac-price-input w-full rounded-lg p-2 border border-emerald-100 text-sm"></div><div class="col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); calcTotalFromDetails();" class="text-rose-400 font-bold text-lg">&times;</button></div>`;
+                        acContainer.appendChild(div);
+                    }
+                });
+            }
+            const asContainer = document.getElementById('assistantDetailsContainer');
+            asContainer.innerHTML = '';
+            if (r.assistantDetail) {
+                r.assistantDetail.split(',').forEach(s => { const [name, amt] = s.split(':'); addAssistantRow(name, amt); });
+            }
+            toggleAcBrand();
+            updateQuickAssistantTags();
+            updateQuickPassTags();
+            calcFormNet();
+            showPage('formPage');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.changeMonth = (o) => {
+            const startInput = document.getElementById('dateStartFilter');
+            const endInput = document.getElementById('dateEndFilter');
+            const base = startInput.value ? new Date(startInput.value + 'T00:00:00') : new Date();
+            base.setMonth(base.getMonth() + o);
+            const first = new Date(base.getFullYear(), base.getMonth(), 1);
+            const last = new Date(base.getFullYear(), base.getMonth() + 1, 0);
+            startInput.value = formatLocalDate(first);
+            endInput.value = formatLocalDate(last);
+            filterRecords();
+        };
+        window.quickFilterUnpaid = () => { /* 此功能現改為由懸浮驚嘆號控制 */ };
+        window.deleteRec = async (id) => { if(confirm('確定要刪除嗎？')) await deleteDoc(doc(db, "cleaningRecords", id)); };
+
+        window.downloadRec = (id) => {
+            const el = document.getElementById(`rec-${id}`);
+            const actionCell = el.querySelector('.action-cell');
+            const contentTds = el.querySelectorAll('td:not(.action-cell)');
+            const customerTd = el.querySelector('td[data-label="客戶"]');
+            const iconsToHide = el.querySelectorAll('.lucide-phone, .lucide-map-pin, button[onclick^="copyText"]');
+            
+            actionCell.style.display = 'none';
+            iconsToHide.forEach(icon => icon.style.display = 'none');
+            
+            const originalWidth = el.style.width;
+            el.style.width = getComputedStyle(el).width;
+            
+            el.style.setProperty('background-color', '#ffffff', 'important');
+            el.style.setProperty('border-top', 'none', 'important'); 
+            
+            // 匯出專屬 class 讓文字往上移 2px
+            el.classList.add('export-capture');
+            
+            contentTds.forEach(td => {
+                td.style.setProperty('position', 'relative', 'important');
+                td.style.setProperty('top', '-8px', 'important');
+            });
+
+            if (customerTd) {
+                customerTd.style.setProperty('margin-top', '-10px', 'important');
+            }
+            
+            html2canvas(el, {
+                scale: 2, 
+                backgroundColor: "#ffffff", 
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                actionCell.style.display = 'flex';
+                iconsToHide.forEach(icon => icon.style.removeProperty('display'));
+                
+                // 移除匯出專屬 class
+                el.classList.remove('export-capture');
+                
+                el.style.width = originalWidth;
+                el.style.removeProperty('background-color');
+                el.style.removeProperty('border-top');
+                contentTds.forEach(td => {
+                    td.style.removeProperty('position');
+                    td.style.removeProperty('top');
+                });
+                if (customerTd) {
+                    customerTd.style.removeProperty('margin-top');
+                }
+                
+                const framedCanvas = document.createElement('canvas');
+                const ctx = framedCanvas.getContext('2d');
+                const padding = 28;
+                const radius = 22;
+                framedCanvas.width = canvas.width + padding * 2;
+                framedCanvas.height = canvas.height + padding * 2;
+
+                const drawRoundedRect = (context, x, y, w, h, r) => {
+                    context.beginPath();
+                    context.moveTo(x + r, y);
+                    context.lineTo(x + w - r, y);
+                    context.quadraticCurveTo(x + w, y, x + w, y + r);
+                    context.lineTo(x + w, y + h - r);
+                    context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                    context.lineTo(x + r, y + h);
+                    context.quadraticCurveTo(x, y + h, x, y + h - r);
+                    context.lineTo(x, y + r);
+                    context.quadraticCurveTo(x, y, x + r, y);
+                    context.closePath();
+                };
+
+                ctx.clearRect(0, 0, framedCanvas.width, framedCanvas.height);
+                ctx.save();
+                drawRoundedRect(ctx, 6, 6, framedCanvas.width - 12, framedCanvas.height - 12, radius + 8);
+                ctx.fillStyle = '#f8fafc';
+                ctx.fill();
+                ctx.restore();
+
+                ctx.save();
+                ctx.shadowColor = 'rgba(15, 23, 42, 0.10)';
+                ctx.shadowBlur = 18;
+                ctx.shadowOffsetY = 6;
+                drawRoundedRect(ctx, padding, padding, canvas.width, canvas.height, radius);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                ctx.restore();
+
+                ctx.save();
+                ctx.shadowColor = 'transparent';
+                drawRoundedRect(ctx, padding, padding, canvas.width, canvas.height, radius);
+                ctx.clip();
+                ctx.drawImage(canvas, padding, padding);
+                ctx.restore();
+
+                ctx.save();
+                drawRoundedRect(ctx, padding + 1.5, padding + 1.5, canvas.width - 3, canvas.height - 3, radius - 1);
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.restore();
+
+                ctx.save();
+                drawRoundedRect(ctx, padding - 8, padding - 8, canvas.width + 16, canvas.height + 16, radius + 6);
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+
+                framedCanvas.toBlob((blob) => {
+                    const name = el.querySelector('[data-label="客戶"] span').innerText;
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `清洗紀錄_${name}_${id.substring(0,4)}.png`;
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                }, 'image/png');
+            });
+        };
+    </script>
+</body>
+</html>

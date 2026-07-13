@@ -1,0 +1,6 @@
+{
+  "name": "冷氣清洗紀錄",
+  "description": "冷氣與家電清洗服務的紀錄與統計系統",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
