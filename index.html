@@ -1167,15 +1167,22 @@
                     <button onclick="prepareNewForm()" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
                         <i data-lucide="pen-line" class="btn-icon"></i>填寫
                     </button>
-                                        <button onclick="downloadBackup(this)" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0" title="下載備份 JSON">
-                        <i data-lucide="file-down" class="btn-icon"></i>備份
-                    </button>
-                    <button onclick="openBackupRestore()" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0" title="還原備份 JSON">
-                        <i data-lucide="file-up" class="btn-icon"></i>還原
-                    </button>
-                    <button onclick="handleLogout()" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-700 hover:bg-rose-600 border border-slate-500 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
-                        <i data-lucide="log-out" class="btn-icon"></i>登出
-                    </button>
+                    <div class="relative">
+                        <button onclick="toggleSettingsMenu(event)" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
+                            <i data-lucide="settings" class="btn-icon"></i>設定
+                        </button>
+                        <div id="settingsMenu" class="hidden absolute bottom-full right-0 mb-2 w-32 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden text-slate-700 text-[0.8rem] z-[90]">
+                            <button onclick="downloadBackup(this); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                                <i data-lucide="file-down" class="w-4 h-4 mr-2 text-slate-500"></i>備份
+                            </button>
+                            <button onclick="openBackupRestore(); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                                <i data-lucide="file-up" class="w-4 h-4 mr-2 text-slate-500"></i>還原
+                            </button>
+                            <button onclick="handleLogout(); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-rose-50 text-rose-600 transition-colors">
+                                <i data-lucide="log-out" class="w-4 h-4 mr-2 text-rose-500"></i>登出
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -1406,6 +1413,18 @@
             document.getElementById('xingfuPage').classList.toggle('hidden', id !== 'xingfuPage');
             lucide.createIcons(); 
         };
+
+        window.toggleSettingsMenu = (e) => {
+            if(e) e.stopPropagation();
+            document.getElementById('settingsMenu').classList.toggle('hidden');
+        };
+
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('settingsMenu');
+            if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
 
         // 顯示幸福家頁面並載入資料
         window.showXingfuPage = () => {
