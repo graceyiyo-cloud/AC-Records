@@ -702,10 +702,79 @@
     <div id="mainApp" class="hidden">
         <!-- 頂部標題列 (自然隨畫面滾動隱藏) -->
         <header class="bg-slate-600 text-white py-3 px-3 md:px-4 shadow-md relative z-[100]">
-            <div class="container mx-auto flex justify-center items-center relative">
-                <h1 class="text-base md:text-lg font-bold tracking-widest whitespace-nowrap shrink-0">冷氣清洗紀錄</h1>
-                <!-- 將原本在最下方的未完成提醒移至此處 -->
-                <div id="floatingUnpaidWrap" class="hidden absolute right-0">
+            <div class="container mx-auto flex justify-between items-center relative">
+                <!-- Mobile Menu Button (Left) -->
+                <div class="md:hidden flex items-center relative z-[110]">
+                    <button onclick="toggleMobileMenu(event)" class="text-white hover:bg-slate-500 bg-slate-500/30 border border-slate-400/30 rounded-lg p-1.5 flex items-center justify-center transition-all shadow-sm">
+                        <i data-lucide="menu" style="width: 24px; height: 24px;"></i>
+                    </button>
+                    <!-- Mobile Menu Dropdown -->
+                    <div id="mobileMenu" class="hidden absolute top-full left-0 mt-3 w-48 bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden z-[100] text-slate-800 text-left">
+                        <button onclick="showXingfuPage(); toggleMobileMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                            <i data-lucide="building-2" class="w-4 h-4 mr-2 text-slate-500"></i>幸福家
+                        </button>
+                        <button onclick="showPage('listPage'); toggleMobileMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                            <i data-lucide="list" class="w-4 h-4 mr-2 text-slate-500"></i>清單
+                        </button>
+                        <button onclick="prepareNewForm(); toggleMobileMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                            <i data-lucide="pen-line" class="w-4 h-4 mr-2 text-slate-500"></i>填寫
+                        </button>
+                        <div class="relative group">
+                            <button onclick="toggleMobileSettingsMenu(event)" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 transition-colors">
+                                <i data-lucide="settings" class="w-4 h-4 mr-2 text-slate-500"></i>設定
+                                <i data-lucide="chevron-down" class="w-4 h-4 ml-auto text-slate-400 transition-transform"></i>
+                            </button>
+                            <div id="mobileSettingsMenu" class="hidden bg-slate-50 border-t border-slate-100">
+                                <button onclick="downloadBackup(this); toggleMobileMenu(event);" class="w-full flex items-center px-8 py-2.5 hover:bg-slate-100 border-b border-slate-200 transition-colors text-[0.8rem]">
+                                    <i data-lucide="file-down" class="w-3.5 h-3.5 mr-2 text-slate-500"></i>備份
+                                </button>
+                                <button onclick="openBackupRestore(); toggleMobileMenu(event);" class="w-full flex items-center px-8 py-2.5 hover:bg-slate-100 border-b border-slate-200 transition-colors text-[0.8rem]">
+                                    <i data-lucide="file-up" class="w-3.5 h-3.5 mr-2 text-slate-500"></i>還原
+                                </button>
+                                <button onclick="handleLogout(); toggleMobileMenu(event);" class="w-full flex items-center px-8 py-2.5 hover:bg-rose-100 text-rose-600 transition-colors text-[0.8rem]">
+                                    <i data-lucide="log-out" class="w-3.5 h-3.5 mr-2 text-rose-500"></i>登出
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Title (Center on mobile, Left on desktop) -->
+                <h1 class="text-base md:text-lg font-bold tracking-widest whitespace-nowrap shrink-0 md:static absolute left-1/2 -translate-x-1/2 md:translate-x-0 pointer-events-none">冷氣清洗紀錄</h1>
+
+                <!-- Desktop Nav & Notifications (Right) -->
+                <div class="flex items-center gap-2">
+                    <!-- Desktop Nav Links -->
+                    <div class="hidden md:flex items-center gap-2 mr-2">
+                        <button onclick="showXingfuPage()" class="flex items-center px-3 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
+                            <i data-lucide="building-2" class="btn-icon"></i>幸福家
+                        </button>
+                        <button onclick="showPage('listPage')" class="flex items-center px-3 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
+                            <i data-lucide="list" class="btn-icon"></i>清單
+                        </button>
+                        <button onclick="prepareNewForm()" class="flex items-center px-3 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
+                            <i data-lucide="pen-line" class="btn-icon"></i>填寫
+                        </button>
+                        <div class="relative">
+                            <button onclick="toggleSettingsMenu(event)" class="flex items-center px-3 py-1.5 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
+                                <i data-lucide="settings" class="btn-icon"></i>設定
+                            </button>
+                            <div id="settingsMenu" class="hidden absolute top-full right-0 mt-2 w-32 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden text-slate-700 text-[0.8rem] z-[90]">
+                                <button onclick="downloadBackup(this); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                                    <i data-lucide="file-down" class="w-4 h-4 mr-2 text-slate-500"></i>備份
+                                </button>
+                                <button onclick="openBackupRestore(); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                                    <i data-lucide="file-up" class="w-4 h-4 mr-2 text-slate-500"></i>還原
+                                </button>
+                                <button onclick="handleLogout(); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-rose-50 text-rose-600 transition-colors">
+                                    <i data-lucide="log-out" class="w-4 h-4 mr-2 text-rose-500"></i>登出
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 將原本在最下方的未完成提醒移至此處 -->
+                    <div id="floatingUnpaidWrap" class="hidden relative">
                     <button onclick="toggleFloatingUnpaid(event)" class="text-amber-400 hover:text-amber-300 transition-colors relative flex items-center justify-center p-1" title="未完成 / 待收款提醒">
                         <i data-lucide="alert-circle" class="w-6 h-6"></i>
                         <span id="unpaidCountBadge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none border-2 border-slate-600">0</span>
@@ -737,8 +806,8 @@
             </div>
         </header>
 
-        <!-- 主要內容區 (增加 pb-24 確保底部內容不被新加入的固定導覽列遮擋) -->
-        <div class="container mx-auto px-1.5 md:px-4 pt-6 pb-24">
+        <!-- 主要內容區 -->
+        <div class="container mx-auto px-1.5 md:px-4 py-6">
             
             <section id="formPage" class="hidden max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
                 <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">
@@ -1029,40 +1098,8 @@
 
 
 
-        <!-- 底部導覽列 (固定在最下方) -->
+        <!-- 隱藏的檔案上傳輸入框 (用於還原備份) -->
         <input type="file" id="backupFileInput" accept="application/json,.json" class="hidden" onchange="restoreBackupFromFile(this)">
-
-        <nav class="fixed bottom-0 left-0 right-0 bg-slate-600 text-white pt-2 px-3 md:px-4 shadow-[0_-4px_12px_rgba(0,0,0,0.15)] z-[80]" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
-            <div class="container mx-auto flex justify-center items-center">
-                <div class="flex items-center justify-center gap-1.5 md:gap-3 overflow-x-auto hide-scrollbar w-full">
-                    <button onclick="showXingfuPage()" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
-                        <i data-lucide="building-2" class="btn-icon"></i>幸福家
-                    </button>
-                    <button onclick="showPage('listPage')" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
-                        <i data-lucide="list" class="btn-icon"></i>清單
-                    </button>
-                    <button onclick="prepareNewForm()" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
-                        <i data-lucide="pen-line" class="btn-icon"></i>填寫
-                    </button>
-                    <div class="relative">
-                        <button onclick="toggleSettingsMenu(event)" class="flex items-center px-2 py-1.5 md:px-3 bg-slate-500 hover:bg-slate-400 border border-slate-400/50 rounded-lg transition-all text-[0.75rem] md:text-[0.8rem] font-medium active:scale-95 whitespace-nowrap shrink-0">
-                            <i data-lucide="settings" class="btn-icon"></i>設定
-                        </button>
-                        <div id="settingsMenu" class="hidden fixed bottom-[4.5rem] right-4 md:right-auto w-32 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden text-slate-700 text-[0.8rem] z-[90]">
-                            <button onclick="downloadBackup(this); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
-                                <i data-lucide="file-down" class="w-4 h-4 mr-2 text-slate-500"></i>備份
-                            </button>
-                            <button onclick="openBackupRestore(); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-slate-50 border-b border-slate-100 transition-colors">
-                                <i data-lucide="file-up" class="w-4 h-4 mr-2 text-slate-500"></i>還原
-                            </button>
-                            <button onclick="handleLogout(); toggleSettingsMenu(event);" class="w-full flex items-center px-4 py-3 hover:bg-rose-50 text-rose-600 transition-colors">
-                                <i data-lucide="log-out" class="w-4 h-4 mr-2 text-rose-500"></i>登出
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
     </div>
 
     <script type="module">
@@ -1296,13 +1333,36 @@
             document.getElementById('settingsMenu').classList.toggle('hidden');
         };
 
+        window.toggleMobileMenu = (e) => {
+            if(e) e.stopPropagation();
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        };
+
+        window.toggleMobileSettingsMenu = (e) => {
+            if(e) e.stopPropagation();
+            const menu = document.getElementById('mobileSettingsMenu');
+            menu.classList.toggle('hidden');
+            const icon = e.currentTarget.querySelector('.lucide-chevron-down');
+            if (icon) {
+                if (menu.classList.contains('hidden')) {
+                    icon.style.transform = '';
+                } else {
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            }
+        };
+
         document.addEventListener('click', (e) => {
             const settingsMenu = document.getElementById('settingsMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
             const floatingList = document.getElementById('floatingUnpaidList');
             const floatingWrap = document.getElementById('floatingUnpaidWrap');
             
             if (settingsMenu && !settingsMenu.classList.contains('hidden') && !settingsMenu.contains(e.target)) {
                 settingsMenu.classList.add('hidden');
+            }
+            if (mobileMenu && !mobileMenu.classList.contains('hidden') && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
             }
             if (floatingList && !floatingList.classList.contains('hidden') && !floatingWrap.contains(e.target)) {
                 floatingList.classList.add('hidden');
