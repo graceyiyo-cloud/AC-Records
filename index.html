@@ -498,9 +498,9 @@
         /* 全裝置統一使用卡片式佈局 - 針對手機版面進行清晰度優化 */
         thead { display: none; }
         tr { 
-            display: block; margin-bottom: 0.5rem; 
+            display: block; margin-bottom: 0.35rem; 
             border-radius: 12px; background: white;
-            padding: 1rem; 
+            padding: 0.6rem 0.8rem; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;
             transition: all 0.3s ease;
         }
@@ -522,8 +522,8 @@
         }
         td.action-cell {
             border-top: 1px solid #e2e8f0 !important; 
-            margin-top: 0.5rem; 
-            padding-top: 0.5rem !important; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;
+            margin-top: 0.3rem; 
+            padding-top: 0.35rem !important; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;
         }
 
         .time-display { 
@@ -2167,7 +2167,7 @@
         };
 
         // 本次修正：捨棄 table，全數改為 Flexbox 確保一列一列左邊項目右邊金額，並消除底部帳目的方塊色塊
-        function renderReport() {
+                function renderReport() {
             const container = document.getElementById('reportContainer');
             if (!container) return;
             
@@ -2201,39 +2201,70 @@
             const tNet = tRev - tExp;
             
             reportHTML += `
-                <div class="stats-card stats-card-all p-5 text-white">
-                    <h2 class="text-xl font-bold mb-4 border-b border-white/20 pb-2 flex items-center gap-2"><i data-lucide="bar-chart" class="w-5 h-5"></i> 歷史總累計</h2>
-                    <div class="grid grid-cols-3 gap-3 text-center mb-4 border-b border-white/10 pb-4">
-                        <div><p class="text-xs text-white/70">冷氣</p><p class="text-2xl font-bold">${tAc}</p></div>
-                        <div><p class="text-xs text-white/70">洗衣機</p><p class="text-2xl font-bold">${tWm}</p></div>
-                        <div><p class="text-xs text-white/70">水塔</p><p class="text-2xl font-bold">${tWt}</p></div>
+                <div class="bg-gradient-to-br from-slate-700 to-slate-800 p-4 rounded-3xl shadow-lg text-white border border-slate-600 mb-6">
+                    <h2 class="text-lg font-bold mb-3 border-b border-slate-600 pb-3 flex items-center gap-2 text-slate-100">
+                        <i data-lucide="bar-chart" class="w-5 h-5 text-slate-400"></i> 歷史總累計
+                    </h2>
+                    <div class="grid grid-cols-3 gap-2 text-center mb-4">
+                        <div class="bg-slate-800/60 rounded-2xl p-2.5 border border-slate-600/50">
+                            <p class="text-[11px] text-slate-400 font-bold mb-1 tracking-wider">冷氣</p>
+                            <p class="text-2xl font-bold text-slate-100">${tAc}</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-2xl p-2.5 border border-slate-600/50">
+                            <p class="text-[11px] text-slate-400 font-bold mb-1 tracking-wider">洗衣機</p>
+                            <p class="text-2xl font-bold text-slate-100">${tWm}</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-2xl p-2.5 border border-slate-600/50">
+                            <p class="text-[11px] text-slate-400 font-bold mb-1 tracking-wider">水塔</p>
+                            <p class="text-2xl font-bold text-slate-100">${tWt}</p>
+                        </div>
                     </div>
-                    <div class="metric-box-grid">
-                        <div class="metric-box metric-box-rev"><span class="metric-box-label">總收入</span><span class="metric-box-value">$${tRev.toLocaleString()}</span></div>
-                        <div class="metric-box metric-box-exp"><span class="metric-box-label">總支出</span><span class="metric-box-value">$${tExp.toLocaleString()}</span></div>
-                        <div class="metric-box metric-box-net"><span class="metric-box-label">總淨利</span><span class="metric-box-value">$${tNet.toLocaleString()}</span></div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-indigo-500/20 border border-indigo-500/30 rounded-xl p-2.5 text-center">
+                            <span class="block text-[10px] text-indigo-300 font-bold mb-1 tracking-wider">總收入</span>
+                            <span class="block font-bold text-indigo-100 text-[1.05rem]">${tRev.toLocaleString()}</span>
+                        </div>
+                        <div class="bg-rose-500/20 border border-rose-500/30 rounded-xl p-2.5 text-center">
+                            <span class="block text-[10px] text-rose-300 font-bold mb-1 tracking-wider">總支出</span>
+                            <span class="block font-bold text-rose-100 text-[1.05rem]">${tExp.toLocaleString()}</span>
+                        </div>
+                        <div class="bg-emerald-500/20 border border-emerald-500/30 rounded-xl p-2.5 text-center">
+                            <span class="block text-[10px] text-emerald-300 font-bold mb-1 tracking-wider">總淨利</span>
+                            <span class="block font-bold text-emerald-100 text-[1.05rem]">${tNet.toLocaleString()}</span>
+                        </div>
                     </div>
                 </div>
             `;
             
             const sortedYears = Object.keys(yearMap).sort().reverse();
             if (sortedYears.length > 0) {
-                reportHTML += `<h3 class="font-bold text-slate-700 text-lg mt-6 mb-3 flex items-center gap-2"><i data-lucide="calendar" class="w-5 h-5 text-indigo-500"></i> 各年度統計</h3><div class="space-y-4">`;
+                reportHTML += `<h3 class="font-bold text-slate-700 text-lg mt-6 mb-3 flex items-center gap-2 px-1"><i data-lucide="calendar-days" class="w-5 h-5 text-slate-400"></i> 各年度統計</h3><div class="space-y-2.5">`;
                 sortedYears.forEach(y => {
                     const d = yearMap[y];
                     reportHTML += `
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+                    <div class="bg-white rounded-[20px] shadow-sm border border-slate-200 p-3.5">
                         <div class="flex justify-between items-center mb-3">
-                            <h4 class="font-bold text-indigo-800 text-lg">${y} 年度</h4>
-                            <span class="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded-md">${d.count} 筆紀錄</span>
+                            <h4 class="font-bold text-slate-800 text-lg tracking-wider">${y} 年度</h4>
+                            <span class="text-[11px] text-slate-500 font-bold bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">${d.count} 筆紀錄</span>
                         </div>
-                        <div class="flex gap-4 text-sm text-slate-600 mb-3 font-medium bg-slate-50 p-2 rounded-xl">
-                            <span>冷 ${d.ac}</span><span>洗 ${d.wm}</span><span>水 ${d.wt}</span>
+                        <div class="flex gap-4 text-sm text-slate-600 mb-3 font-medium bg-slate-50 p-2 rounded-xl border border-slate-100 justify-center">
+                            <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div>冷氣 ${d.ac}</span>
+                            <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div>洗衣機 ${d.wm}</span>
+                            <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div>水塔 ${d.wt}</span>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 text-center mt-2">
-                            <div class="bg-blue-50/50 p-2 rounded-xl border border-blue-100/50"><div class="text-[10px] text-blue-600/70 font-bold mb-1">收入</div><div class="font-bold text-slate-700">$${d.rev.toLocaleString()}</div></div>
-                            <div class="bg-rose-50/50 p-2 rounded-xl border border-rose-100/50"><div class="text-[10px] text-rose-600/70 font-bold mb-1">支出</div><div class="font-bold text-slate-700">$${d.exp.toLocaleString()}</div></div>
-                            <div class="bg-emerald-50 p-2 rounded-xl border border-emerald-100"><div class="text-[10px] text-emerald-700 font-bold mb-1">淨利</div><div class="font-bold text-emerald-700">$${(d.rev - d.exp).toLocaleString()}</div></div>
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                <div class="text-[10px] text-slate-400 font-bold mb-1 tracking-wider">收入</div>
+                                <div class="font-bold text-slate-700">${d.rev.toLocaleString()}</div>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                <div class="text-[10px] text-slate-400 font-bold mb-1 tracking-wider">支出</div>
+                                <div class="font-bold text-slate-700">${d.exp.toLocaleString()}</div>
+                            </div>
+                            <div class="bg-slate-700 p-2 rounded-xl border border-slate-800 shadow-md">
+                                <div class="text-[10px] text-slate-300 font-bold mb-1 tracking-wider">淨利</div>
+                                <div class="font-bold text-white">${(d.rev - d.exp).toLocaleString()}</div>
+                            </div>
                         </div>
                     </div>`;
                 });
@@ -2242,19 +2273,19 @@
 
             const sortedMonths = Object.keys(monthMap).sort().reverse();
             if (sortedMonths.length > 0) {
-                reportHTML += `<h3 class="font-bold text-slate-700 text-lg mt-8 mb-3 flex items-center gap-2"><i data-lucide="list" class="w-5 h-5 text-emerald-500"></i> 各月份統計</h3><div class="space-y-3">`;
+                reportHTML += `<h3 class="font-bold text-slate-700 text-lg mt-6 mb-3 flex items-center gap-2 px-1"><i data-lucide="list" class="w-5 h-5 text-slate-400"></i> 各月份統計</h3><div class="space-y-2.5">`;
                 sortedMonths.forEach(m => {
                     const d = monthMap[m];
                     reportHTML += `
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-3 flex flex-col md:flex-row justify-between md:items-center gap-3">
+                    <div class="bg-white rounded-[16px] shadow-sm border border-slate-200 p-3 flex flex-col md:flex-row justify-between md:items-center gap-2">
                         <div class="flex items-center gap-3">
-                            <div class="bg-emerald-100 text-emerald-800 font-bold text-sm px-3 py-1.5 rounded-lg border border-emerald-200 tracking-wider">${m}</div>
-                            <div class="text-xs text-slate-500 font-medium">冷${d.ac} / 洗${d.wm} / 水${d.wt} (${d.count}筆)</div>
+                            <div class="bg-slate-100 text-slate-700 font-bold text-sm px-3 py-1.5 rounded-xl border border-slate-200 tracking-wider">${m}</div>
+                            <div class="text-xs text-slate-500 font-medium">冷${d.ac} / 洗${d.wm} / 水${d.wt} <span class="text-slate-400">(${d.count}筆)</span></div>
                         </div>
-                        <div class="flex gap-4 text-sm whitespace-nowrap">
-                            <div class="flex items-center gap-1"><span class="text-slate-400 text-[10px]">收</span><span class="font-bold text-slate-700">$${d.rev.toLocaleString()}</span></div>
-                            <div class="flex items-center gap-1"><span class="text-slate-400 text-[10px]">支</span><span class="font-bold text-rose-500">$${d.exp.toLocaleString()}</span></div>
-                            <div class="flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100"><span class="text-emerald-600 text-[10px] font-bold">淨</span><span class="font-bold text-emerald-700">$${(d.rev - d.exp).toLocaleString()}</span></div>
+                        <div class="flex items-center gap-3 text-sm whitespace-nowrap bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 justify-between md:justify-end">
+                            <div class="flex items-center gap-1.5"><span class="text-slate-400 text-[10px] font-bold tracking-wider">收</span><span class="font-bold text-slate-600">${d.rev.toLocaleString()}</span></div>
+                            <div class="flex items-center gap-1.5"><span class="text-slate-400 text-[10px] font-bold tracking-wider">支</span><span class="font-bold text-slate-600">${d.exp.toLocaleString()}</span></div>
+                            <div class="flex items-center gap-1.5 pl-3 border-l border-slate-200"><span class="text-slate-700 text-[10px] font-bold tracking-wider">淨</span><span class="font-bold text-slate-800">${(d.rev - d.exp).toLocaleString()}</span></div>
                         </div>
                     </div>`;
                 });
@@ -2263,6 +2294,7 @@
 
             container.innerHTML = reportHTML;
         }
+
         function renderRecords(data) {
             const list = document.getElementById('recordList');
             list.innerHTML = data.map(i => {
@@ -2315,7 +2347,7 @@
                 }
                 
                 if (i.assistantDetail) {
-                    detailsHtml += `<div class="mt-2 pt-1.5 border-t border-slate-100 border-dashed">`;
+                    detailsHtml += `<div class="mt-1 pt-1.5 border-t border-slate-100 border-dashed">`;
                     i.assistantDetail.split(',').forEach(s => {
                         const [n, a] = s.split(':');
                         const amt = parseInt(a) || 0;
@@ -2332,11 +2364,11 @@
 
                 return `
                 <tr id="rec-${i.id}" class="${isComp ? 'completed-row' : ''}">
-                    <td data-label="預約時間" class="px-6 py-4 time-display flex justify-between items-center">
+                    <td data-label="預約時間" class="px-6 py-2 time-display flex justify-between items-center">
                         <span>${i.bookingTime.replace('T',' ')}</span>
                         ${i.passFrom ? `<span class="text-indigo-500 font-bold flex items-center gap-1"><i data-lucide="forward" class="w-3 h-3"></i>PASS: ${i.passFrom}</span>` : '<span></span>'}
                     </td>
-                    <td data-label="客戶" class="px-6 py-4 flex items-center gap-2">
+                    <td data-label="客戶" class="px-6 py-2 flex items-center gap-2">
                         <span class="font-bold text-slate-900">${i.customerName}</span>
                         ${i.phone ? `<span class="text-[12px] text-slate-400 font-normal flex items-center gap-0.5"><i data-lucide="phone" class="w-3 h-3"></i>${i.phone}</span>` : ''}
                     </td>
@@ -2352,8 +2384,8 @@
                         ${detailsHtml}
                         ${i.note ? `<div class="text-[15px] text-slate-400 note-display border-t border-slate-100/60 mt-1 pt-1.5">備註: ${i.note}</div>` : ''}
                     </td>
-                    <td data-label="金額帳目" class="px-6 py-4">
-                        <div class="border-t border-slate-200 border-dashed pt-2 mt-0">
+                    <td data-label="金額帳目" class="px-6 py-1">
+                        <div class="border-t border-slate-200 border-dashed pt-1.5 mt-0">
                             <div class="flex justify-between items-center text-[0.85rem] leading-none">
                                 <div class="flex-1 text-center border-r border-slate-200/80">
                                     <span class="text-slate-400 text-[10px] mr-1">收入</span>
@@ -2370,7 +2402,7 @@
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 action-cell">
+                    <td class="px-6 py-2 action-cell">
                         <button onclick="toggleDone('${i.id}', '${i.status}')" class="flex items-center gap-1 ${isComp ? 'text-slate-400 bg-slate-50 border-slate-200' : 'text-emerald-700 bg-emerald-50 border-emerald-100'} px-2 py-1.5 rounded-lg border text-[10px] font-bold">
                             <i data-lucide="${isComp ? 'check-circle' : 'circle'}" class="w-3 h-3"></i>
                             <span>${isComp ? '已完成' : '未完成'}</span>
