@@ -1069,11 +1069,21 @@
                             <div class="date-filter-row">
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">起始日期</label>
-                                    <input type="date" id="dateStartFilter" onchange="filterRecords()" class="w-full bg-slate-50 border-none rounded-xl p-2.5 text-sm outline-none font-medium h-[42px]">
+                                    <div class="flex items-center gap-1">
+                                        <button type="button" onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 rounded-lg transition-colors h-[42px] flex items-center justify-center shrink-0" title="上個月">
+                                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                        </button>
+                                        <input type="date" id="dateStartFilter" onchange="filterRecords()" class="w-full flex-1 bg-slate-50 border-none rounded-xl p-2.5 text-sm outline-none font-medium h-[42px]">
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">結束日期</label>
-                                    <input type="date" id="dateEndFilter" onchange="filterRecords()" class="w-full bg-slate-50 border-none rounded-xl p-2.5 text-sm outline-none font-medium h-[42px]">
+                                    <div class="flex items-center gap-1">
+                                        <input type="date" id="dateEndFilter" onchange="filterRecords()" class="w-full flex-1 bg-slate-50 border-none rounded-xl p-2.5 text-sm outline-none font-medium h-[42px]">
+                                        <button type="button" onclick="changeMonth(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 rounded-lg transition-colors h-[42px] flex items-center justify-center shrink-0" title="下個月">
+                                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
