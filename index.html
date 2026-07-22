@@ -2426,11 +2426,39 @@
             lucide.createIcons();
         }
 
-        window.scrollToRecord = (id) => {
-            const e = document.getElementById(`rec-${id}`);
-            if (e) { e.scrollIntoView({ behavior: 'smooth', block: 'center' }); e.classList.add('highlight-target'); setTimeout(() => e.classList.remove('highlight-target'), 2000); }
-        };
+                        window.scrollToRecord = (id) => {
+            const r = allRecords.find(x => x.id === id);
+            if(!r) return;
+            showPage('listPage');
+            if (r.bookingTime) {
+                const d = r.bookingTime.substring(0, 10);
+                const y = d.split('-')[0];
+                const m = d.split('-')[1];
+                document.getElementById('dateStartFilter').value = `${y}-${m}-01`;
+                document.getElementById('dateEndFilter').value = formatLocalDate(new Date(y, m, 0));
+            } else {
+                document.getElementById('dateStartFilter').value = '';
+                document.getElementById('dateEndFilter').value = '';
+            }
+            document.getElementById('searchKeyword').value = '';
+            
+            currentTypeFilter = 'all';
+            currentStatusFilter = 'all';
+            if (typeof resetFilterButtonStyles === 'function') {
+                resetFilterButtonStyles('.type-btn', 'all');
+                resetFilterButtonStyles('.status-btn', 'all');
+            }
+            filterRecords();
 
+            setTimeout(() => {
+                const e = document.getElementById(`rec-${id}`);
+                if (e) {
+                    e.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    e.classList.add('highlight-target');
+                    setTimeout(() => e.classList.remove('highlight-target'), 2000);
+                }
+            }, 100);
+        };
         window.editRec = (id) => {
             const r = allRecords.find(x => x.id === id);
             if(!r) return;
