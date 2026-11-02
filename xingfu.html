@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f2">
+  <title>幸福家清洗紀錄與未收款</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#263a33;background:#f6f7f2;font-synthesis:none}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh}button,input{font:inherit}button{cursor:pointer}
+    .shell{max-width:900px;margin:auto;padding:24px 20px 72px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}
+    .brand{display:flex;align-items:center;gap:12px}.mark{width:39px;height:39px;border-radius:13px;background:#dce8df;display:grid;place-items:center;color:#426b57}
+    h1{font-size:20px;letter-spacing:.03em;margin:0}h2{font-size:18px;margin:0}.muted{color:#829189}.sub{font-size:12px;margin:3px 0 0}
+    .quiet{background:transparent;color:#687c70;border:1px solid #dce4dc;border-radius:10px;padding:8px 12px;font-size:13px}
+    .quiet:hover,.quiet:focus-visible{background:#eaf0e9}.tabs{display:flex;gap:7px;padding:5px;border-radius:15px;background:#e9eee7;margin-bottom:20px}
+    .tab{flex:1;border:0;background:transparent;color:#718278;padding:11px;border-radius:11px;font-weight:650;font-size:14px}
+    .tab[aria-selected="true"]{background:#fff;color:#335c48;box-shadow:0 1px 5px #2f554217}
+    .card{background:#fff;border:1px solid #e0e9df;border-radius:19px;box-shadow:0 4px 20px #334d3909;overflow:hidden}
+    .cardhead{padding:22px 24px 18px;border-bottom:1px solid #edf0eb;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .count{font-size:12px;color:#718278;background:#f0f4ef;padding:5px 9px;border-radius:99px;white-space:nowrap}
+    .list{padding:2px 24px}.row{display:grid;grid-template-columns:108px minmax(0,1fr);gap:12px;align-items:start;padding:16px 0;border-bottom:1px solid #edf1ed}
+    .row:last-child{border-bottom:0}.date{font-size:13px;color:#5f826e;font-variant-numeric:tabular-nums;padding-top:2px}.name{font-weight:700;overflow-wrap:anywhere}
+    .detail{font-size:13px;line-height:1.65;color:#718178;margin-top:4px;overflow-wrap:anywhere}.amount{font-weight:720;font-variant-numeric:tabular-nums;color:#9a685d;font-size:17px;white-space:nowrap}
+    .moneyrow{grid-template-columns:108px minmax(0,1fr) auto}.summary{margin:16px 24px 5px;padding:15px 17px;border-radius:13px;background:#f7f5f0;display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:14px;color:#6f766b}.summary strong{font-size:20px;color:#835d54;font-variant-numeric:tabular-nums}
+    .empty{padding:60px 24px;text-align:center;color:#829189;font-size:14px}.login{max-width:390px;margin:18vh auto 0;padding:32px 27px;text-align:center}.login .mark{margin:0 auto 18px;width:48px;height:48px}.login p{color:#76877b;line-height:1.7;font-size:14px}.primary{border:0;border-radius:11px;background:#52745e;color:#fff;font-weight:700;padding:12px 18px;margin-top:12px;width:100%}.primary:hover,.primary:focus-visible{background:#3f604c}.error{color:#ac5b58!important;white-space:pre-wrap}.loading{padding:80px 20px;text-align:center;color:#829189}
+    [hidden]{display:none!important}:focus-visible{outline:3px solid #a7c4ab;outline-offset:2px}
+    @media(max-width:600px){.shell{padding:20px 14px 56px}.top{margin-bottom:20px}.cardhead{padding:19px 17px 16px}.list{padding:2px 17px}.row{grid-template-columns:1fr;gap:3px;padding:14px 0}.moneyrow{grid-template-columns:minmax(0,1fr) auto}.moneyrow .date{grid-column:1/-1}.summary{margin:14px 17px 3px}h1{font-size:18px}}
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading" role="status">載入中…</div>
+  <main id="login" class="card login" hidden>
+    <div class="mark" aria-hidden="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21v-8h6v8"/></svg></div>
+    <h1>幸福家清洗紀錄</h1>
+    <p>登入後查看最新清洗紀錄與未收款資料</p>
+    <button class="primary" id="loginButton">使用 Google 登入</button>
+    <p id="loginError" class="error" role="alert" hidden></p>
+  </main>
+  <main id="app" class="shell" hidden>
+    <header class="top"><div class="brand"><div class="mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21v-8h6v8"/></svg></div><div><h1>幸福家清洗紀錄</h1><p class="sub muted">清洗紀錄 · 待收款</p></div></div><button id="logoutButton" class="quiet">登出</button></header>
+    <nav class="tabs" aria-label="頁面"><button class="tab" id="recordsTab" data-page="records" aria-selected="true">清洗紀錄</button><button class="tab" id="unpaidTab" data-page="unpaid" aria-selected="false">未收款</button></nav>
+    <section id="recordsPage" class="card" aria-labelledby="recordsTitle"><div class="cardhead"><h2 id="recordsTitle">幸福家最新清洗紀錄</h2><span id="recordsCount" class="count"></span></div><div id="recordsList" class="list"></div></section>
+    <section id="unpaidPage" class="card" aria-labelledby="unpaidTitle" hidden><div class="cardhead"><h2 id="unpaidTitle">未收款</h2><span id="unpaidCount" class="count"></span></div><div id="unpaidSummary" class="summary" hidden><span>待收合計</span><strong id="unpaidTotal"></strong></div><div id="unpaidList" class="list"></div></section>
+    <p id="dataError" class="error" role="alert" hidden></p>
+  </main>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyDTyt_nIV1h_MFRhQoT9PHFMXhus1jQVL4',
+      projectId: 'ac-records-b8c40',
+      authDomain: 'ac-records-b8c40.firebaseapp.com',
+      storageBucket: 'ac-records-b8c40.firebasestorage.app',
+      messagingSenderId: '471993362594',
+      appId: '1:471993362594:web:1be7e72af1021760c64ffb'
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    let unsubscribeRecords = null;
+    let unsubscribeUnpaid = null;
+    const el = id => document.getElementById(id);
+    const money = n => '$' + n.toLocaleString('zh-TW');
+    const amount = value => Number.parseInt(value, 10) || 0;
+    const date = record => String(record.bookingTime || '').slice(0, 10);
+
+    function setPage(page, writeHistory = false) {
+      const next = page === 'unpaid' ? 'unpaid' : 'records';
+      if (writeHistory && new URL(location.href).searchParams.get('page') !== next) {
+        const url = new URL(location.href);
+        url.searchParams.set('page', next);
+        history.pushState({ page: next }, '', url);
+      }
+      el('recordsPage').hidden = next !== 'records';
+      el('unpaidPage').hidden = next !== 'unpaid';
+      el('recordsTab').setAttribute('aria-selected', String(next === 'records'));
+      el('unpaidTab').setAttribute('aria-selected', String(next === 'unpaid'));
+    }
+    document.querySelectorAll('.tab').forEach(button => button.addEventListener('click', () => setPage(button.dataset.page, true)));
+    addEventListener('popstate', () => setPage(new URL(location.href).searchParams.get('page')));
+    setPage(new URL(location.href).searchParams.get('page'));
+
+    function addText(parent, tag, className, content) {
+      const node = document.createElement(tag);
+      node.className = className;
+      node.textContent = content;
+      parent.append(node);
+      return node;
+    }
+    function renderRecords(records) {
+      const list = records.sort((a, b) => String(b.bookingTime || '').localeCompare(String(a.bookingTime || '')));
+      el('recordsCount').textContent = `${list.length} 間`;
+      el('recordsList').replaceChildren();
+      if (!list.length) { addText(el('recordsList'), 'div', 'empty', '尚無幸福家紀錄'); return; }
+      list.forEach(record => {
+        const row = addText(el('recordsList'), 'article', 'row', '');
+        addText(row, 'span', 'date', date(record));
+        const content = addText(row, 'div', '', '');
+        addText(content, 'div', 'name', String(record.customerName || '').replace(/幸福家-?/g, '').trim());
+        const services = [];
+        const ac = amount(record.acCount), wm = amount(record.wmCount), wt = amount(record.wtCount);
+        const brand = String(record.acBrand || '').split('+').map(part => part.split('*')[0]).join('、');
+        if (ac > 0) services.push(`冷氣${ac}台${brand ? '：' + brand : ''}`);
+        if (wm > 0) services.push(`洗衣機${wm}台`);
+        if (wt > 0) services.push(`水塔${wt}口`);
+        addText(content, 'div', 'detail', services.join('、'));
+      });
+    }
+    function renderUnpaid(records) {
+      const list = records.sort((a, b) => String(b.bookingTime || '').localeCompare(String(a.bookingTime || '')));
+      el('unpaidCount').textContent = `${list.length} 筆`;
+      el('unpaidTotal').textContent = money(list.reduce((sum, record) => sum + amount(record.totalAmount), 0));
+      el('unpaidSummary').hidden = !list.length;
+      el('unpaidList').replaceChildren();
+      if (!list.length) { addText(el('unpaidList'), 'div', 'empty', '目前沒有未收款資料'); return; }
+      list.forEach(record => {
+        const row = addText(el('unpaidList'), 'article', 'row moneyrow', '');
+        addText(row, 'span', 'date', date(record));
+        const content = addText(row, 'div', '', '');
+        addText(content, 'div', 'name', record.customerName || '未填姓名');
+        const services = [];
+        if (amount(record.acCount)) services.push(`冷氣${amount(record.acCount)}台`);
+        if (amount(record.wmCount)) services.push(`洗衣機${amount(record.wmCount)}台`);
+        if (amount(record.wtCount)) services.push(`水塔${amount(record.wtCount)}口`);
+        addText(content, 'div', 'detail', services.join('、'));
+        addText(row, 'strong', 'amount', money(amount(record.totalAmount)));
+      });
+    }
+    function showDataError(error) {
+        console.error(error);
+        el('dataError').textContent = error.code === 'permission-denied' ? '這個帳號沒有清單存取權限。' : '讀取資料失敗，請稍後重新整理。';
+        el('dataError').hidden = false;
+    }
+    function startSubscription() {
+      if (unsubscribeRecords || unsubscribeUnpaid) return;
+      unsubscribeRecords = onSnapshot(collection(db, 'sharedXingfuRecords'), snapshot => {
+        renderRecords(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      }, showDataError);
+      unsubscribeUnpaid = onSnapshot(collection(db, 'sharedUnpaidRecords'), snapshot => {
+        renderUnpaid(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      }, showDataError);
+    }
+    onAuthStateChanged(auth, user => {
+      el('loading').hidden = true;
+      el('recordsList').replaceChildren();
+      el('unpaidList').replaceChildren();
+      el('recordsCount').textContent = '';
+      el('unpaidCount').textContent = '';
+      el('unpaidSummary').hidden = true;
+      el('dataError').hidden = true;
+      if (user) {
+        el('login').hidden = true;
+        el('app').hidden = false;
+        el('loginError').hidden = true;
+        startSubscription();
+      } else {
+        if (unsubscribeRecords) { unsubscribeRecords(); unsubscribeRecords = null; }
+        if (unsubscribeUnpaid) { unsubscribeUnpaid(); unsubscribeUnpaid = null; }
+        el('app').hidden = true;
+        el('login').hidden = false;
+      }
+    });
+    el('loginButton').addEventListener('click', async () => {
+      el('loginError').hidden = true;
+      try { await signInWithPopup(auth, provider); }
+      catch (error) {
+        console.error(error);
+        el('loginError').textContent = `登入失敗（${error.code || '未知錯誤'}）。請確認登入帳號及 Firebase 授權網域。`;
+        el('loginError').hidden = false;
+      }
+    });
+    el('logoutButton').addEventListener('click', () => signOut(auth));
+  </script>
+</body>
+</html>
+
