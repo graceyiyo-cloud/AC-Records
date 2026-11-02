@@ -110,7 +110,7 @@
       });
     }
     function renderUnpaid(records) {
-      const list = records.filter(record => record.payment === 'unpaid').sort((a, b) => String(b.bookingTime || '').localeCompare(String(a.bookingTime || '')));
+      const list = records.sort((a, b) => String(b.bookingTime || '').localeCompare(String(a.bookingTime || '')));
       el('unpaidCount').textContent = `${list.length} 筆`;
       el('unpaidTotal').textContent = money(list.reduce((sum, record) => sum + amount(record.totalAmount), 0));
       el('unpaidSummary').hidden = !list.length;
