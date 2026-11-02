@@ -1,6 +1,6 @@
 import { getApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, collection, onSnapshot, getDocs, doc, writeBatch } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, collection, onSnapshot, getDocsFromServer, doc, writeBatch } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const db = getFirestore(getApp());
 const auth = getAuth();
@@ -41,7 +41,7 @@ function matches(existing, desired) {
 }
 
 async function reconcile(target, desired) {
-  const current = await getDocs(target);
+  const current = await getDocsFromServer(target);
   const changes = [];
   current.forEach(snapshot => {
     if (!desired.has(snapshot.id)) changes.push({ type: 'delete', ref: snapshot.ref });
