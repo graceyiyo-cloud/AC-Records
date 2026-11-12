@@ -691,7 +691,7 @@
             <h2 class="text-2xl font-bold text-slate-800 mb-2">系統登入</h2>
             <p class="text-slate-400 text-sm mb-8">請使用授權的 Google 帳號進行登入</p>
             
-            <button onclick="handleLogin()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-4 rounded-xl border border-slate-200 shadow-sm transition-all active:scale-95 mb-4">
+            <button id="loginButton" onclick="handleLogin()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-4 rounded-xl border border-slate-200 shadow-sm transition-all active:scale-95 mb-4">
                 <img src="https://www.gstatic.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" class="w-5 h-5">
                 Google 帳號登入
             </button>
@@ -1138,6 +1138,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
+        let loginPending = false;
         
         const recordsCol = collection(db, "cleaningRecords");
         let allRecords = [];
@@ -1186,14 +1187,28 @@
         });
 
         window.handleLogin = async () => {
+            if (loginPending) return;
+            loginPending = true;
+            const loginButton = document.getElementById('loginButton');
+            loginButton.disabled = true;
             const errorEl = document.getElementById('authError');
             errorEl.classList.add('hidden');
             try {
                 await signInWithPopup(auth, provider);
             } catch (error) {
                 console.error("Login failed", error);
-                errorEl.innerText = `⚠️ 登入失敗！\n錯誤代碼: ${error.code}\n請檢查 Firebase Console 是否啟動 Google 登入並加入授權網域。`;
+                const message = {
+                    'auth/cancelled-popup-request': '登入視窗被新的登入請求中斷，請再試一次。',
+                    'auth/popup-closed-by-user': '登入視窗已關閉，請再試一次。',
+                    'auth/popup-blocked': '瀏覽器封鎖了登入視窗，請允許此網站開啟彈出視窗。',
+                    'auth/unauthorized-domain': '此網站尚未加入 Firebase 授權網域。',
+                    'auth/operation-not-allowed': 'Firebase 尚未啟用 Google 登入。'
+                }[error.code] || `登入失敗（${error.code || '未知錯誤'}），請稍後再試。`;
+                errorEl.innerText = message;
                 errorEl.classList.remove('hidden');
+            } finally {
+                loginPending = false;
+                loginButton.disabled = false;
             }
         };
 

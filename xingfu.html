@@ -60,6 +60,7 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
+    let loginPending = false;
     let unsubscribeRecords = null;
     let unsubscribeUnpaid = null;
     const el = id => document.getElementById(id);
@@ -164,12 +165,25 @@
       }
     });
     el('loginButton').addEventListener('click', async () => {
+      if (loginPending) return;
+      loginPending = true;
+      el('loginButton').disabled = true;
       el('loginError').hidden = true;
       try { await signInWithPopup(auth, provider); }
       catch (error) {
         console.error(error);
-        el('loginError').textContent = `登入失敗（${error.code || '未知錯誤'}）。請確認登入帳號及 Firebase 授權網域。`;
+        const message = {
+          'auth/cancelled-popup-request': '登入視窗被新的登入請求中斷，請再試一次。',
+          'auth/popup-closed-by-user': '登入視窗已關閉，請再試一次。',
+          'auth/popup-blocked': '瀏覽器封鎖了登入視窗，請允許此網站開啟彈出視窗。',
+          'auth/unauthorized-domain': '此網站尚未加入 Firebase 授權網域。',
+          'auth/operation-not-allowed': 'Firebase 尚未啟用 Google 登入。'
+        }[error.code] || `登入失敗（${error.code || '未知錯誤'}），請稍後再試。`;
+        el('loginError').textContent = message;
         el('loginError').hidden = false;
+      } finally {
+        loginPending = false;
+        el('loginButton').disabled = false;
       }
     });
     el('logoutButton').addEventListener('click', () => signOut(auth));
